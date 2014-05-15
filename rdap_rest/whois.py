@@ -12,8 +12,8 @@ from utils.corbarecoder import u2c, c2u
 importIDL(settings.CORBA_IDL_PATH)
 
 _CORBA = Corba(ior=settings.CORBA_NS_HOST_PORT, context_name=settings.CORBA_NS_CONTEXT, export_modules=settings.CORBA_EXPORT_MODULES)
-_WHOIS = SimpleLazyObject(lambda: _CORBA.get_object('Whois', 'ccReg.Whois'))
-_INTERFACE = _CORBA.ccReg
+_WHOIS = SimpleLazyObject(lambda: _CORBA.get_object('Whois2', 'Registry.Whois.WhoisIntf'))
+_INTERFACE = _CORBA.Registry
 
 
 def struct_to_dict(struct):
@@ -27,5 +27,5 @@ def struct_to_dict(struct):
 
 def whois_get_contact_by_handle(handle):
     logging.debug('whois_get_contact_by_handle: %s' % handle)
-    return c2u(_WHOIS.getContactByHandle(u2c(handle)))
+    return c2u(_WHOIS.get_contact_by_handle(u2c(handle)))
 
