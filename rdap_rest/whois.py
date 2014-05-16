@@ -17,6 +17,9 @@ _WHOIS = SimpleLazyObject(lambda: _CORBA.get_object('Whois2', 'Registry.Whois.Wh
 _INTERFACE = _CORBA.Registry
 
 
+def unwrap_datetime(idl_datetime):
+    return datetime(idl_datetime.date.year, idl_datetime.date.month, idl_datetime.date.day, idl_datetime.hour, idl_datetime.minute, idl_datetime.second)    
+
 def contact_to_dict(struct):
     """
     Transform CORBA struct to python dictionary
@@ -71,7 +74,7 @@ def contact_to_dict(struct):
       "events":[
         {
           "eventAction": "created",
-          "eventDate": datetime(struct.created.date.year, struct.created.date.month, struct.created.date.day, struct.created.hour, struct.created.minute, struct.created.second),
+          "eventDate": unwrap_datetime(struct.created),
           "eventActor": struct.creating_registrar_handle
         }
       ]
@@ -79,12 +82,12 @@ def contact_to_dict(struct):
     if struct.changed is not None:
         result['events'].append({
             "eventAction": 'last_update',
-            "eventDate": datetime(struct.changed.date.year, struct.changed.date.month, struct.changed.date.day, struct.changed.hour, struct.changed.minute, struct.changed.second)
+            "eventDate": unwrap_datetime(struct.changed)
         })
     if struct.last_transfer is not None:
         result['events'].append({
             "eventAction": 'last_transfer',
-            "eventDate": datetime(struct.last_transfer.date.year, struct.last_transfer.date.month, struct.last_transfer.date.day, struct.last_transfer.hour, struct.last_transfer.minute, struct.last_transfer.second)
+            "eventDate": unwrap_datetime(struct.last_transfer)
         })
 
     logging.debug(result)
