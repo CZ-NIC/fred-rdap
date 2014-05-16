@@ -2,6 +2,7 @@
 Wrapper module to whois idl interface
 """
 import logging
+from datetime import datetime
 
 from django.utils.functional import SimpleLazyObject
 from django.conf import settings
@@ -19,13 +20,78 @@ _INTERFACE = _CORBA.Registry
 def struct_to_dict(struct):
     """
     Transform CORBA struct to python dictionary
-    (mainly for testing purpose)
     """
-    return dict([(attr, getattr(struct, attr)) for attr in dir(struct) if not attr.startswith('_')])
+    logging.debug(struct)
 
+    cz_nic_rdap_url = 'rdap.nic.cz'
+    cz_nic_unix_whois_url = 'whois.nic.cz'
+
+    result = {
+      "handle": struct.handle,
+      "vcardArray":[
+        "vcard",
+        [
+          ["version", {}, "text", "4.0"],
+          ["fn", {}, "text", struct.name],
+          ["org", {}, "text", struct.organization],
+          ["adr",
+            { "type":"official" },
+            "text",
+            [
+              '', # P. O. BOX
+              struct.address.street1,
+              struct.address.street2,
+              struct.address.street3,
+              struct.address.city,
+              struct.address.stateorprovince,
+              struct.address.postalcode,
+              struct.address.country_code
+            ]
+          ],
+          ["tel",
+            { "type":["official"] },
+            "uri", "tel:"+ struct.phone
+          ],
+          ["email",
+            { "type":"official" },
+            "text", struct.email
+          ],
+        ]
+      ],
+      "status": struct.statuses,               #? tady by asi casem mohl byt preklad
+      "links":[
+        {
+          "value":"http://"+ cz_nic_rdap_url +"/entity/"+ struct.handle,
+          "rel":"self",
+          "href":"http://"+ cz_nic_rdap_url +"/entity/"+ struct.handle,
+          "type":"application/rdap+json"
+        }
+      ],
+      "port43": cz_nic_unix_whois_url,
+      "events":[
+        {
+          "eventAction": "created",
+          "eventDate": datetime(struct.created.date.year, struct.created.date.month, struct.created.date.day, struct.created.hour, struct.created.minute, struct.created.second),
+          "eventActor": struct.creating_registrar_handle
+        }
+      ]
+    }
+    if struct.changed is not None:
+        result['events'].append({
+            "eventAction": 'last_update',
+            "eventDate": datetime(struct.changed.date.year, struct.changed.date.month, struct.changed.date.day, struct.changed.hour, struct.changed.minute, struct.changed.second)
+        })
+    if struct.last_transfer is not None:
+        result['events'].append({
+            "eventAction": 'last_transfer',
+            "eventDate": datetime(struct.changed.date.year, struct.changed.date.month, struct.changed.date.day, struct.changed.hour, struct.changed.minute, struct.changed.second)
+        })
+
+    logging.debug(result)
+    return result
 
 
 def whois_get_contact_by_handle(handle):
-    logging.debug('whois_get_contact_by_handle: %s' % handle)
+    logging.debug('get_contact_by_handle: %s' % handle)
     return c2u(_WHOIS.get_contact_by_handle(u2c(handle)))
 
