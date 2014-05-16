@@ -17,7 +17,7 @@ _WHOIS = SimpleLazyObject(lambda: _CORBA.get_object('Whois2', 'Registry.Whois.Wh
 _INTERFACE = _CORBA.Registry
 
 
-def struct_to_dict(struct):
+def contact_to_dict(struct):
     """
     Transform CORBA struct to python dictionary
     """
@@ -84,7 +84,7 @@ def struct_to_dict(struct):
     if struct.last_transfer is not None:
         result['events'].append({
             "eventAction": 'last_transfer',
-            "eventDate": datetime(struct.changed.date.year, struct.changed.date.month, struct.changed.date.day, struct.changed.hour, struct.changed.minute, struct.changed.second)
+            "eventDate": datetime(struct.last_transfer.date.year, struct.last_transfer.date.month, struct.last_transfer.date.day, struct.last_transfer.hour, struct.last_transfer.minute, struct.last_transfer.second)
         })
 
     logging.debug(result)
@@ -93,5 +93,5 @@ def struct_to_dict(struct):
 
 def whois_get_contact_by_handle(handle):
     logging.debug('get_contact_by_handle: %s' % handle)
-    return c2u(_WHOIS.get_contact_by_handle(u2c(handle)))
+    return contact_to_dict(c2u(_WHOIS.get_contact_by_handle(u2c(handle))))
 
