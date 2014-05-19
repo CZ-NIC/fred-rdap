@@ -61,7 +61,7 @@ def contact_to_dict(struct):
           ],
         ]
       ],
-      "status": struct.statuses,               #? tady by asi casem mohl byt preklad
+      "status": struct.statuses,
       "links":[
         {
           "value":"http://"+ cz_nic_rdap_url +"/entity/"+ struct.handle,
