@@ -26,7 +26,8 @@ def contact_to_dict(struct):
     """
     logging.debug(struct)
 
-    cz_nic_rdap_url = 'rdap.nic.cz'
+    cz_nic_rdap_url_tmp = "http://rdap.nic.cz/entity/%(handle)s"
+    self_link = cz_nic_rdap_url_tmp % {"handle": struct.handle}
     cz_nic_unix_whois_url = 'whois.nic.cz'
 
     result = {
@@ -64,9 +65,9 @@ def contact_to_dict(struct):
       "status": struct.statuses,
       "links":[
         {
-          "value":"http://"+ cz_nic_rdap_url +"/entity/"+ struct.handle,
+          "value": self_link,
           "rel":"self",
-          "href":"http://"+ cz_nic_rdap_url +"/entity/"+ struct.handle,
+          "href": self_link,
           "type":"application/rdap+json"
         }
       ],
