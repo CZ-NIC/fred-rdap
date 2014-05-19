@@ -31,6 +31,7 @@ def contact_to_dict(struct):
     cz_nic_unix_whois_url = 'whois.nic.cz'
 
     result = {
+      "rdapConformance" : ["rdap_level_0"],
       "handle": struct.handle,
       "vcardArray":[
         "vcard",
