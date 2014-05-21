@@ -31,9 +31,8 @@ def contact_to_dict(struct):
           "rdapConformance" : ["rdap_level_0"]
         }    
     else:
-        cz_nic_rdap_url_tmp = "http://rdap.nic.cz/entity/%(handle)s"
-        self_link = cz_nic_rdap_url_tmp % {"handle": struct.handle}
-        cz_nic_unix_whois_url = 'whois.nic.cz'
+        cz_nic_rdap_url_tmp = "%(rdap_root_url)s/entity/%(handle)s"
+        self_link = cz_nic_rdap_url_tmp % {"rdap_root_url": settings.RDAP_ROOT_URL, "handle": struct.handle}
         
         vcard = [ ["version", {}, "text", "4.0"] ]
         
@@ -85,7 +84,7 @@ def contact_to_dict(struct):
               "type":"application/rdap+json"
             }
           ],
-          "port43": cz_nic_unix_whois_url,
+          "port43": settings.UNIX_WHOIS_HOST,
           "events":[
             {
               "eventAction": "created",
