@@ -5,7 +5,6 @@ from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from rdap_rest.whois import struct_to_dict
 from rdap_rest.whois import whois_get_contact_by_handle
 
 
@@ -21,8 +20,7 @@ class EntityViewSet(viewsets.ViewSet):
         XXX: all responses are not rdap valid and so far are used just for testing rest framework
         """
         try:
-            data = whois_get_contact_by_handle(str(handle))
-            return Response(struct_to_dict(data))
+            return Response(whois_get_contact_by_handle(str(handle)))
         except Exception, e:
             logging.debug(str(e))
             logging.debug(traceback.format_exc())
