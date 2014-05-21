@@ -25,49 +25,57 @@ def contact_to_dict(struct):
     Transform CORBA struct to python dictionary
     """
     logging.debug(struct)
-
-    cz_nic_rdap_url_tmp = "http://rdap.nic.cz/entity/%(handle)s"
-    self_link = cz_nic_rdap_url_tmp % {"handle": struct.handle}
-    cz_nic_unix_whois_url = 'whois.nic.cz'
-
+    
     if struct is None:
         result = {
           "rdapConformance" : ["rdap_level_0"]
         }    
     else:
+        cz_nic_rdap_url_tmp = "http://rdap.nic.cz/entity/%(handle)s"
+        self_link = cz_nic_rdap_url_tmp % {"handle": struct.handle}
+        cz_nic_unix_whois_url = 'whois.nic.cz'
+        
+        vcard = [ ["version", {}, "text", "4.0"] ]
+        
+        if struct.name is not None:
+            vcard.append( ["fn", {}, "text", struct.name] )
+        if struct.organization is not None:
+            vcard.append( ["org", {}, "text", struct.organization] )
+        if struct.address is not None:
+            vcard.append(
+                ["adr",
+                    { "type":"official" },
+                    "text",
+                    [
+                      '', # P. O. BOX
+                      struct.address.street1,
+                      struct.address.street2,
+                      struct.address.street3,
+                      struct.address.city,
+                      struct.address.stateorprovince,
+                      struct.address.postalcode,
+                      struct.address.country_code
+                    ]
+                ]
+            )
+        if struct.phone is not None:
+            vcard.append(
+                ["tel", { "type":["official"] },
+                "uri", "tel:"+ struct.phone
+                ]
+            )
+        if struct.email is not None:
+            vcard.append(
+                ["email",
+                { "type":"official" },
+                "text", struct.email
+                ]
+            )
+
         result = {
           "rdapConformance" : ["rdap_level_0"],
           "handle": struct.handle,
-          "vcardArray":[
-            "vcard",
-            [
-              ["version", {}, "text", "4.0"],
-              ["fn", {}, "text", struct.name],
-              ["org", {}, "text", struct.organization],
-              ["adr",
-                { "type":"official" },
-                "text",
-                [
-                  '', # P. O. BOX
-                  struct.address.street1,
-                  struct.address.street2,
-                  struct.address.street3,
-                  struct.address.city,
-                  struct.address.stateorprovince,
-                  struct.address.postalcode,
-                  struct.address.country_code
-                ]
-              ],
-              ["tel",
-                { "type":["official"] },
-                "uri", "tel:"+ struct.phone
-              ],
-              ["email",
-                { "type":"official" },
-                "text", struct.email
-              ],
-            ]
-          ],
+          "vcardArray":[ "vcard", vcard ],
           "status": struct.statuses,
           "links":[
             {
