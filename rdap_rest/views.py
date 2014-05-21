@@ -1,3 +1,6 @@
+import logging
+import traceback
+
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -20,7 +23,9 @@ class EntityViewSet(viewsets.ViewSet):
         try:
             data = whois_get_contact_by_handle(str(handle))
             return Response(struct_to_dict(data))
-        except:
+        except Exception, e:
+            logging.debug(str(e))
+            logging.debug(traceback.format_exc())
             return Response(None, status=status.HTTP_404_NOT_FOUND)
 
 
