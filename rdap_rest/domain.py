@@ -87,6 +87,11 @@ def domain_to_dict(struct):
                 "eventAction" : "transfer",
                 "eventDate": unwrap_datetime(struct.last_transfer)
             })
+        if struct.validated_to is not None:
+            result['events'].append({
+                "eventAction" : "enum validation expiration",
+                "eventDate": unwrap_date(struct.validated_to)
+            })
     
     logging.debug(result)
     return result
