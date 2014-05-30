@@ -24,5 +24,5 @@ def whois_get_contact_by_handle(handle):
     return entity.contact_to_dict(c2u(_WHOIS.get_contact_by_handle(u2c(handle))))
 
 def whois_get_domain_by_handle(handle):
-    logging.debug('get_contact_by_handle: %s' % handle)
-    return domain.domain_to_dict(c2u(_WHOIS.get_contact_by_handle(u2c(handle))))
+    logging.debug('get_domain_by_handle: %s' % handle)
+    return domain.domain_to_dict(c2u(_WHOIS.get_domain_by_handle(u2c(handle))))

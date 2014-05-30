@@ -24,14 +24,12 @@ entity_detail = views.EntityViewSet.as_view({
     'get': 'retrieve'
 })
 
-
-entity_list = views.EntityViewSet.as_view({
-    'get': 'list'
+domain_detail = views.DomainViewSet.as_view({
+    'get': 'retrieve'
 })
-
 
 urlpatterns = patterns('',
     url(r'(?i)^entity/(?P<handle>[A-Z0-9_\:\.\-]{1,255})$', entity_detail, name='entity-detail'),
-    url(r'(?i)^entities/$', entity_list, name='entity-list'),
+    url(r'(?i)^domain/(?P<handle>[A-Z0-9_\.\-]{1,255})$', domain_detail, name='domain-detail'),
 )
 
