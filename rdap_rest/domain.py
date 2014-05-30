@@ -73,6 +73,21 @@ def domain_to_dict(struct):
             },   
           ]
         }
+        
+        for admin_contact in struct.admin_contact_handles:
+            result['entities'].append(
+                {
+                    "handle" : admin_contact,
+                    "roles" : [ "technical" ],
+                    "links" : 
+                    [{
+                        "value" : settings.RDAP_ENTITY_URL_TMPL  % {"handle": admin_contact},
+                        "rel" : "self",
+                        "href" : settings.RDAP_ENTITY_URL_TMPL  % {"handle": admin_contact},
+                        "type" : "application/rdap+json"
+                    }]
+                }
+            )
     
     logging.debug(result)
     return result
