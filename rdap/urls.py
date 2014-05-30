@@ -31,7 +31,7 @@ entity_list = views.EntityViewSet.as_view({
 
 
 urlpatterns = patterns('',
-    url(r'^entity/(?P<handle>[A-Z0-9-_.]+)$', entity_detail, name='entity-detail'),
-    url(r'^entities/$', entity_list, name='entity-list'),
+    url(r'(?i)^entity/(?P<handle>[A-Z0-9_\:\.\-]{1,255})$', entity_detail, name='entity-detail'),
+    url(r'(?i)^entities/$', entity_list, name='entity-list'),
 )
 
