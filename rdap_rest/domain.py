@@ -121,6 +121,22 @@ def domain_to_dict(struct):
                             }
                         ]
                     })
+        if struct.keyset_handle != "":
+            keyset = c2u(_WHOIS.get_keyset_by_handle(u2c(struct.keyset_handle)))
+            if keyset is not None:
+                result["secureDNS"] = {
+                    "zoneSigned": True,
+                    "delegationSigned": True,
+                    "maxSigLife": 604800,
+                    "keyData": []
+                }
+                for key in keyset.dns_keys:
+                    result["secureDNS"]['keyData'].append({
+                        "flags": key.flags,
+                        "protocol": key.protocol,
+                        "algorithm": key.alg,
+                        "publicKey": key.public_key
+                    })
     
     logging.debug(result)
     return result
