@@ -5,6 +5,17 @@ import logging
 from django.conf import settings
 from rdap_utils import *
 
+from django.utils.functional import SimpleLazyObject
+
+from utils.corba import Corba, importIDL
+from utils.corbarecoder import u2c, c2u
+
+importIDL(settings.CORBA_IDL_PATH)
+
+_CORBA = Corba(ior=settings.CORBA_NS_HOST_PORT, context_name=settings.CORBA_NS_CONTEXT, export_modules=settings.CORBA_EXPORT_MODULES)
+_WHOIS = SimpleLazyObject(lambda: _CORBA.get_object('Whois2', 'Registry.Whois.WhoisIntf'))
+_INTERFACE = _CORBA.Registry
+
 def domain_to_dict(struct):
     """
     Transform CORBA domain struct to python dictionary
