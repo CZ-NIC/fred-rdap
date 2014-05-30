@@ -38,22 +38,11 @@ def domain_to_dict(struct):
           [
             {
               "eventAction" : "registration",
-              "eventDate" : "1990-12-31T23:59:60Z"
-            },
-            {
-              "eventAction" : "last changed",
-              "eventDate" : "1991-12-31T23:59:60Z",
-              "eventActor" : "joe@example.com"
-            },
-            {
-              "eventAction" : "transfer",
-              "eventDate" : "1991-12-31T23:59:60Z",
-              "eventActor" : "joe@example.com"
+              "eventDate" : unwrap_datetime(struct.registered)
             },
             {
               "eventAction" : "expiration",
-              "eventDate" : "2016-12-31T23:59:60Z",
-              "eventActor" : "joe@example.com"
+              "eventDate" : unwrap_date(struct.expire)
             }
           ],
           "entities" : 
@@ -88,6 +77,16 @@ def domain_to_dict(struct):
                     }]
                 }
             )
+        if struct.changed is not None:
+            result['events'].append({
+                "eventAction" : "last changed",
+                "eventDate": unwrap_datetime(struct.changed)
+            })
+        if struct.last_transfer is not None:
+            result['events'].append({
+                "eventAction" : "transfer",
+                "eventDate": unwrap_datetime(struct.last_transfer)
+            })
     
     logging.debug(result)
     return result
