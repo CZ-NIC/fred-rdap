@@ -60,7 +60,8 @@ def domain_to_dict(struct):
                 }
               ]
             },   
-          ]
+          ],
+          "nameServers" : []
         }
         
         for admin_contact in struct.admin_contact_handles:
@@ -92,6 +93,23 @@ def domain_to_dict(struct):
                 "eventAction" : "enum validation expiration",
                 "eventDate": unwrap_date(struct.validated_to)
             })
+        if struct.nsset_handle != "":
+            nsset = c2u(_WHOIS.get_nsset_by_handle(u2c(struct.nsset_handle)))
+            if nsset is not None:
+                for ns_fqdn in nsset.nservers:
+                    result['nameServers'].append({
+                        "handle" : ns_fqdn,
+                        "ldhName" : ns_fqdn,
+                        "links" : 
+                        [
+                            {
+                                "value" : settings.RDAP_NAMESERVER_URL_TMPL  % {"handle": ns_fqdn},
+                                "rel" : "self",
+                                "href" : settings.RDAP_NAMESERVER_URL_TMPL  % {"handle": ns_fqdn},
+                                "type" : "application/rdap+json"
+                            }
+                        ]
+                    })
     
     logging.debug(result)
     return result
