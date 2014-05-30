@@ -7,7 +7,7 @@ from rdap_utils import *
 
 def contact_to_dict(struct):
     """
-    Transform CORBA struct to python dictionary
+    Transform CORBA contact struct to python dictionary
     """
     logging.debug(struct)
     
@@ -16,8 +16,7 @@ def contact_to_dict(struct):
           "rdapConformance" : ["rdap_level_0"]
         }    
     else:
-        cz_nic_rdap_url_tmp = "%(rdap_root_url)s/entity/%(handle)s"
-        self_link = cz_nic_rdap_url_tmp % {"rdap_root_url": settings.RDAP_ROOT_URL, "handle": struct.handle}
+        self_link = settings.RDAP_ENTITY_URL_TMPL  % {"handle": struct.handle}
         
         vcard = [ ["version", {}, "text", "4.0"] ]
         
