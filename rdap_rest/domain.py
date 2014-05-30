@@ -104,7 +104,7 @@ def domain_to_dict(struct):
                 "eventAction" : "enum validation expiration",
                 "eventDate": unwrap_date(struct.validated_to)
             })
-        if struct.nsset_handle != "":
+        if struct.nsset_handle is not None:
             nsset = c2u(_WHOIS.get_nsset_by_handle(u2c(struct.nsset_handle)))
             if nsset is not None:
                 for ns_fqdn in nsset.nservers:
@@ -121,7 +121,7 @@ def domain_to_dict(struct):
                             }
                         ]
                     })
-        if struct.keyset_handle != "":
+        if struct.keyset_handle is not None:
             keyset = c2u(_WHOIS.get_keyset_by_handle(u2c(struct.keyset_handle)))
             if keyset is not None:
                 result["secureDNS"] = {
