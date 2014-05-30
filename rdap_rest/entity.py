@@ -79,12 +79,12 @@ def contact_to_dict(struct):
         }
         if struct.changed is not None:
             result['events'].append({
-                "eventAction": 'last_update',
+                "eventAction": 'last changed',
                 "eventDate": unwrap_datetime(struct.changed)
             })
         if struct.last_transfer is not None:
             result['events'].append({
-                "eventAction": 'last_transfer',
+                "eventAction": 'transfer',
                 "eventDate": unwrap_datetime(struct.last_transfer)
             })
 
