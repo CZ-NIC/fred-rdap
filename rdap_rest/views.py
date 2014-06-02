@@ -9,37 +9,27 @@ from rdap_rest.whois import whois_get_contact_by_handle
 from rdap_rest.whois import whois_get_domain_by_handle
 
 
+def response_handling(query_result):
+    try:
+        if query_result is None:
+            return Response(None, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response(query_result)
+    except Exception, e:
+        logging.debug(str(e))
+        logging.debug(traceback.format_exc())
+        return Response(None, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class EntityViewSet(viewsets.ViewSet):
     """
-    Just testing prototype of rdap entity view
+    Entity View
     """
     def retrieve(self, request, handle=None):
-        """
-        Get entity detail by handle
-
-        XXX: all responses are not rdap valid and so far are used just for testing rest framework
-        """
-        try:
-            return Response(whois_get_contact_by_handle(str(handle)))
-        except Exception, e:
-            logging.debug(str(e))
-            logging.debug(traceback.format_exc())
-            return Response(None, status=status.HTTP_404_NOT_FOUND)
+        return response_handling(whois_get_contact_by_handle(str(handle)))
             
 class DomainViewSet(viewsets.ViewSet):
     """
-    Just testing prototype of rdap domain view
+    Domain View
     """
     def retrieve(self, request, handle=None):
-        """
-        Get domain detail by handle
-
-        XXX: all responses are not rdap valid and so far are used just for testing rest framework
-        """
-        try:
-            return Response(whois_get_domain_by_handle(str(handle)))
-        except Exception, e:
-            logging.debug(str(e))
-            logging.debug(traceback.format_exc())
-            return Response(None, status=status.HTTP_404_NOT_FOUND)
+        return response_handling(whois_get_domain_by_handle(str(handle)))

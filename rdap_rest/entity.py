@@ -12,9 +12,7 @@ def contact_to_dict(struct):
     logging.debug(struct)
     
     if struct is None:
-        result = {
-          "rdapConformance" : ["rdap_level_0"]
-        }    
+        result = None
     else:
         self_link = settings.RDAP_ENTITY_URL_TMPL  % {"handle": struct.handle}
         
