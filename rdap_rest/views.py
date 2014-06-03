@@ -5,9 +5,7 @@ from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from rdap_rest.whois import whois_get_contact_by_handle
-from rdap_rest.whois import whois_get_domain_by_handle
-
+from rdap_rest.whois import *
 
 def response_handling(query_result):
     try:
@@ -33,3 +31,10 @@ class DomainViewSet(viewsets.ViewSet):
     """
     def retrieve(self, request, handle=None):
         return response_handling(whois_get_domain_by_handle(str(handle)))
+
+class NameserverViewSet(viewsets.ViewSet):
+    """
+    Nameserver View
+    """
+    def retrieve(self, request, handle=None):
+        return response_handling(whois_get_nameserver_by_handle(str(handle)))
