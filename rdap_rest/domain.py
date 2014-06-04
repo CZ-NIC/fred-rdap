@@ -105,16 +105,16 @@ def domain_to_dict(struct):
         if struct.nsset_handle is not None:
             nsset = c2u(_WHOIS.get_nsset_by_handle(u2c(struct.nsset_handle)))
             if nsset is not None:
-                for ns_fqdn in nsset.nservers:
+                for ns in nsset.nservers:
                     result['nameServers'].append({
-                        "handle" : ns_fqdn,
-                        "ldhName" : ns_fqdn,
+                        "handle" : ns.fqdn,
+                        "ldhName" : ns.fqdn,
                         "links" : 
                         [
                             {
-                                "value" : settings.RDAP_NAMESERVER_URL_TMPL  % {"handle": ns_fqdn},
+                                "value" : settings.RDAP_NAMESERVER_URL_TMPL  % {"handle": ns.fqdn},
                                 "rel" : "self",
-                                "href" : settings.RDAP_NAMESERVER_URL_TMPL  % {"handle": ns_fqdn},
+                                "href" : settings.RDAP_NAMESERVER_URL_TMPL  % {"handle": ns.fqdn},
                                 "type" : "application/rdap+json"
                             }
                         ]
