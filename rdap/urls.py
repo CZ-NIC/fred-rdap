@@ -20,17 +20,9 @@ from rest_framework import routers
 from rdap_rest import views
 
 
-entity_detail = views.EntityViewSet.as_view({
-    'get': 'retrieve'
-})
-
-domain_detail = views.DomainViewSet.as_view({
-    'get': 'retrieve'
-})
-
-nameserver_detail = views.NameserverViewSet.as_view({
-    'get': 'retrieve'
-})
+entity_detail       = views.EntityViewSet.as_view({'get': 'retrieve'})
+domain_detail       = views.DomainViewSet.as_view({'get': 'retrieve'})
+nameserver_detail   = views.NameserverViewSet.as_view({'get': 'retrieve'})
 nsset_detail        = views.NSSetViewSet.as_view({'get': 'retrieve'})
 
 urlpatterns = patterns('',
