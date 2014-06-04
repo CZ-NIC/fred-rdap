@@ -31,10 +31,12 @@ domain_detail = views.DomainViewSet.as_view({
 nameserver_detail = views.NameserverViewSet.as_view({
     'get': 'retrieve'
 })
+nsset_detail        = views.NSSetViewSet.as_view({'get': 'retrieve'})
 
 urlpatterns = patterns('',
     url(r'(?i)^entity/(?P<handle>[A-Z0-9_\:\.\-]{1,255})$', entity_detail, name='entity-detail'),
     url(r'(?i)^domain/(?P<handle>[A-Z0-9_\.\-]{1,255})$', domain_detail, name='domain-detail'),
     url(r'(?i)^nameserver/(?P<handle>[A-Z0-9_\.\-]{1,255})$', nameserver_detail, name='nameserver-detail'),
+    url(r'(?i)^cznic_nsset/(?P<handle>[A-Z0-9_\:\.\-]{1,255})$', nsset_detail, name='nsset-detail'),
 )
 
