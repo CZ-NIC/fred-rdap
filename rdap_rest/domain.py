@@ -28,7 +28,7 @@ def domain_to_dict(struct):
         self_link = settings.RDAP_DOMAIN_URL_TMPL  % {"handle": struct.handle}
         
         result = {
-          "rdapConformance" : ["rdap_level_0"],
+          "rdapConformance" : ["rdap_level_0", "cznic_version_0"],
           "handle" : struct.handle,
           "ldhName" : struct.handle,
           "unicodeName" : struct.handle,
@@ -72,7 +72,7 @@ def domain_to_dict(struct):
           ],
           "nameServers" : []
         }
-        
+
         for admin_contact in struct.admin_contact_handles:
             result['entities'].append(
                 {
@@ -105,8 +105,20 @@ def domain_to_dict(struct):
         if struct.nsset_handle is not None:
             nsset = c2u(_WHOIS.get_nsset_by_handle(u2c(struct.nsset_handle)))
             if nsset is not None:
+                result['cznic_nsset'] = {
+                    "handle": nsset.handle,
+                    "links":[
+                        {
+                          "value": settings.RDAP_NSSET_URL_TMPL  % {"handle": nsset.handle},
+                          "rel":"self",
+                          "href": settings.RDAP_NSSET_URL_TMPL  % {"handle": nsset.handle},
+                          "type":"application/rdap+json"
+                        }
+                    ],
+                    "nameServers" : []
+                }
                 for ns in nsset.nservers:
-                    result['nameServers'].append({
+                    ns_obj = {
                         "handle" : ns.fqdn,
                         "ldhName" : ns.fqdn,
                         "links" : 
@@ -118,7 +130,23 @@ def domain_to_dict(struct):
                                 "type" : "application/rdap+json"
                             }
                         ]
-                    })
+                    }
+                    if ns.ip_addresses:
+                        addrs_v4 = []
+                        addrs_v6 = []
+                        for ip_addr in ns.ip_addresses:
+                            if ip_addr.version._v == _CORBA.Registry.Whois.v4._v:
+                                addrs_v4.append(ip_addr.address)
+                            if ip_addr.version._v == _CORBA.Registry.Whois.v6._v:
+                                addrs_v6.append(ip_addr.address)
+                        ns_obj["ipAddresses"] = {}
+                        if addrs_v4:
+                            ns_obj["ipAddresses"]["v4"] = addrs_v4
+                        if addrs_v6:
+                            ns_obj["ipAddresses"]["v6"] = addrs_v6
+                    result['nameServers'].append(ns_obj)
+                    result['cznic_nsset']['nameServers'].append(ns_obj)
+                
         if struct.keyset_handle is not None:
             keyset = c2u(_WHOIS.get_keyset_by_handle(u2c(struct.keyset_handle)))
             if keyset is not None:
