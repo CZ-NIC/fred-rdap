@@ -13,6 +13,7 @@ from utils.corbarecoder import u2c, c2u
 import entity
 import domain
 import nameserver
+import nsset
 
 importIDL(settings.CORBA_IDL_PATH)
 
@@ -31,3 +32,7 @@ def whois_get_domain_by_handle(handle):
 def whois_get_nameserver_by_handle(handle):
     logging.debug('get_nameserver_by_handle: %s' % handle)
     return nameserver.nameserver_to_dict(c2u(_WHOIS.get_nameserver_by_fqdn(u2c(handle))))
+
+def whois_get_nsset_by_handle(handle):
+    logging.debug('get_nsset_by_handle: %s' % handle)
+    return nsset.nsset_to_dict(c2u(_WHOIS.get_nsset_by_handle(u2c(handle))))
