@@ -38,3 +38,10 @@ class NameserverViewSet(viewsets.ViewSet):
     """
     def retrieve(self, request, handle=None):
         return response_handling(whois_get_nameserver_by_handle(str(handle)))
+
+class NSSetViewSet(viewsets.ViewSet):
+    """
+    NSSet View
+    """
+    def retrieve(self, request, handle=None):
+        return response_handling(whois_get_nsset_by_handle(str(handle)))
