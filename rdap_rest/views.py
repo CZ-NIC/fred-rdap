@@ -45,3 +45,10 @@ class NSSetViewSet(viewsets.ViewSet):
     """
     def retrieve(self, request, handle=None):
         return response_handling(whois_get_nsset_by_handle(str(handle)))
+
+class KeySetViewSet(viewsets.ViewSet):
+    """
+    KeySet View
+    """
+    def retrieve(self, request, handle=None):
+        return response_handling(whois_get_keyset_by_handle(str(handle)))
