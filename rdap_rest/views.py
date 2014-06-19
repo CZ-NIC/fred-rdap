@@ -52,3 +52,17 @@ class KeySetViewSet(viewsets.ViewSet):
     """
     def retrieve(self, request, handle=None):
         return response_handling(whois_get_keyset_by_handle(str(handle)))
+
+class MalformedRdapPath(viewsets.ViewSet):
+    """
+    MalformedRdapPath View
+    """
+    def retrieve(self, request, handle=None):
+        return Response(None, status=status.HTTP_400_BAD_REQUEST)
+
+class NotFound(viewsets.ViewSet):
+    """
+    NotFound View
+    """
+    def retrieve(self, request, handle=None):
+        return Response(None, status=status.HTTP_404_NOT_FOUND)
