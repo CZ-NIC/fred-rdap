@@ -153,7 +153,7 @@ def domain_to_dict(struct):
                 result["secureDNS"] = {
                     "zoneSigned": True,
                     "delegationSigned": True,
-                    "maxSigLife": 604800,
+                    "maxSigLife": settings.DNS_MAX_SIG_LIFE,
                     "keyData": []
                 }
                 result['cznic_keyset'] = {
