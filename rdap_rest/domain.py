@@ -156,8 +156,26 @@ def domain_to_dict(struct):
                     "maxSigLife": 604800,
                     "keyData": []
                 }
+                result['cznic_keyset'] = {
+                    "handle": keyset.handle,
+                    "links":[
+                        {
+                          "value": settings.RDAP_KEYSET_URL_TMPL  % {"handle": keyset.handle},
+                          "rel":"self",
+                          "href": settings.RDAP_KEYSET_URL_TMPL  % {"handle": keyset.handle},
+                          "type":"application/rdap+json"
+                        }
+                    ],
+                    "dns_keys" : []
+                }
                 for key in keyset.dns_keys:
                     result["secureDNS"]['keyData'].append({
+                        "flags": key.flags,
+                        "protocol": key.protocol,
+                        "algorithm": key.alg,
+                        "publicKey": key.public_key
+                    })
+                    result["cznic_keyset"]['dns_keys'].append({
                         "flags": key.flags,
                         "protocol": key.protocol,
                         "algorithm": key.alg,
