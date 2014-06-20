@@ -35,16 +35,17 @@ def nsset_to_dict(struct):
           [
             {
               "handle" : struct.registrar_handle,
-              "roles" : [ "registrar" ],
-              "links" : 
-              [
-                {
-                  "value" : settings.RDAP_ENTITY_URL_TMPL  % {"handle": struct.registrar_handle},
-                  "rel" : "self",
-                  "href" : settings.RDAP_ENTITY_URL_TMPL  % {"handle": struct.registrar_handle},
-                  "type" : "application/rdap+json"
-                }
-              ]
+              "roles" : [ "registrar" ]
+#              ,
+#              "links" : 
+#              [
+#                {
+#                  "value" : settings.RDAP_ENTITY_URL_TMPL  % {"handle": struct.registrar_handle},
+#                  "rel" : "self",
+#                  "href" : settings.RDAP_ENTITY_URL_TMPL  % {"handle": struct.registrar_handle},
+#                  "type" : "application/rdap+json"
+#                }
+#              ]
             }
           ],
           "status" : struct.statuses,

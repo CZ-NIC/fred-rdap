@@ -68,7 +68,21 @@ def domain_to_dict(struct):
                   "type" : "application/rdap+json"
                 }
               ]
-            },   
+            },
+            {
+              "handle" : struct.registrar_handle,
+              "roles" : [ "registrar" ]
+#              ,
+#              "links" :
+#              [
+#                {
+#                  "value" : settings.RDAP_ENTITY_URL_TMPL  % {"handle": struct.registrar_handle},
+#                  "rel" : "self",
+#                  "href" : settings.RDAP_ENTITY_URL_TMPL  % {"handle": struct.registrar_handle},
+#                  "type" : "application/rdap+json"
+#                }
+#              ]
+            }
           ],
           "nameServers" : []
         }
