@@ -48,9 +48,10 @@ class EntityViewSet(viewsets.ViewSet):
     Entity View
     """
     def retrieve(self, request, handle=None, path=None):
+        log_req = create_log_request(path, handle, request.META.get('REMOTE_ADDR', ''))
         return response_handling(
             get_contact_by_handle(str(handle)),
-            create_log_request(path, handle, request.META.get('REMOTE_ADDR', ''))
+            log_req
         )
 
 
@@ -59,9 +60,10 @@ class DomainViewSet(viewsets.ViewSet):
     Domain View
     """
     def retrieve(self, request, handle=None, path=None):
+        log_req = create_log_request(path, handle, request.META.get('REMOTE_ADDR', ''))
         return response_handling(
             get_domain_by_handle(str(handle)),
-            create_log_request(path, handle, request.META.get('REMOTE_ADDR', ''))
+            log_req
         )
 
 
@@ -70,9 +72,10 @@ class NameserverViewSet(viewsets.ViewSet):
     Nameserver View
     """
     def retrieve(self, request, handle=None, path=None):
+        log_req = create_log_request(path, handle, request.META.get('REMOTE_ADDR', ''))
         return response_handling(
             get_nameserver_by_handle(str(handle)),
-            create_log_request(path, handle, request.META.get('REMOTE_ADDR', ''))
+            log_req
         )
 
 
@@ -81,9 +84,10 @@ class NSSetViewSet(viewsets.ViewSet):
     NSSet View
     """
     def retrieve(self, request, handle=None, path=None):
+        log_req = create_log_request(path, handle, request.META.get('REMOTE_ADDR', ''))
         return response_handling(
             get_nsset_by_handle(str(handle)),
-            create_log_request(path, handle, request.META.get('REMOTE_ADDR', ''))
+            log_req
         )
 
 
@@ -92,9 +96,10 @@ class KeySetViewSet(viewsets.ViewSet):
     KeySet View
     """
     def retrieve(self, request, handle=None, path=None):
+        log_req = create_log_request(path, handle, request.META.get('REMOTE_ADDR', ''))
         return response_handling(
             get_keyset_by_handle(str(handle)),
-            create_log_request(path, handle, request.META.get('REMOTE_ADDR', ''))
+            log_req
         )
 
 
