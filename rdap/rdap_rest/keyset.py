@@ -2,20 +2,21 @@
 Wrapper module to whois idl interface
 """
 import logging
-from django.conf import settings
-from rdap_utils import *
 
+from django.conf import settings
 from django.utils.functional import SimpleLazyObject
-from django.conf import settings
 
-from utils.corba import Corba, importIDL
-from utils.corbarecoder import u2c, c2u
+from rdap.utils.corba import Corba, importIDL
+from rdap.utils.corbarecoder import u2c, c2u
+from .rdap_utils import *
+
 
 importIDL(settings.CORBA_IDL_ROOT_PATH + '/' + settings.CORBA_IDL_WHOIS_FILENAME)
 
 _CORBA = Corba(ior=settings.CORBA_NS_HOST_PORT, context_name=settings.CORBA_NS_CONTEXT, export_modules=settings.CORBA_EXPORT_MODULES)
 _WHOIS = SimpleLazyObject(lambda: _CORBA.get_object('Whois2', 'Registry.Whois.WhoisIntf'))
 _INTERFACE = _CORBA.Registry
+
 
 def keyset_to_dict(struct):
     """

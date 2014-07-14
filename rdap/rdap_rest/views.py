@@ -5,9 +5,9 @@ from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from rdap_rest.whois import *
+from .whois import *
+from rdap.utils.py_logging import get_logger
 
-from utils.py_logging import get_logger
 
 def translate_rest_path_to_request_type(path):
     if path == 'entity':

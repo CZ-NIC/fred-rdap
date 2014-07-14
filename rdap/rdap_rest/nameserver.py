@@ -2,8 +2,11 @@
 Wrapper module to whois idl interface
 """
 import logging
+
 from django.conf import settings
-from rdap_utils import *
+
+from .rdap_utils import *
+
 
 def nameserver_to_dict(struct):
     """
