@@ -28,8 +28,9 @@ def create_log_request(path, handle, remote_addr):
                                        [('handle', handle)], None, None, 'InternalServerError')
 
 
-def response_handling(query_result, log_request):
+def response_handling(data_getter, getter_input_handle, log_request):
     try:
+        query_result = data_getter(getter_input_handle)
         if query_result is None:
             log_request.close('NotFound')
             return Response(None, status=status.HTTP_404_NOT_FOUND)
@@ -40,7 +41,6 @@ def response_handling(query_result, log_request):
         logging.debug(str(e))
         logging.debug(traceback.format_exc())
         log_request.close('InternalServerError')
-        return Response(None, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class EntityViewSet(viewsets.ViewSet):
@@ -50,7 +50,8 @@ class EntityViewSet(viewsets.ViewSet):
     def retrieve(self, request, handle=None, path=None):
         log_req = create_log_request(path, handle, request.META.get('REMOTE_ADDR', ''))
         return response_handling(
-            get_contact_by_handle(str(handle)),
+            get_contact_by_handle,
+            str(handle),
             log_req
         )
 
@@ -62,7 +63,8 @@ class DomainViewSet(viewsets.ViewSet):
     def retrieve(self, request, handle=None, path=None):
         log_req = create_log_request(path, handle, request.META.get('REMOTE_ADDR', ''))
         return response_handling(
-            get_domain_by_handle(str(handle)),
+            get_domain_by_handle,
+            str(handle),
             log_req
         )
 
@@ -74,7 +76,8 @@ class NameserverViewSet(viewsets.ViewSet):
     def retrieve(self, request, handle=None, path=None):
         log_req = create_log_request(path, handle, request.META.get('REMOTE_ADDR', ''))
         return response_handling(
-            get_nameserver_by_handle(str(handle)),
+            get_nameserver_by_handle,
+            str(handle),
             log_req
         )
 
@@ -86,7 +89,8 @@ class NSSetViewSet(viewsets.ViewSet):
     def retrieve(self, request, handle=None, path=None):
         log_req = create_log_request(path, handle, request.META.get('REMOTE_ADDR', ''))
         return response_handling(
-            get_nsset_by_handle(str(handle)),
+            get_nsset_by_handle,
+            str(handle),
             log_req
         )
 
@@ -98,7 +102,8 @@ class KeySetViewSet(viewsets.ViewSet):
     def retrieve(self, request, handle=None, path=None):
         log_req = create_log_request(path, handle, request.META.get('REMOTE_ADDR', ''))
         return response_handling(
-            get_keyset_by_handle(str(handle)),
+            get_keyset_by_handle,
+            str(handle),
             log_req
         )
 
