@@ -4,7 +4,6 @@ from django.utils.functional import SimpleLazyObject
 from pylogger.corbalogger import Logger
 
 from .corba import Corba, importIDL
-from .corbarecoder import u2c, c2u
 
 
 importIDL(settings.CORBA_IDL_ROOT_PATH + '/' + settings.CORBA_IDL_LOGGER_FILENAME)

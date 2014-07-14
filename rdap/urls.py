@@ -1,5 +1,4 @@
 from django.conf.urls import patterns, include, url
-from rest_framework import routers
 
 from rdap.rdap_rest.views import DomainViewSet, EntityViewSet, KeySetViewSet, MalformedRdapPath, NameserverViewSet, \
     NotFound, NSSetViewSet
