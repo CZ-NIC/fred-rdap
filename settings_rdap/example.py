@@ -31,9 +31,6 @@ STATIC_URL = '/static/'
 ROOT_URLCONF = 'rdap.urls'
 
 REST_FRAMEWORK = {
-    'DEFAULT_PARSER_CLASSES': (
-        'rdap.rdap_rest.parser.RDAPJSONParser',
-    ),
     'DEFAULT_RENDERER_CLASSES': (
         'rdap.rdap_rest.renderer.UnicodeRDAPJSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
