@@ -33,7 +33,7 @@ def domain_to_dict(struct):
             "rdapConformance": ["rdap_level_0", "cznic_version_0"],
             "handle": struct.handle,
             "ldhName": struct.handle,
-            "unicodeName": struct.handle,
+#            "unicodeName": struct.handle, # should be present only when containing non-ASCII chars
             "status": struct.statuses,
             "links": [
                 {
