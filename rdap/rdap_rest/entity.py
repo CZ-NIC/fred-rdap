@@ -68,7 +68,7 @@ def contact_to_dict(struct):
             "port43": settings.UNIX_WHOIS_HOST,
             "events": [
                 {
-                    "eventAction": "created",
+                    "eventAction": "registration",
                     "eventDate": unwrap_datetime(struct.created),
                     "eventActor": struct.creating_registrar_handle,
                 }
