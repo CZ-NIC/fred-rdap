@@ -88,9 +88,9 @@ def nsset_to_dict(struct):
                 addrs_v4 = []
                 addrs_v6 = []
                 for ip_addr in ns.ip_addresses:
-                    if ip_addr.version._v == _CORBA.Registry.Whois.v4._v:
+                    if ip_addr.version._v == _CORBA.Registry.Whois.IPv4._v:
                         addrs_v4.append(ip_addr.address)
-                    if ip_addr.version._v == _CORBA.Registry.Whois.v6._v:
+                    if ip_addr.version._v == _CORBA.Registry.Whois.IPv6._v:
                         addrs_v6.append(ip_addr.address)
                 ns_json["ipAddresses"] = {}
                 if addrs_v4:
