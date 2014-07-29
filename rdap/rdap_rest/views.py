@@ -32,15 +32,18 @@ def response_handling(data_getter, getter_input_handle, log_request):
     try:
         query_result = data_getter(getter_input_handle)
         if query_result is None:
-            log_request.close('NotFound')
+            log_status = 'NotFound'
             return Response(None, status=status.HTTP_404_NOT_FOUND)
         else:
-            log_request.close('Ok')
+            log_status = 'Ok'
             return Response(query_result)
     except Exception, e:
         logging.debug(str(e))
         logging.debug(traceback.format_exc())
-        log_request.close('InternalServerError')
+        log_status = 'InternalServerError'
+    finally:
+        log_request.close(log_status)
+
 
 
 class EntityViewSet(viewsets.ViewSet):
