@@ -41,7 +41,7 @@ class ModuleInstall(install):
         content = content.replace("CORBA_NS_HOST_PORT = ''",        "CORBA_NS_HOST_PORT = '" + self.nshostport + "'")
         content = content.replace("CORBA_NS_CONTEXT = ''",          "CORBA_NS_CONTEXT = 'fred'")
         content = content.replace("CORBA_EXPORT_MODULES = ['']",    "CORBA_EXPORT_MODULES = ['Registry']")
-        content = content.replace("RDAP_ROOT_URL = ''",             "RDAP_ROOT_URL = '" + self.host + "'")
+        content = content.replace("RDAP_ROOT_URL = ''",             "RDAP_ROOT_URL = 'http://" + self.host + ":" + self.port + "'")
         content = content.replace("UNIX_WHOIS_HOST = ''",           "UNIX_WHOIS_HOST = '" + self.unixwhoishost + "'")
         
         open(filename, 'w').write(content)
