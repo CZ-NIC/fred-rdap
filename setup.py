@@ -34,35 +34,33 @@ class ModuleInstall(install):
         self.wsgirundir = None
 
     def update_rdap_cfg_py(self, filename):
-        content = open(filename).read()
-        content = content.replace("CORBA_IDL_ROOT_PATH = ''",       "CORBA_IDL_ROOT_PATH = '" + self.expand_filename('$data/share/idl/fred') + "'")
-        content = content.replace("CORBA_IDL_WHOIS_FILENAME = ''",  "CORBA_IDL_WHOIS_FILENAME = 'Whois2.idl'")
-        content = content.replace("CORBA_IDL_LOGGER_FILENAME = ''", "CORBA_IDL_LOGGER_FILENAME = 'Logger.idl'")
-        content = content.replace("CORBA_NS_HOST_PORT = ''",        "CORBA_NS_HOST_PORT = '" + self.nshostport + "'")
-        content = content.replace("CORBA_NS_CONTEXT = ''",          "CORBA_NS_CONTEXT = 'fred'")
-        content = content.replace("CORBA_EXPORT_MODULES = ['']",    "CORBA_EXPORT_MODULES = ['Registry']")
-        content = content.replace("RDAP_ROOT_URL = ''",             "RDAP_ROOT_URL = 'http://" + self.host + ":" + self.port + "'")
-        content = content.replace("UNIX_WHOIS_HOST = ''",           "UNIX_WHOIS_HOST = '" + self.unixwhoishost + "'")
-        
-        open(filename, 'w').write(content)
-        self.announce("File '%s' was updated" % filename)
+        if self.nshostport is not None or self.host is not None or self.unixwhoishost is not None:
+            content = open(filename).read()
+            content = content.replace("CORBA_IDL_ROOT_PATH = ''",       "CORBA_IDL_ROOT_PATH = '" + self.expand_filename('$data/share/idl/fred') + "'")
+            content = content.replace("CORBA_NS_HOST_PORT = ''",        "CORBA_NS_HOST_PORT = '" + self.nshostport + "'")
+            content = content.replace("RDAP_ROOT_URL = ''",             "RDAP_ROOT_URL = 'http://" + self.host + ":" + self.port + "'")
+            content = content.replace("UNIX_WHOIS_HOST = ''",           "UNIX_WHOIS_HOST = '" + self.unixwhoishost + "'")
+
+            open(filename, 'w').write(content)
+            self.announce("File '%s' was updated" % filename)
         
     def update_apache_conf(self, filename):
-        content = open(filename).read()
-        content = content.replace("INSTALL_PURELIB", self.expand_filename('$purelib/rdap'))
-        content = content.replace("LISTEN_HOST", "*")
-        content = content.replace("LISTEN_PORT", self.port)
-        content = content.replace("WSGI_RUN_DIR_ROOT", self.wsgirundir)
-        
-        open(filename, 'w').write(content)
-        self.announce("File '%s' was updated" % filename)
+        if self.port is not None or self.wsgirundir is not None:
+            content = open(filename).read()
+            content = content.replace("INSTALL_PURELIB", self.expand_filename('$purelib/rdap'))
+            content = content.replace("LISTEN_PORT", self.port)
+            content = content.replace("WSGI_RUN_DIR_ROOT", self.wsgirundir)
+
+            open(filename, 'w').write(content)
+            self.announce("File '%s' was updated" % filename)
         
     def update_run_wsgi(self, filename):
-        content = open(filename).read()
-        content = content.replace("ROOT_DIR", self.expand_filename('$data'))
-        
-        open(filename, 'w').write(content)
-        self.announce("File '%s' was updated" % filename)
+        if self.wsgirundir is not None:
+            content = open(filename).read()
+            content = content.replace("ROOT_DIR", self.expand_filename('$data'))
+
+            open(filename, 'w').write(content)
+            self.announce("File '%s' was updated" % filename)
         
 
 def main():
