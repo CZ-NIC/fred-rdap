@@ -47,6 +47,10 @@ def contact_to_dict(struct):
             vcard.append(
                 ["tel", {"type": ["official", "voice"]}, "uri", "tel:%s" % struct.phone]
             )
+        if struct.fax is not None:
+            vcard.append(
+                ["tel", {"type": ["official", "fax"]}, "uri", "tel:%s" % struct.fax]
+            )
         if struct.email is not None:
             vcard.append(
                 ["email", {"type": "official"}, "text", struct.email]
