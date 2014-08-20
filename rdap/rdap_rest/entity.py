@@ -72,7 +72,13 @@ def contact_to_dict(struct):
                     "eventDate": unwrap_datetime(struct.created),
                     "eventActor": struct.creating_registrar_handle,
                 }
-            ]
+            ],
+            "entities": [
+                {
+                    "handle": struct.sponsoring_registrar_handle,
+                    "roles": ["registrar"],
+                },
+            ],
         }
         if struct.changed is not None:
             result['events'].append({
