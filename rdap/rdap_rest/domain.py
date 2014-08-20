@@ -79,7 +79,7 @@ def domain_to_dict(struct):
             result['entities'].append(
                 {
                     "handle": admin_contact,
-                    "roles": ["technical"],
+                    "roles": ["administrative"],
                     "links": [
                         {
                             "value": settings.RDAP_ENTITY_URL_TMPL % {"handle": admin_contact},
