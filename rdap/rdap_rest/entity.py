@@ -47,7 +47,7 @@ def contact_to_dict(struct):
                 vcard.append(
                     [
                         "adr",
-                        {"type": "official"},
+                        {"type": ""},
                         "text",
                         [
                           '',  # P. O. BOX
@@ -63,15 +63,15 @@ def contact_to_dict(struct):
                 )
             if nonempty(struct.phone):
                 vcard.append(
-                    ["tel", {"type": ["official", "voice"]}, "uri", "tel:%s" % struct.phone]
+                    ["tel", {"type": ["voice"]}, "uri", "tel:%s" % struct.phone]
                 )
             if nonempty(struct.fax):
                 vcard.append(
-                    ["tel", {"type": ["official", "fax"]}, "uri", "tel:%s" % struct.fax]
+                    ["tel", {"type": ["fax"]}, "uri", "tel:%s" % struct.fax]
                 )
             if nonempty(struct.email):
                 vcard.append(
-                    ["email", {"type": "official"}, "text", struct.email]
+                    ["email", {"type": ""}, "text", struct.email]
                 )
 
             result = {
