@@ -34,7 +34,6 @@ def domain_to_dict(struct):
             "handle": struct.handle,
             "ldhName": struct.handle,
 #            "unicodeName": struct.handle, # should be present only when containing non-ASCII chars
-            "status": struct.statuses,
             "links": [
                 {
                     "value": self_link,
@@ -71,8 +70,7 @@ def domain_to_dict(struct):
                     "handle": struct.registrar_handle,
                     "roles": ["registrar"],
                 },
-            ],
-            "nameServers" : [],
+            ]
         }
 
         for admin_contact in struct.admin_contact_handles:
@@ -90,6 +88,8 @@ def domain_to_dict(struct):
                     ],
                 }
             )
+        if struct.statuses:
+            result["status"] = struct.statuses
         if nonempty(struct.changed):
             result['events'].append({
                 "eventAction": "last changed",
@@ -108,6 +108,7 @@ def domain_to_dict(struct):
         if nonempty(struct.nsset_handle):
             nsset = c2u(_WHOIS.get_nsset_by_handle(u2c(struct.nsset_handle)))
             if nsset is not None:
+                result["nameServers"] = []
                 result['cznic_nsset'] = {
                     "handle": nsset.handle,
                     "links": [

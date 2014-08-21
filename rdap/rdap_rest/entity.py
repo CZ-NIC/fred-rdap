@@ -78,7 +78,6 @@ def contact_to_dict(struct):
                 "rdapConformance" : ["rdap_level_0"],
                 "handle": struct.handle,
                 "vcardArray": ["vcard", vcard],
-                "status": struct.statuses,
                 "links": [
                     {
                         "value": self_link,
@@ -102,6 +101,8 @@ def contact_to_dict(struct):
                     },
                 ],
             }
+            if struct.statuses:
+                result["status"] = struct.statuses
             if nonempty(struct.changed):
                 result['events'].append({
                     "eventAction": 'last changed',

@@ -38,7 +38,6 @@ def keyset_to_dict(struct):
                     "roles": ["registrar"],
                 },
             ],
-            "status": struct.statuses,
             "port43": settings.UNIX_WHOIS_HOST,
             "events": [
                 {
@@ -53,10 +52,12 @@ def keyset_to_dict(struct):
                     "href": self_link,
                     "type":"application/rdap+json",
                 },
-            ],
-            "dns_keys" : [],
+            ]
         }
 
+        if struct.statuses:
+            result["status"] = struct.statuses
+            
         for tech_c in struct.tech_contact_handles:
             result['entities'].append({
                 "handle": tech_c,
@@ -81,13 +82,16 @@ def keyset_to_dict(struct):
                 "eventAction": "transfer",
                 "eventDate": unwrap_datetime(struct.last_transfer),
             })
-        for key in struct.dns_keys:
-            result['dns_keys'].append({
-                "flags": key.flags,
-                "protocol": key.protocol,
-                "algorithm": key.alg,
-                "publicKey": key.public_key,
-            })
+
+        if struct.dns_keys:
+            result["dns_keys"] = []
+            for key in struct.dns_keys:
+                result['dns_keys'].append({
+                    "flags": key.flags,
+                    "protocol": key.protocol,
+                    "algorithm": key.alg,
+                    "publicKey": key.public_key,
+                })
 
     logging.debug(result)
     return result

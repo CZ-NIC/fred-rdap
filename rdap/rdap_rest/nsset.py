@@ -38,7 +38,6 @@ def nsset_to_dict(struct):
                     "roles": ["registrar"],
                 }
             ],
-            "status": struct.statuses,
             "port43": settings.UNIX_WHOIS_HOST,
             "events": [
                 {
@@ -56,6 +55,9 @@ def nsset_to_dict(struct):
             ],
             "nameServers" : [],
         }
+        
+        if struct.statuses:
+            result["status"] = struct.statuses
 
         for tech_c in struct.tech_contact_handles:
             result['entities'].append({
