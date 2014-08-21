@@ -11,3 +11,6 @@ def unwrap_datetime(idl_datetime):
 
 def unwrap_date(idl_date):
     return date(idl_date.year, idl_date.month, idl_date.day)
+
+def nonempty(input):
+    return input is not None and input != ''

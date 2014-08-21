@@ -9,7 +9,7 @@ from django.utils.functional import SimpleLazyObject
 from rdap.utils.corba import Corba, importIDL
 from rdap.utils.corbarecoder import u2c, c2u
 from .rdap_utils import unwrap_date, unwrap_datetime
-
+from .rdap_utils import nonempty
 
 importIDL('%s/%s' % (settings.CORBA_IDL_ROOT_PATH, settings.CORBA_IDL_WHOIS_FILENAME))
 _CORBA = Corba(ior=settings.CORBA_NS_HOST_PORT, context_name=settings.CORBA_NS_CONTEXT,
@@ -34,7 +34,6 @@ def domain_to_dict(struct):
             "handle": struct.handle,
             "ldhName": struct.handle,
 #            "unicodeName": struct.handle, # should be present only when containing non-ASCII chars
-            "status": struct.statuses,
             "links": [
                 {
                     "value": self_link,
@@ -71,15 +70,14 @@ def domain_to_dict(struct):
                     "handle": struct.registrar_handle,
                     "roles": ["registrar"],
                 },
-            ],
-            "nameServers" : [],
+            ]
         }
 
         for admin_contact in struct.admin_contact_handles:
             result['entities'].append(
                 {
                     "handle": admin_contact,
-                    "roles": ["technical"],
+                    "roles": ["administrative"],
                     "links": [
                         {
                             "value": settings.RDAP_ENTITY_URL_TMPL % {"handle": admin_contact},
@@ -90,24 +88,27 @@ def domain_to_dict(struct):
                     ],
                 }
             )
-        if struct.changed is not None:
+        if struct.statuses:
+            result["status"] = struct.statuses
+        if nonempty(struct.changed):
             result['events'].append({
                 "eventAction": "last changed",
                 "eventDate": unwrap_datetime(struct.changed),
             })
-        if struct.last_transfer is not None:
+        if nonempty(struct.last_transfer):
             result['events'].append({
                 "eventAction": "transfer",
                 "eventDate": unwrap_datetime(struct.last_transfer),
             })
-        if struct.validated_to is not None:
+        if nonempty(struct.validated_to):
             result['events'].append({
                 "eventAction": "enum validation expiration",
                 "eventDate": unwrap_date(struct.validated_to),
             })
-        if struct.nsset_handle is not None:
+        if nonempty(struct.nsset_handle):
             nsset = c2u(_WHOIS.get_nsset_by_handle(u2c(struct.nsset_handle)))
             if nsset is not None:
+                result["nameServers"] = []
                 result['cznic_nsset'] = {
                     "handle": nsset.handle,
                     "links": [
@@ -149,7 +150,7 @@ def domain_to_dict(struct):
                     result['nameServers'].append(ns_obj)
                     result['cznic_nsset']['nameServers'].append(ns_obj)
 
-        if struct.keyset_handle is not None:
+        if nonempty(struct.keyset_handle):
             keyset = c2u(_WHOIS.get_keyset_by_handle(u2c(struct.keyset_handle)))
             if keyset is not None:
                 result["secureDNS"] = {
