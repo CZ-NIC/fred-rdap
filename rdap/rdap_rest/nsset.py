@@ -8,7 +8,7 @@ from django.utils.functional import SimpleLazyObject
 
 from rdap.utils.corba import Corba, importIDL
 from .rdap_utils import unwrap_datetime
-
+from .rdap_utils import nonempty
 
 importIDL(settings.CORBA_IDL_ROOT_PATH + '/' + settings.CORBA_IDL_WHOIS_FILENAME)
 
@@ -100,12 +100,12 @@ def nsset_to_dict(struct):
 
             result['nameServers'].append(ns_json)
 
-        if struct.changed is not None:
+        if nonempty(struct.changed):
             result['events'].append({
                 "eventAction": "last changed",
                 "eventDate": unwrap_datetime(struct.changed),
             })
-        if struct.last_transfer is not None:
+        if nonempty(struct.last_transfer):
             result['events'].append({
                 "eventAction": "transfer",
                 "eventDate": unwrap_datetime(struct.last_transfer),

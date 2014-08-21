@@ -6,6 +6,7 @@ import logging
 from django.conf import settings
 
 from .rdap_utils import unwrap_datetime
+from .rdap_utils import nonempty
 
 
 def contact_to_dict(struct):
@@ -38,11 +39,11 @@ def contact_to_dict(struct):
         else:
             vcard = [["version", {}, "text", "4.0"]]
 
-            if struct.name is not None:
+            if nonempty(struct.name):
                 vcard.append(["fn", {}, "text", struct.name])
-            if struct.organization is not None:
+            if nonempty(struct.organization):
                 vcard.append(["org", {}, "text", struct.organization])
-            if struct.address is not None:
+            if nonempty(struct.address):
                 vcard.append(
                     [
                         "adr",
@@ -60,15 +61,15 @@ def contact_to_dict(struct):
                         ]
                     ]
                 )
-            if struct.phone is not None:
+            if nonempty(struct.phone):
                 vcard.append(
                     ["tel", {"type": ["official", "voice"]}, "uri", "tel:%s" % struct.phone]
                 )
-            if struct.fax is not None:
+            if nonempty(struct.fax):
                 vcard.append(
                     ["tel", {"type": ["official", "fax"]}, "uri", "tel:%s" % struct.fax]
                 )
-            if struct.email is not None:
+            if nonempty(struct.email):
                 vcard.append(
                     ["email", {"type": "official"}, "text", struct.email]
                 )
@@ -101,12 +102,12 @@ def contact_to_dict(struct):
                     },
                 ],
             }
-            if struct.changed is not None:
+            if nonempty(struct.changed):
                 result['events'].append({
                     "eventAction": 'last changed',
                     "eventDate": unwrap_datetime(struct.changed),
                 })
-            if struct.last_transfer is not None:
+            if nonempty(struct.last_transfer):
                 result['events'].append({
                     "eventAction": 'transfer',
                     "eventDate": unwrap_datetime(struct.last_transfer),
