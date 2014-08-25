@@ -31,6 +31,12 @@ def contact_to_dict(struct):
                         "type":"application/rdap+json",
                     },
                 ],
+                "entities": [
+                    {
+                        "handle": struct.sponsoring_registrar_handle,
+                        "roles": ["registrar"],
+                    },
+                ],
                 "port43": settings.UNIX_WHOIS_HOST,
                 "remarks":[
                     { "description":[ "Omitting data because contact is not linked to any registry object."] }
