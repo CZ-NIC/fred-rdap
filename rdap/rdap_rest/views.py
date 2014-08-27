@@ -7,7 +7,9 @@ from rest_framework.response import Response
 from .whois import get_contact_by_handle, get_domain_by_handle, get_keyset_by_handle, get_nameserver_by_handle, \
     get_nsset_by_handle
 from rdap.utils.py_logging import get_logger
+from .rdap_utils import get_disclaimer_text
 
+from django.conf import settings
 
 def translate_rest_path_to_request_type(path):
     if path == 'entity':
@@ -30,19 +32,32 @@ def create_log_request(path, handle, remote_addr):
 
 def response_handling(data_getter, getter_input_handle, log_request):
     try:
+        log_content = ''
         query_result = data_getter(getter_input_handle)
         if query_result is None:
             log_status = 'NotFound'
             return Response(None, status=status.HTTP_404_NOT_FOUND)
         else:
             log_status = 'Ok'
+            if settings.DISCLAIMER_FILE:
+                if not 'notices' in query_result:
+                    query_result["notices"] = []
+                query_result["notices"].append(
+                    {
+                        "title": "Disclaimer",
+                        "description": [ get_disclaimer_text() ]
+                    }
+                )
+
             return Response(query_result)
     except Exception, e:
         logging.debug(str(e))
         logging.debug(traceback.format_exc())
         log_status = 'InternalServerError'
+        log_content = str(e)
+        return Response(None, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     finally:
-        log_request.close(log_status)
+        log_request.close(log_status, log_content)
 
 
 
