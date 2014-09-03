@@ -22,7 +22,9 @@ class ModuleInstall(install):
         ('nshostport=', None,
          'host:port of CORBA name service'),
         ('wsgirundir=', None,
-         'Directory for WSGI socket')
+         'Directory for WSGI socket'),
+        ('disclaimerfile=', None,
+         'File with disclaimer')
     ]
     
     def initialize_options(self):
@@ -32,14 +34,20 @@ class ModuleInstall(install):
         self.unixwhoishost = None
         self.nshostport = None
         self.wsgirundir = None
+        self.disclaimerfile = None
 
     def update_rdap_cfg_py(self, filename):
-        if self.nshostport is not None or self.host is not None or self.unixwhoishost is not None:
+        if self.nshostport is not None or self.host is not None or self.unixwhoishost is not None or self.disclaimerfile:
             content = open(filename).read()
             content = content.replace("CORBA_IDL_ROOT_PATH = ''",       "CORBA_IDL_ROOT_PATH = '" + self.expand_filename('$data/share/idl/fred') + "'")
-            content = content.replace("CORBA_NS_HOST_PORT = ''",        "CORBA_NS_HOST_PORT = '" + self.nshostport + "'")
-            content = content.replace("RDAP_ROOT_URL = ''",             "RDAP_ROOT_URL = 'http://" + self.host + ":" + self.port + "'")
-            content = content.replace("UNIX_WHOIS_HOST = ''",           "UNIX_WHOIS_HOST = '" + self.unixwhoishost + "'")
+            if self.nshostport is not None:
+                content = content.replace("CORBA_NS_HOST_PORT = ''",        "CORBA_NS_HOST_PORT = '" + self.nshostport + "'")
+            if self.host is not None and self.port is not None:
+                content = content.replace("RDAP_ROOT_URL = ''",             "RDAP_ROOT_URL = 'http://" + self.host + ":" + self.port + "'")
+            if self.unixwhoishost is not None:
+                content = content.replace("UNIX_WHOIS_HOST = ''",           "UNIX_WHOIS_HOST = '" + self.unixwhoishost + "'")
+            if self.disclaimerfile is not None:
+                content = content.replace("DISCLAIMER_FILE = ''",           "DISCLAIMER_FILE = '" + self.disclaimerfile + "'")
 
             open(filename, 'w').write(content)
             self.announce("File '%s' was updated" % filename)
@@ -81,6 +89,7 @@ def main():
           data_files=[
               ('$sysconf/fred/', ['settings_rdap/rdap_cfg.py']),
               ('$data/share/rdap', ['settings_rdap/apache.conf']),
+              ('$sysconf/fred/', ['settings_rdap/rdap_disclaimer.txt']),
               ('$purelib/rdap', ['rdap/run.wsgi'])
           ],
           cmdclass={'install': ModuleInstall},
