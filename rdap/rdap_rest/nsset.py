@@ -55,7 +55,7 @@ def nsset_to_dict(struct):
             ],
             "nameServers" : [],
         }
-        
+
         if struct.statuses:
             result["status"] = struct.statuses
 

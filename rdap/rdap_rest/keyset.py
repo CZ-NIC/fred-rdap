@@ -57,7 +57,7 @@ def keyset_to_dict(struct):
 
         if struct.statuses:
             result["status"] = struct.statuses
-            
+
         for tech_c in struct.tech_contact_handles:
             result['entities'].append({
                 "handle": tech_c,

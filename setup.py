@@ -11,7 +11,7 @@ PROJECT_NAME = 'rdap'
 
 
 class ModuleInstall(install):
-    
+
     user_options = install.user_options + [
         ('host=', None,
          'RDAP host'),
@@ -26,7 +26,7 @@ class ModuleInstall(install):
         ('disclaimerfile=', None,
          'File with disclaimer')
     ]
-    
+
     def initialize_options(self):
         install.initialize_options(self)
         self.host = None
@@ -39,19 +39,19 @@ class ModuleInstall(install):
     def update_rdap_cfg_py(self, filename):
         if self.nshostport is not None or self.host is not None or self.unixwhoishost is not None or self.disclaimerfile:
             content = open(filename).read()
-            content = content.replace("CORBA_IDL_ROOT_PATH = ''",       "CORBA_IDL_ROOT_PATH = '" + self.expand_filename('$data/share/idl/fred') + "'")
+            content = content.replace("CORBA_IDL_ROOT_PATH = ''", "CORBA_IDL_ROOT_PATH = '" + self.expand_filename('$data/share/idl/fred') + "'")
             if self.nshostport is not None:
-                content = content.replace("CORBA_NS_HOST_PORT = ''",        "CORBA_NS_HOST_PORT = '" + self.nshostport + "'")
+                content = content.replace("CORBA_NS_HOST_PORT = ''", "CORBA_NS_HOST_PORT = '" + self.nshostport + "'")
             if self.host is not None and self.port is not None:
-                content = content.replace("RDAP_ROOT_URL = ''",             "RDAP_ROOT_URL = 'http://" + self.host + ":" + self.port + "'")
+                content = content.replace("RDAP_ROOT_URL = ''", "RDAP_ROOT_URL = 'http://" + self.host + ":" + self.port + "'")
             if self.unixwhoishost is not None:
-                content = content.replace("UNIX_WHOIS_HOST = ''",           "UNIX_WHOIS_HOST = '" + self.unixwhoishost + "'")
+                content = content.replace("UNIX_WHOIS_HOST = ''", "UNIX_WHOIS_HOST = '" + self.unixwhoishost + "'")
             if self.disclaimerfile is not None:
-                content = content.replace("DISCLAIMER_FILE = ''",           "DISCLAIMER_FILE = '" + self.disclaimerfile + "'")
+                content = content.replace("DISCLAIMER_FILE = ''", "DISCLAIMER_FILE = '" + self.disclaimerfile + "'")
 
             open(filename, 'w').write(content)
             self.announce("File '%s' was updated" % filename)
-        
+
     def update_apache_conf(self, filename):
         if self.port is not None or self.wsgirundir is not None:
             content = open(filename).read()
@@ -61,7 +61,7 @@ class ModuleInstall(install):
 
             open(filename, 'w').write(content)
             self.announce("File '%s' was updated" % filename)
-        
+
     def update_run_wsgi(self, filename):
         if self.wsgirundir is not None:
             content = open(filename).read()
@@ -69,7 +69,7 @@ class ModuleInstall(install):
 
             open(filename, 'w').write(content)
             self.announce("File '%s' was updated" % filename)
-        
+
 
 def main():
     setup(name=PROJECT_NAME,
