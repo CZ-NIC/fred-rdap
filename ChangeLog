@@ -1,9 +1,13 @@
+2014-09-03 Jan Korous (0.1.1)
+
+  * add optional disclaimer text from file (settings)
+
 2014-08-01 Jan Korous, Jiri Sadek (0.1.0)
 
   * prototype of RDAP implementation for FRED registry system
     - implemented queries for - entity, domain, nameserver
     - extension for FRED specific types - cznic_nsset, cznic_keyset
     - used drafts:
-	  - http://tools.ietf.org/html/draft-ietf-weirds-rdap-query-10
-	  - http://tools.ietf.org/html/draft-ietf-weirds-json-response-07
-	  - http://tools.ietf.org/html/draft-ietf-weirds-using-http-08
+      - http://tools.ietf.org/html/draft-ietf-weirds-rdap-query-10
+      - http://tools.ietf.org/html/draft-ietf-weirds-json-response-07
+      - http://tools.ietf.org/html/draft-ietf-weirds-using-http-08
