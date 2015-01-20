@@ -27,6 +27,10 @@ def domain_to_dict(struct):
     if struct is None:
         result = None
     else:
+        if nonempty(struct.statuses):
+            if "deleteCandidate" in struct.statuses:
+                return delete_candidate_domain_to_dict(struct)
+
         self_link = settings.RDAP_DOMAIN_URL_TMPL % {"handle": struct.handle}
 
         result = {
@@ -184,6 +188,39 @@ def domain_to_dict(struct):
                         "algorithm": key.alg,
                         "publicKey": key.public_key,
                     })
+
+    logging.debug(result)
+    return result
+
+def delete_candidate_domain_to_dict(struct):
+    """
+    Transform CORBA domain struct containing deleteCandidate data to python dictionary
+    """
+    logging.debug(struct)
+
+    if struct is None:
+        result = None
+    else:
+        self_link = settings.RDAP_DOMAIN_URL_TMPL % {"handle": struct.handle}
+
+        result = {
+            "rdapConformance": ["rdap_level_0", "cznic_version_0"],
+            "handle": struct.handle,
+            "ldhName": struct.handle,
+#            "unicodeName": struct.handle, # should be present only when containing non-ASCII chars
+            "links": [
+                {
+                    "value": self_link,
+                    "rel": "self",
+                    "href": self_link,
+                    "type": "application/rdap+json",
+                },
+            ],
+            "port43": settings.UNIX_WHOIS_HOST
+        }
+
+        if struct.statuses:
+            result["status"] = ["pending delete"]
 
     logging.debug(result)
     return result
