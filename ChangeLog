@@ -1,3 +1,7 @@
+2015-01-27 Jan Korous (0.2.0)
+
+  * show 'delete pending' status for domains scheduled for deletion
+
 2014-09-03 Jan Korous (0.1.1)
 
   * add optional disclaimer text from file (settings)
