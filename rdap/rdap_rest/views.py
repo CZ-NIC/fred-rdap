@@ -36,7 +36,7 @@ def response_handling(data_getter, getter_input_handle, log_request):
         query_result = data_getter(getter_input_handle)
         if query_result is None:
             log_status = 'NotFound'
-            return Response(None, status=status.HTTP_404_NOT_FOUND)
+            return Response(None, status=status.HTTP_404_NOT_FOUND, headers={'Access-Control-Allow-Origin': '*'})
         else:
             log_status = 'Ok'
             if settings.DISCLAIMER_FILE:
@@ -49,13 +49,14 @@ def response_handling(data_getter, getter_input_handle, log_request):
                     }
                 )
 
-            return Response(query_result)
+            return Response(query_result, headers={'Access-Control-Allow-Origin': '*'})
     except Exception, e:
         logging.debug(str(e))
         logging.debug(traceback.format_exc())
         log_status = 'InternalServerError'
         log_content = str(e)
-        return Response(None, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(None, status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        headers={'Access-Control-Allow-Origin': '*'})
     finally:
         log_request.close(log_status, log_content)
 
@@ -141,3 +142,25 @@ class NotFound(viewsets.ViewSet):
     def retrieve(self, request, handle=None, path=None):
         create_log_request(path, handle, request.META.get('REMOTE_ADDR', '')).close('NotFound')
         return Response(None, status=status.HTTP_404_NOT_FOUND)
+
+
+class Unsupported(viewsets.ViewSet):
+    """
+    Unsupported View
+    """
+    def retrieve(self, request, handle=None, path=None):
+        return Response(None, status=status.HTTP_501_NOT_IMPLEMENTED)
+
+
+class Help(viewsets.ViewSet):
+    """
+    Help View
+    """
+    def retrieve(self, request):
+        help_response = {
+            "rdapConformance": ["rdap_level_0"],
+            "notices": [
+                {"title": "Help", "description": ["No help."]}
+            ]
+        }
+        return Response(help_response, headers={'Access-Control-Allow-Origin': '*'})

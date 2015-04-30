@@ -19,6 +19,8 @@ def nameserver_to_dict(struct):
 
         result = {
           "rdapConformance": ["rdap_level_0"],
+          "objectClassName": "nameserver",
+          "handle": struct.fqdn,
           "ldhName": struct.fqdn,
           "links": [
               {

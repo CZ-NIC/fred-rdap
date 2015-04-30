@@ -22,6 +22,7 @@ def contact_to_dict(struct):
         if not "linked" in struct.statuses:
             result = {
                 "rdapConformance" : ["rdap_level_0"],
+                "objectClassName": "entity",
                 "handle": struct.handle,
                 "links": [
                     {
@@ -33,6 +34,7 @@ def contact_to_dict(struct):
                 ],
                 "entities": [
                     {
+                        "objectClassName": "entity",
                         "handle": struct.sponsoring_registrar_handle,
                         "roles": ["registrar"],
                     },
@@ -81,6 +83,7 @@ def contact_to_dict(struct):
                 )
 
             result = {
+                "objectClassName": "entity",
                 "rdapConformance" : ["rdap_level_0"],
                 "handle": struct.handle,
                 "vcardArray": ["vcard", vcard],
@@ -102,6 +105,7 @@ def contact_to_dict(struct):
                 ],
                 "entities": [
                     {
+                        "objectClassName": "entity",
                         "handle": struct.sponsoring_registrar_handle,
                         "roles": ["registrar"],
                     },

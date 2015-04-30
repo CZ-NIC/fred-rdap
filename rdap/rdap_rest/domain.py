@@ -35,6 +35,7 @@ def domain_to_dict(struct):
 
         result = {
             "rdapConformance": ["rdap_level_0", "cznic_version_0"],
+            "objectClassName": "domain",
             "handle": struct.handle,
             "ldhName": struct.handle,
 #            "unicodeName": struct.handle, # should be present only when containing non-ASCII chars
@@ -59,6 +60,7 @@ def domain_to_dict(struct):
             ],
             "entities": [
                 {
+                    "objectClassName": "entity",
                     "handle": struct.registrant_handle,
                     "roles": ["registrant"],
                     "links": [
@@ -71,6 +73,7 @@ def domain_to_dict(struct):
                     ]
                 },
                 {
+                    "objectClassName": "entity",
                     "handle": struct.registrar_handle,
                     "roles": ["registrar"],
                 },
@@ -80,6 +83,7 @@ def domain_to_dict(struct):
         for admin_contact in struct.admin_contact_handles:
             result['entities'].append(
                 {
+                    "objectClassName": "entity",
                     "handle": admin_contact,
                     "roles": ["administrative"],
                     "links": [
@@ -112,8 +116,9 @@ def domain_to_dict(struct):
         if nonempty(struct.nsset_handle):
             nsset = c2u(_WHOIS.get_nsset_by_handle(u2c(struct.nsset_handle)))
             if nsset is not None:
-                result["nameServers"] = []
+                result["nameservers"] = []
                 result['cznic_nsset'] = {
+                    "objectClassName": "nsset",
                     "handle": nsset.handle,
                     "links": [
                         {
@@ -123,10 +128,11 @@ def domain_to_dict(struct):
                           "type": "application/rdap+json"
                         },
                     ],
-                    "nameServers" : [],
+                    "nameservers" : [],
                 }
                 for ns in nsset.nservers:
                     ns_obj = {
+                        "objectClassName": "nameserver",
                         "handle": ns.fqdn,
                         "ldhName": ns.fqdn,
                         "links": [
@@ -151,8 +157,8 @@ def domain_to_dict(struct):
                             ns_obj["ipAddresses"]["v4"] = addrs_v4
                         if addrs_v6:
                             ns_obj["ipAddresses"]["v6"] = addrs_v6
-                    result['nameServers'].append(ns_obj)
-                    result['cznic_nsset']['nameServers'].append(ns_obj)
+                    result['nameservers'].append(ns_obj)
+                    result['cznic_nsset']['nameservers'].append(ns_obj)
 
         if nonempty(struct.keyset_handle):
             keyset = c2u(_WHOIS.get_keyset_by_handle(u2c(struct.keyset_handle)))
@@ -164,6 +170,7 @@ def domain_to_dict(struct):
                     "keyData": [],
                 }
                 result['cznic_keyset'] = {
+                    "objectClassName": "keyset",
                     "handle": keyset.handle,
                     "links": [
                         {
@@ -204,6 +211,7 @@ def delete_candidate_domain_to_dict(struct):
         self_link = settings.RDAP_DOMAIN_URL_TMPL % {"handle": struct.handle}
 
         result = {
+            "objectClassName": "domain",
             "rdapConformance": ["rdap_level_0", "cznic_version_0"],
             "handle": struct.handle,
             "ldhName": struct.handle,
