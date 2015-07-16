@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, include, url
 
 from rdap.rdap_rest.views import DomainViewSet, EntityViewSet, KeySetViewSet, MalformedRdapPath, NameserverViewSet, \
-    NotFound, NSSetViewSet
+    NotFound, NSSetViewSet, Unsupported, Help
 
 
 entity_detail = EntityViewSet.as_view({'get': 'retrieve'})
@@ -11,6 +11,8 @@ nsset_detail = NSSetViewSet.as_view({'get': 'retrieve'})
 keyset_detail = KeySetViewSet.as_view({'get': 'retrieve'})
 malformed_rdap_path = MalformedRdapPath.as_view({'get': 'retrieve'})
 not_found = NotFound.as_view({'get': 'retrieve'})
+unsupported = Unsupported.as_view({'get': 'retrieve'})
+help_page = Help.as_view({'get': 'retrieve'})
 
 
 urlpatterns = patterns('',
@@ -21,5 +23,7 @@ urlpatterns = patterns('',
     url(r'(?i)^(?P<path>cznic_keyset)/(?P<handle>[A-Z0-9_\:\.\-]{1,255})$', keyset_detail, name='keyset-detail'),
     url(r'(?i)^(?P<path>(entity|domain|nameserver|cznic_nsset|cznic_keyset))/(?P<handle>.+)$', not_found,
         name='not-found'),
+    url(r'(?i)^(?P<path>autnum|ip).*', unsupported, name='unsupported'),
+    url(r'(?i)^help$', help_page, name='help'),
     url(r'.*', malformed_rdap_path, name='malformed-path-view'),
 )

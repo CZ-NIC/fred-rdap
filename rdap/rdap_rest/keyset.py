@@ -31,9 +31,11 @@ def keyset_to_dict(struct):
 
         result = {
             "rdapConformance" : ["rdap_level_0", "cznic_version_0"],
+            "objectClassName": "keyset",
             "handle": struct.handle,
             "entities": [
                 {
+                    "objectClassName": "entity",
                     "handle": struct.registrar_handle,
                     "roles": ["registrar"],
                 },
@@ -60,6 +62,7 @@ def keyset_to_dict(struct):
 
         for tech_c in struct.tech_contact_handles:
             result['entities'].append({
+                "objectClassName": "entity",
                 "handle": tech_c,
                 "roles": ["technical"],
                 "links": [

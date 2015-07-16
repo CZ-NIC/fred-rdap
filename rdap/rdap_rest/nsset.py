@@ -31,9 +31,11 @@ def nsset_to_dict(struct):
 
         result = {
             "rdapConformance" : ["rdap_level_0", "cznic_version_0"],
+            "objectClassName": "nsset",
             "handle": struct.handle,
             "entities": [
                 {
+                    "objectClassName": "entity",
                     "handle": struct.registrar_handle,
                     "roles": ["registrar"],
                 }
@@ -61,6 +63,7 @@ def nsset_to_dict(struct):
 
         for tech_c in struct.tech_contact_handles:
             result['entities'].append({
+                "objectClassName": "entity",
                 "handle": tech_c,
                 "roles": ["technical"],
                 "links": [
@@ -75,6 +78,7 @@ def nsset_to_dict(struct):
 
         for ns in struct.nservers:
             ns_json = {
+                "objectClassName": "nameserver",
                 "handle": ns.fqdn,
                 "ldhName": ns.fqdn,
                 "links": [
