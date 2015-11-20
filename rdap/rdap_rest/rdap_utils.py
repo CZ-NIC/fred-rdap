@@ -13,8 +13,17 @@ def unwrap_datetime(idl_datetime):
 def unwrap_date(idl_date):
     return date(idl_date.year, idl_date.month, idl_date.day)
 
+
 def nonempty(input):
     return input is not None and input != ''
+
+
+def disclosable_nonempty(disclosable):
+    if disclosable.disclose:
+        return nonempty(disclosable.value)
+    else:
+        return False
+
 
 def get_disclaimer_text():
     if get_disclaimer_text.text is None:
