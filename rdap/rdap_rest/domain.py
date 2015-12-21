@@ -11,6 +11,7 @@ from rdap.utils.corbarecoder import u2c, c2u
 from .rdap_utils import unwrap_date, unwrap_datetime
 from .rdap_utils import nonempty
 from .rdap_utils import ObjectClassName
+from .rdap_utils import rdap_status_mapping
 
 importIDL('%s/%s' % (settings.CORBA_IDL_ROOT_PATH, settings.CORBA_IDL_WHOIS_FILENAME))
 _CORBA = Corba(ior=settings.CORBA_NS_HOST_PORT, context_name=settings.CORBA_NS_CONTEXT,
@@ -97,8 +98,9 @@ def domain_to_dict(struct):
                     ],
                 }
             )
-        if struct.statuses:
-            result["status"] = struct.statuses
+        status = rdap_status_mapping(struct.statuses)
+        if status:
+            result["status"] = status
         if nonempty(struct.changed):
             result['events'].append({
                 "eventAction": "last changed",

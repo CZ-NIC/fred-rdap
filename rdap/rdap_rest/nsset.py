@@ -10,6 +10,7 @@ from rdap.utils.corba import Corba, importIDL
 from .rdap_utils import unwrap_datetime
 from .rdap_utils import nonempty
 from .rdap_utils import ObjectClassName
+from .rdap_utils import rdap_status_mapping
 
 importIDL(settings.CORBA_IDL_ROOT_PATH + '/' + settings.CORBA_IDL_WHOIS_FILENAME)
 
@@ -59,8 +60,9 @@ def nsset_to_dict(struct):
             "nameservers" : [],
         }
 
-        if struct.statuses:
-            result["status"] = struct.statuses
+        status = rdap_status_mapping(struct.statuses)
+        if status:
+            result["status"] = status
 
         for tech_c in struct.tech_contact_handles:
             result['entities'].append({

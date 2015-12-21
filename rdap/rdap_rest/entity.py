@@ -8,6 +8,7 @@ from django.conf import settings
 from .rdap_utils import unwrap_datetime
 from .rdap_utils import nonempty, disclosable_nonempty
 from .rdap_utils import ObjectClassName
+from .rdap_utils import rdap_status_mapping
 
 
 def contact_to_dict(struct):
@@ -113,8 +114,9 @@ def contact_to_dict(struct):
                     },
                 ],
             }
-            if struct.statuses:
-                result["status"] = struct.statuses
+            status = rdap_status_mapping(struct.statuses)
+            if status:
+                result["status"] = status
             if nonempty(struct.changed):
                 result['events'].append({
                     "eventAction": 'last changed',
