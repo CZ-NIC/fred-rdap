@@ -16,13 +16,11 @@ help_page = Help.as_view({'get': 'retrieve'})
 
 
 urlpatterns = patterns('',
-    url(r'(?i)^(?P<path>entity)/(?P<handle>[A-Z0-9_\:\.\-]{1,255})$', entity_detail, name='entity-detail'),
-    url(r'(?i)^(?P<path>domain)/(?P<handle>[A-Z0-9_\.\-]{1,255})$', domain_detail, name='domain-detail'),
-    url(r'(?i)^(?P<path>nameserver)/(?P<handle>[A-Z0-9_\.\-]{1,255})$', nameserver_detail, name='nameserver-detail'),
-    url(r'(?i)^(?P<path>cznic_nsset)/(?P<handle>[A-Z0-9_\:\.\-]{1,255})$', nsset_detail, name='nsset-detail'),
-    url(r'(?i)^(?P<path>cznic_keyset)/(?P<handle>[A-Z0-9_\:\.\-]{1,255})$', keyset_detail, name='keyset-detail'),
-    url(r'(?i)^(?P<path>(entity|domain|nameserver|cznic_nsset|cznic_keyset))/(?P<handle>.+)$', malformed_rdap_path,
-        name='malformed-path-view'),
+    url(r'(?i)^(?P<path>entity)/(?P<handle>.+)$', entity_detail, name='entity-detail'),
+    url(r'(?i)^(?P<path>domain)/(?P<handle>.+)$', domain_detail, name='domain-detail'),
+    url(r'(?i)^(?P<path>nameserver)/(?P<handle>.+)$', nameserver_detail, name='nameserver-detail'),
+    url(r'(?i)^(?P<path>cznic_nsset)/(?P<handle>.+)$', nsset_detail, name='nsset-detail'),
+    url(r'(?i)^(?P<path>cznic_keyset)/(?P<handle>.+)$', keyset_detail, name='keyset-detail'),
     url(r'(?i)^(?P<path>autnum|ip).*', unsupported, name='unsupported'),
     url(r'(?i)^help$', help_page, name='help'),
     url(r'.*', malformed_rdap_path, name='malformed-path-view'),
