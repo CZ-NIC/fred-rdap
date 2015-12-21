@@ -55,7 +55,7 @@ def nsset_to_dict(struct):
                     "type": "application/rdap+json",
                 },
             ],
-            "nameServers" : [],
+            "nameservers" : [],
         }
 
         if struct.statuses:
@@ -104,7 +104,7 @@ def nsset_to_dict(struct):
                 if addrs_v6:
                     ns_json["ipAddresses"]["v6"] = addrs_v6
 
-            result['nameServers'].append(ns_json)
+            result['nameservers'].append(ns_json)
 
         if nonempty(struct.changed):
             result['events'].append({
