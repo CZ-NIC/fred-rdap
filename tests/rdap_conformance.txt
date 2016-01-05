@@ -1,0 +1,10 @@
+Running conformance tests
+=========================
+
+  1. clone repository:
+    fred-rdap $> git clone https://github.com/APNIC-net/rdap-conformance.git
+  2. build (run maven)
+    fred-rdap/rdap-conformace $> mvn package
+  3. create test configuration, see example rdap_conformance_conf.json.example
+  4. run tests
+    fred-rdap/rdap-conformace $> java -jar target/rdap-conformance-<version>.jar rdap_conformance_conf.json
