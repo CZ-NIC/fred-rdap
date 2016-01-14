@@ -144,15 +144,6 @@ class MalformedRdapPathViewSet(viewsets.ViewSet):
         return Response(None, status=status.HTTP_400_BAD_REQUEST)
 
 
-class NotFoundViewSet(viewsets.ViewSet):
-    """
-    NotFound View
-    """
-    def retrieve(self, request, handle=None, path=None):
-        create_log_request(path, handle, request.META.get('REMOTE_ADDR', '')).close('NotFound')
-        return Response(None, status=status.HTTP_404_NOT_FOUND)
-
-
 class UnsupportedViewSet(viewsets.ViewSet):
     """
     Unsupported View
