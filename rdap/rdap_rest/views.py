@@ -136,7 +136,7 @@ class KeySetViewSet(viewsets.ViewSet):
         )
 
 
-class MalformedRdapPath(viewsets.ViewSet):
+class MalformedRdapPathViewSet(viewsets.ViewSet):
     """
     MalformedRdapPath View
     """
@@ -144,7 +144,7 @@ class MalformedRdapPath(viewsets.ViewSet):
         return Response(None, status=status.HTTP_400_BAD_REQUEST)
 
 
-class NotFound(viewsets.ViewSet):
+class NotFoundViewSet(viewsets.ViewSet):
     """
     NotFound View
     """
@@ -153,7 +153,7 @@ class NotFound(viewsets.ViewSet):
         return Response(None, status=status.HTTP_404_NOT_FOUND)
 
 
-class Unsupported(viewsets.ViewSet):
+class UnsupportedViewSet(viewsets.ViewSet):
     """
     Unsupported View
     """
@@ -161,7 +161,7 @@ class Unsupported(viewsets.ViewSet):
         return Response(None, status=status.HTTP_501_NOT_IMPLEMENTED)
 
 
-class Help(viewsets.ViewSet):
+class HelpViewSet(viewsets.ViewSet):
     """
     Help View
     """

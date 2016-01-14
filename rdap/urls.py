@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, include, url
 
-from rdap.rdap_rest.views import DomainViewSet, EntityViewSet, KeySetViewSet, MalformedRdapPath, NameserverViewSet, \
-    NSSetViewSet, Unsupported, Help
+from rdap.rdap_rest.views import DomainViewSet, EntityViewSet, KeySetViewSet, MalformedRdapPathViewSet, \
+    NameserverViewSet, NSSetViewSet, UnsupportedViewSet, HelpViewSet
 
 
 entity_detail = EntityViewSet.as_view({'get': 'retrieve'})
@@ -9,9 +9,9 @@ domain_detail = DomainViewSet.as_view({'get': 'retrieve'})
 nameserver_detail = NameserverViewSet.as_view({'get': 'retrieve'})
 nsset_detail = NSSetViewSet.as_view({'get': 'retrieve'})
 keyset_detail = KeySetViewSet.as_view({'get': 'retrieve'})
-malformed_rdap_path = MalformedRdapPath.as_view({'get': 'retrieve'})
-unsupported = Unsupported.as_view({'get': 'retrieve'})
-help_page = Help.as_view({'get': 'retrieve'})
+malformed_rdap_path = MalformedRdapPathViewSet.as_view({'get': 'retrieve'})
+unsupported = UnsupportedViewSet.as_view({'get': 'retrieve'})
+help_page = HelpViewSet.as_view({'get': 'retrieve'})
 
 
 urlpatterns = patterns('',
