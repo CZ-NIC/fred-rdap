@@ -24,12 +24,14 @@ _INTERFACE = _CORBA.Registry
 
 
 class NotFoundError(Exception):
-    pass
-
+    """
+    Represents error when requested object is not found
+    """
 
 class InvalidHandleError(Exception):
-    pass
-
+    """
+    Requested object identifier is not valid (bad format)
+    """
 
 
 def get_contact_by_handle(handle):
