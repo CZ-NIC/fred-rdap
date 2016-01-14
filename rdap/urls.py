@@ -20,7 +20,7 @@ urlpatterns = patterns('',
     url(r'(?i)^(?P<path>nameserver)/(?P<handle>.+)$', nameserver_detail, name='nameserver-detail'),
     url(r'(?i)^(?P<path>cznic_nsset)/(?P<handle>.+)$', nsset_detail, name='nsset-detail'),
     url(r'(?i)^(?P<path>cznic_keyset)/(?P<handle>.+)$', keyset_detail, name='keyset-detail'),
-    url(r'(?i)^(?P<path>autnum|ip).*', unsupported, name='unsupported'),
+    url(r'(?i)^(?P<path>autnum|ip)/.+', unsupported, name='unsupported'),
     url(r'(?i)^help$', help_page, name='help'),
     url(r'.*', malformed_rdap_path, name='malformed-path-view'),
 )
