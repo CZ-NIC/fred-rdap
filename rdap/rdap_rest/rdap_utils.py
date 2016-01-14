@@ -19,6 +19,9 @@ def nonempty(input):
 
 
 def disclosable_nonempty(disclosable):
+    """
+    Check if value which can be hidden by user setting should be added to output
+    """
     if disclosable.disclose:
         return nonempty(disclosable.value)
     else:
