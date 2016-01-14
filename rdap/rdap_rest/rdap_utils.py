@@ -33,3 +33,11 @@ def get_disclaimer_text():
     return get_disclaimer_text.text
 
 get_disclaimer_text.text = None
+
+
+class ObjectClassName(object):
+    DOMAIN = 'domain'
+    ENTITY = 'entity'
+    NAMESERVER = 'nameserver'
+    NSSET = 'nsset'
+    KEYSET = 'keyset'

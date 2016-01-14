@@ -9,6 +9,7 @@ from django.utils.functional import SimpleLazyObject
 from rdap.utils.corba import Corba, importIDL
 from .rdap_utils import unwrap_datetime
 from .rdap_utils import nonempty
+from .rdap_utils import ObjectClassName
 
 importIDL(settings.CORBA_IDL_ROOT_PATH + '/' + settings.CORBA_IDL_WHOIS_FILENAME)
 
@@ -31,11 +32,11 @@ def keyset_to_dict(struct):
 
         result = {
             "rdapConformance" : ["rdap_level_0", "cznic_version_0"],
-            "objectClassName": "keyset",
+            "objectClassName": ObjectClassName.KEYSET,
             "handle": struct.handle,
             "entities": [
                 {
-                    "objectClassName": "entity",
+                    "objectClassName": ObjectClassName.ENTITY,
                     "handle": struct.registrar_handle,
                     "roles": ["registrar"],
                 },
@@ -62,7 +63,7 @@ def keyset_to_dict(struct):
 
         for tech_c in struct.tech_contact_handles:
             result['entities'].append({
-                "objectClassName": "entity",
+                "objectClassName": ObjectClassName.ENTITY,
                 "handle": tech_c,
                 "roles": ["technical"],
                 "links": [
