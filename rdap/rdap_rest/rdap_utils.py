@@ -29,7 +29,12 @@ def disclosable_nonempty(disclosable):
         return False
 
 
-EPP_TO_RDAP_STATUS_MAPPING = {
+RDAP_STATUS_MAPPING = {
+    # EPP defined
+    # https://tools.ietf.org/html/rfc7483#section-10.2.2
+    #
+    # empty values will be added from draft
+    # https://tools.ietf.org/html/draft-gould-epp-rdap-status-mapping-02
     'addPeriod': '',
     'autoRenewPeriod': '',
     'clientDeleteProhibited': '',
@@ -54,10 +59,7 @@ EPP_TO_RDAP_STATUS_MAPPING = {
     'serverUpdateProhibited': '',
     'serverHold': '',
     'transferPeriod': '',
-}
-
-
-CUSTOM_TO_RDAP_STATUS_MAPPING = {
+    # FRED custom
     'validatedContact': 'validated',
     'contactPassedManualVerification': 'validated',
     'deleteCandidate': 'pending delete',
@@ -65,19 +67,17 @@ CUSTOM_TO_RDAP_STATUS_MAPPING = {
 }
 
 
-STATUS_MAPPING = (
-    EPP_TO_RDAP_STATUS_MAPPING,
-    CUSTOM_TO_RDAP_STATUS_MAPPING,
-)
-
-
 def rdap_status_mapping(status_list):
+    """
+    Translates backend status identifiers to rdap values
+    ('ok' status is not returned by backend and it is represented
+    with empty input list - means no restrictions or pending operations)
+    """
     if not status_list:
         status_list = ['ok']
     ret = set()
     for status in status_list:
-        for mapping in STATUS_MAPPING:
-            mapped_value = mapping.get(status)
+            mapped_value = RDAP_STATUS_MAPPING.get(status)
             if mapped_value:
                 ret.add(mapped_value)
     return ret
