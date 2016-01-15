@@ -70,6 +70,7 @@ RDAP_STATUS_MAPPING = {
 def rdap_status_mapping(status_list):
     """
     Translates backend status identifiers to rdap values
+
     ('ok' status is not returned by backend and it is represented
     with empty input list - means no restrictions or pending operations)
     """
@@ -77,9 +78,9 @@ def rdap_status_mapping(status_list):
         status_list = ['ok']
     ret = set()
     for status in status_list:
-            mapped_value = RDAP_STATUS_MAPPING.get(status)
-            if mapped_value:
-                ret.add(mapped_value)
+        mapped_value = RDAP_STATUS_MAPPING.get(status)
+        if mapped_value:
+            ret.add(mapped_value)
     return ret
 
 
