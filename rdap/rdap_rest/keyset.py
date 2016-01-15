@@ -7,10 +7,8 @@ from django.conf import settings
 from django.utils.functional import SimpleLazyObject
 
 from rdap.utils.corba import Corba, importIDL
-from .rdap_utils import unwrap_datetime
-from .rdap_utils import nonempty
-from .rdap_utils import ObjectClassName
-from .rdap_utils import rdap_status_mapping
+
+from .rdap_utils import ObjectClassName, nonempty, rdap_status_mapping, unwrap_datetime
 
 importIDL(settings.CORBA_IDL_ROOT_PATH + '/' + settings.CORBA_IDL_WHOIS_FILENAME)
 

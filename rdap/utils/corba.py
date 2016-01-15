@@ -1,15 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+import logging
 import sys
 import types
-import logging
 
-# extension imports
-import omniORB
 import CosNaming
+import omniORB
+from django.conf import settings
 from omniORB import CORBA, importIDL
 
-from django.conf import settings
 
 # own exceptions
 class IorNotFoundError(Exception):

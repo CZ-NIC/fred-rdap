@@ -7,13 +7,13 @@ from django.conf import settings
 from django.utils.functional import SimpleLazyObject
 
 from rdap.utils.corba import Corba, importIDL
-from rdap.utils.corbarecoder import u2c, c2u
+from rdap.utils.corbarecoder import c2u, u2c
+
 from .domain import domain_to_dict
 from .entity import contact_to_dict
 from .keyset import keyset_to_dict
 from .nameserver import nameserver_to_dict
 from .nsset import nsset_to_dict
-
 
 importIDL(settings.CORBA_IDL_ROOT_PATH + '/' + settings.CORBA_IDL_WHOIS_FILENAME)
 

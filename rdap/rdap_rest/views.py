@@ -1,16 +1,16 @@
 import logging
 import traceback
 
-from rest_framework import viewsets, status
+from django.conf import settings
+from rest_framework import status, viewsets
 from rest_framework.response import Response
 
-from .whois import get_contact_by_handle, get_domain_by_handle, get_keyset_by_handle, \
-    get_nameserver_by_handle, get_nsset_by_handle, NotFoundError, InvalidHandleError
-
 from rdap.utils.py_logging import get_logger
-from .rdap_utils import get_disclaimer_text
 
-from django.conf import settings
+from .rdap_utils import get_disclaimer_text
+from .whois import InvalidHandleError, NotFoundError, get_contact_by_handle, get_domain_by_handle, \
+    get_keyset_by_handle, get_nameserver_by_handle, get_nsset_by_handle
+
 
 def translate_rest_path_to_request_type(path):
     if path == 'entity':

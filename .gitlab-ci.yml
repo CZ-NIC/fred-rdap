@@ -1,0 +1,3 @@
+isort:
+    image: cznic/ubuntu_python_runner:latest
+    script: "isort --recursive --check-only --diff rdap"
