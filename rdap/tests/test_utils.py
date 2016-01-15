@@ -28,12 +28,13 @@ class TestDisclosableOutput(SimpleTestCase):
 class TestStatusMappingDefinition(SimpleTestCase):
 
     def test_ok_status_special_behaviour(self):
-        self.assertEqual(rdap_utils.rdap_status_mapping([]), rdap_utils.rdap_status_mapping(['ok']))
+        self.assertEqual(rdap_utils.rdap_status_mapping([]), set(['active']))
 
-    def test_unknown_key(self):
-        unknown = 'foobar'
-        self.assertTrue(unknown not in rdap_utils.RDAP_STATUS_MAPPING.keys())
-        self.assertEqual(rdap_utils.rdap_status_mapping([unknown]), set([]))
+    def test_unknown_keys(self):
+        self.assertEqual(rdap_utils.rdap_status_mapping(['foobar']), set([]))
+        self.assertEqual(rdap_utils.rdap_status_mapping(['barbaz']), set([]))
+        self.assertEqual(rdap_utils.rdap_status_mapping(['bazfoo']), set([]))
+        self.assertEqual(rdap_utils.rdap_status_mapping(['why-do-cows-moo']), set([]))
 
     def test_defined_mapping(self):
         defined = (
@@ -69,16 +70,12 @@ class TestStatusMappingDefinition(SimpleTestCase):
         for in_list, out_set in defined:
             self.assertEqual(rdap_utils.rdap_status_mapping(in_list), out_set)
 
-    def test_combination(self):
-        defined = (
-            (
-                ['pendingCreate', 'pendingDelete', 'pendingRenew', 'pendingRestore', 'pendingTransfer'],
-                set(['pending create', 'pending delete', 'pending renew', 'pending transfer'])
-            ),
-            (
-                ['validatedContact', 'contactPassedManualVerification', 'deleteCandidate'],
-                set(['validated', 'pending delete'])
-            ),
-        )
-        for in_list, out_set in defined:
-            self.assertEqual(rdap_utils.rdap_status_mapping(in_list), out_set)
+    def test_combination_4_mapped_1_nomap(self):
+        in_list = ['pendingCreate', 'pendingDelete', 'pendingRenew', 'pendingRestore', 'pendingTransfer']
+        out_set = set(['pending create', 'pending delete', 'pending renew', 'pending transfer'])
+        self.assertEqual(rdap_utils.rdap_status_mapping(in_list), out_set)
+
+    def test_combination_same_mapped_value_just_once(self):
+        in_list = ['validatedContact', 'contactPassedManualVerification', 'deleteCandidate']
+        out_set = set(['validated', 'pending delete'])
+        self.assertEqual(rdap_utils.rdap_status_mapping(in_list), out_set)
