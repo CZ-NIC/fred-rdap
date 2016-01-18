@@ -4,6 +4,7 @@ Wrapper module to whois idl interface
 import logging
 
 from django.conf import settings
+from .rdap_utils import ObjectClassName
 
 
 def nameserver_to_dict(struct):
@@ -19,7 +20,7 @@ def nameserver_to_dict(struct):
 
         result = {
           "rdapConformance": ["rdap_level_0"],
-          "objectClassName": "nameserver",
+          "objectClassName": ObjectClassName.NAMESERVER,
           "handle": struct.fqdn,
           "ldhName": struct.fqdn,
           "links": [

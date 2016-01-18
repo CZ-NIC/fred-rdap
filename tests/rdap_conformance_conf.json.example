@@ -1,0 +1,40 @@
+{
+    "baseUrl": "http://localhost:<port>",
+    "objectClasses": {
+        "ip": {
+            "supported": false
+        },
+        "autnum": {
+            "supported": false
+        },
+        "domain": {
+            "supported": true,
+            "exists": ["fred.cz"],
+            "notExists": ["kocanska.cz"],
+            "search": {
+                "name": {
+                    "supported": false
+                }
+            }
+
+        },
+        "nameserver": {
+            "supported": true,
+            "exists": ["a.ns.nic.cz"],
+            "notExists": ["eso.rimmer.cz"]
+        },
+        "entity": {
+            "supported": true,
+            "exists": ["KONTAKT"],
+            "notExists": ["ARTHUR-DENT"],
+            "search": {
+                "fn": {
+                    "supported": false
+                },
+                "handle": {
+                    "supported": false
+                }
+            }
+        }
+    }
+}

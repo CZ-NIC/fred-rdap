@@ -4,8 +4,9 @@ import traceback
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 
-from .whois import get_contact_by_handle, get_domain_by_handle, get_keyset_by_handle, get_nameserver_by_handle, \
-    get_nsset_by_handle
+from .whois import get_contact_by_handle, get_domain_by_handle, get_keyset_by_handle, \
+    get_nameserver_by_handle, get_nsset_by_handle, NotFoundError, InvalidHandleError
+
 from rdap.utils.py_logging import get_logger
 from .rdap_utils import get_disclaimer_text
 
@@ -32,34 +33,42 @@ def create_log_request(path, handle, remote_addr):
 
 def response_handling(data_getter, getter_input_handle, log_request):
     try:
+        rsp_content = None
+        rsp_status = status.HTTP_500_INTERNAL_SERVER_ERROR
         log_content = ''
-        query_result = data_getter(getter_input_handle)
-        if query_result is None:
-            log_status = 'NotFound'
-            return Response(None, status=status.HTTP_404_NOT_FOUND, headers={'Access-Control-Allow-Origin': '*'})
-        else:
-            log_status = 'Ok'
-            if settings.DISCLAIMER_FILE:
-                if not 'notices' in query_result:
-                    query_result["notices"] = []
-                query_result["notices"].append(
-                    {
-                        "title": "Disclaimer",
-                        "description": [ get_disclaimer_text() ]
-                    }
-                )
+        log_status = 'InternalServerError'
 
-            return Response(query_result, headers={'Access-Control-Allow-Origin': '*'})
+        query_result = data_getter(getter_input_handle)
+
+        if settings.DISCLAIMER_FILE:
+            if not 'notices' in query_result:
+                query_result["notices"] = []
+            query_result["notices"].append(
+                {
+                    "title": "Disclaimer",
+                    "description": [ get_disclaimer_text() ]
+                }
+            )
+
+        rsp_content = query_result
+        rsp_status = status.HTTP_200_OK
+        log_status = 'Ok'
+    except NotFoundError:
+        rsp_status = status.HTTP_404_NOT_FOUND
+        log_status = 'NotFound'
+    except InvalidHandleError:
+        rsp_status = status.HTTP_400_BAD_REQUEST
+        log_status = 'BadRequest'
     except Exception, e:
         logging.debug(str(e))
         logging.debug(traceback.format_exc())
-        log_status = 'InternalServerError'
+        rsp_status = status.HTTP_500_INTERNAL_SERVER_ERROR
         log_content = str(e)
-        return Response(None, status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                        headers={'Access-Control-Allow-Origin': '*'})
+        log_status = 'InternalServerError'
     finally:
         log_request.close(log_status, log_content)
 
+    return Response(rsp_content, status=rsp_status, headers={'Access-Control-Allow-Origin': '*'})
 
 
 class EntityViewSet(viewsets.ViewSet):
@@ -127,7 +136,7 @@ class KeySetViewSet(viewsets.ViewSet):
         )
 
 
-class MalformedRdapPath(viewsets.ViewSet):
+class MalformedRdapPathViewSet(viewsets.ViewSet):
     """
     MalformedRdapPath View
     """
@@ -135,16 +144,7 @@ class MalformedRdapPath(viewsets.ViewSet):
         return Response(None, status=status.HTTP_400_BAD_REQUEST)
 
 
-class NotFound(viewsets.ViewSet):
-    """
-    NotFound View
-    """
-    def retrieve(self, request, handle=None, path=None):
-        create_log_request(path, handle, request.META.get('REMOTE_ADDR', '')).close('NotFound')
-        return Response(None, status=status.HTTP_404_NOT_FOUND)
-
-
-class Unsupported(viewsets.ViewSet):
+class UnsupportedViewSet(viewsets.ViewSet):
     """
     Unsupported View
     """
@@ -152,7 +152,7 @@ class Unsupported(viewsets.ViewSet):
         return Response(None, status=status.HTTP_501_NOT_IMPLEMENTED)
 
 
-class Help(viewsets.ViewSet):
+class HelpViewSet(viewsets.ViewSet):
     """
     Help View
     """

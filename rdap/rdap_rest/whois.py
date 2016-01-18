@@ -23,26 +23,62 @@ _WHOIS = SimpleLazyObject(lambda: _CORBA.get_object('Whois2', 'Registry.Whois.Wh
 _INTERFACE = _CORBA.Registry
 
 
+class NotFoundError(Exception):
+    """
+    Represents error when requested object is not found
+    """
+
+class InvalidHandleError(Exception):
+    """
+    Requested object identifier is not valid (bad format)
+    """
+
+
 def get_contact_by_handle(handle):
     logging.debug('get_contact_by_handle: %s', handle)
-    return contact_to_dict(c2u(_WHOIS.get_contact_by_handle(u2c(handle))))
+    try:
+        return contact_to_dict(c2u(_WHOIS.get_contact_by_handle(u2c(handle))))
+    except _INTERFACE.Whois.OBJECT_NOT_FOUND, e:
+        raise NotFoundError()
+    except _INTERFACE.Whois.INVALID_HANDLE, e:
+        raise InvalidHandleError()
 
 
 def get_domain_by_handle(handle):
     logging.debug('get_domain_by_handle: %s', handle)
-    return domain_to_dict(c2u(_WHOIS.get_domain_by_handle(u2c(handle))))
+    try:
+        return domain_to_dict(c2u(_WHOIS.get_domain_by_handle(u2c(handle))))
+    except (_INTERFACE.Whois.OBJECT_NOT_FOUND, _INTERFACE.Whois.TOO_MANY_LABELS, _INTERFACE.Whois.UNMANAGED_ZONE), e:
+        raise NotFoundError()
+    except _INTERFACE.Whois.INVALID_LABEL, e:
+        raise InvalidHandleError()
 
 
 def get_nameserver_by_handle(handle):
     logging.debug('get_nameserver_by_handle: %s', handle)
-    return nameserver_to_dict(c2u(_WHOIS.get_nameserver_by_fqdn(u2c(handle))))
+    try:
+        return nameserver_to_dict(c2u(_WHOIS.get_nameserver_by_fqdn(u2c(handle))))
+    except _INTERFACE.Whois.OBJECT_NOT_FOUND, e:
+        raise NotFoundError()
+    except _INTERFACE.Whois.INVALID_HANDLE, e:
+        raise InvalidHandleError()
 
 
 def get_nsset_by_handle(handle):
     logging.debug('get_nsset_by_handle: %s', handle)
-    return nsset_to_dict(c2u(_WHOIS.get_nsset_by_handle(u2c(handle))))
+    try:
+        return nsset_to_dict(c2u(_WHOIS.get_nsset_by_handle(u2c(handle))))
+    except _INTERFACE.Whois.OBJECT_NOT_FOUND, e:
+        raise NotFoundError()
+    except _INTERFACE.Whois.INVALID_HANDLE, e:
+        raise InvalidHandleError()
 
 
 def get_keyset_by_handle(handle):
     logging.debug('get_keyset_by_handle: %s', handle)
-    return keyset_to_dict(c2u(_WHOIS.get_keyset_by_handle(u2c(handle))))
+    try:
+        return keyset_to_dict(c2u(_WHOIS.get_keyset_by_handle(u2c(handle))))
+    except _INTERFACE.Whois.OBJECT_NOT_FOUND, e:
+        raise NotFoundError()
+    except _INTERFACE.Whois.INVALID_HANDLE, e:
+        raise InvalidHandleError()

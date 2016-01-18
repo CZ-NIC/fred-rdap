@@ -6,7 +6,9 @@ import logging
 from django.conf import settings
 
 from .rdap_utils import unwrap_datetime
-from .rdap_utils import nonempty
+from .rdap_utils import nonempty, disclosable_nonempty
+from .rdap_utils import ObjectClassName
+from .rdap_utils import rdap_status_mapping
 
 
 def contact_to_dict(struct):
@@ -22,7 +24,7 @@ def contact_to_dict(struct):
         if not "linked" in struct.statuses:
             result = {
                 "rdapConformance" : ["rdap_level_0"],
-                "objectClassName": "entity",
+                "objectClassName": ObjectClassName.ENTITY,
                 "handle": struct.handle,
                 "links": [
                     {
@@ -34,7 +36,7 @@ def contact_to_dict(struct):
                 ],
                 "entities": [
                     {
-                        "objectClassName": "entity",
+                        "objectClassName": ObjectClassName.ENTITY,
                         "handle": struct.sponsoring_registrar_handle,
                         "roles": ["registrar"],
                     },
@@ -47,11 +49,12 @@ def contact_to_dict(struct):
         else:
             vcard = [["version", {}, "text", "4.0"]]
 
-            if nonempty(struct.name):
-                vcard.append(["fn", {}, "text", struct.name])
-            if nonempty(struct.organization):
-                vcard.append(["org", {}, "text", struct.organization])
-            if nonempty(struct.address):
+            if disclosable_nonempty(struct.name):
+                vcard.append(["fn", {}, "text", struct.name.value])
+            if disclosable_nonempty(struct.organization):
+                vcard.append(["org", {}, "text", struct.organization.value])
+            if disclosable_nonempty(struct.address):
+                address = struct.address.value
                 vcard.append(
                     [
                         "adr",
@@ -59,31 +62,31 @@ def contact_to_dict(struct):
                         "text",
                         [
                           '',  # P. O. BOX
-                          struct.address.street1,
-                          struct.address.street2,
-                          struct.address.street3,
-                          struct.address.city,
-                          struct.address.stateorprovince,
-                          struct.address.postalcode,
-                          struct.address.country_code,
+                          address.street1,
+                          address.street2,
+                          address.street3,
+                          address.city,
+                          address.stateorprovince,
+                          address.postalcode,
+                          address.country_code,
                         ]
                     ]
                 )
-            if nonempty(struct.phone):
+            if disclosable_nonempty(struct.phone):
                 vcard.append(
-                    ["tel", {"type": ["voice"]}, "uri", "tel:%s" % struct.phone]
+                    ["tel", {"type": ["voice"]}, "uri", "tel:%s" % struct.phone.value]
                 )
-            if nonempty(struct.fax):
+            if disclosable_nonempty(struct.fax):
                 vcard.append(
-                    ["tel", {"type": ["fax"]}, "uri", "tel:%s" % struct.fax]
+                    ["tel", {"type": ["fax"]}, "uri", "tel:%s" % struct.fax.value]
                 )
-            if nonempty(struct.email):
+            if disclosable_nonempty(struct.email):
                 vcard.append(
-                    ["email", {"type": ""}, "text", struct.email]
+                    ["email", {"type": ""}, "text", struct.email.value]
                 )
 
             result = {
-                "objectClassName": "entity",
+                "objectClassName": ObjectClassName.ENTITY,
                 "rdapConformance" : ["rdap_level_0"],
                 "handle": struct.handle,
                 "vcardArray": ["vcard", vcard],
@@ -105,14 +108,15 @@ def contact_to_dict(struct):
                 ],
                 "entities": [
                     {
-                        "objectClassName": "entity",
+                        "objectClassName": ObjectClassName.ENTITY,
                         "handle": struct.sponsoring_registrar_handle,
                         "roles": ["registrar"],
                     },
                 ],
             }
-            if struct.statuses:
-                result["status"] = struct.statuses
+            status = rdap_status_mapping(struct.statuses)
+            if status:
+                result["status"] = status
             if nonempty(struct.changed):
                 result['events'].append({
                     "eventAction": 'last changed',

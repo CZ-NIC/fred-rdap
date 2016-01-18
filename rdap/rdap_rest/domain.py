@@ -10,6 +10,8 @@ from rdap.utils.corba import Corba, importIDL
 from rdap.utils.corbarecoder import u2c, c2u
 from .rdap_utils import unwrap_date, unwrap_datetime
 from .rdap_utils import nonempty
+from .rdap_utils import ObjectClassName
+from .rdap_utils import rdap_status_mapping
 
 importIDL('%s/%s' % (settings.CORBA_IDL_ROOT_PATH, settings.CORBA_IDL_WHOIS_FILENAME))
 _CORBA = Corba(ior=settings.CORBA_NS_HOST_PORT, context_name=settings.CORBA_NS_CONTEXT,
@@ -35,7 +37,7 @@ def domain_to_dict(struct):
 
         result = {
             "rdapConformance": ["rdap_level_0", "cznic_version_0"],
-            "objectClassName": "domain",
+            "objectClassName": ObjectClassName.DOMAIN,
             "handle": struct.handle,
             "ldhName": struct.handle,
 #            "unicodeName": struct.handle, # should be present only when containing non-ASCII chars
@@ -60,7 +62,7 @@ def domain_to_dict(struct):
             ],
             "entities": [
                 {
-                    "objectClassName": "entity",
+                    "objectClassName": ObjectClassName.ENTITY,
                     "handle": struct.registrant_handle,
                     "roles": ["registrant"],
                     "links": [
@@ -73,7 +75,7 @@ def domain_to_dict(struct):
                     ]
                 },
                 {
-                    "objectClassName": "entity",
+                    "objectClassName": ObjectClassName.ENTITY,
                     "handle": struct.registrar_handle,
                     "roles": ["registrar"],
                 },
@@ -83,7 +85,7 @@ def domain_to_dict(struct):
         for admin_contact in struct.admin_contact_handles:
             result['entities'].append(
                 {
-                    "objectClassName": "entity",
+                    "objectClassName": ObjectClassName.ENTITY,
                     "handle": admin_contact,
                     "roles": ["administrative"],
                     "links": [
@@ -96,8 +98,9 @@ def domain_to_dict(struct):
                     ],
                 }
             )
-        if struct.statuses:
-            result["status"] = struct.statuses
+        status = rdap_status_mapping(struct.statuses)
+        if status:
+            result["status"] = status
         if nonempty(struct.changed):
             result['events'].append({
                 "eventAction": "last changed",
@@ -118,7 +121,7 @@ def domain_to_dict(struct):
             if nsset is not None:
                 result["nameservers"] = []
                 result['cznic_nsset'] = {
-                    "objectClassName": "nsset",
+                    "objectClassName": ObjectClassName.NSSET,
                     "handle": nsset.handle,
                     "links": [
                         {
@@ -132,7 +135,7 @@ def domain_to_dict(struct):
                 }
                 for ns in nsset.nservers:
                     ns_obj = {
-                        "objectClassName": "nameserver",
+                        "objectClassName": ObjectClassName.NAMESERVER,
                         "handle": ns.fqdn,
                         "ldhName": ns.fqdn,
                         "links": [
@@ -170,7 +173,7 @@ def domain_to_dict(struct):
                     "keyData": [],
                 }
                 result['cznic_keyset'] = {
-                    "objectClassName": "keyset",
+                    "objectClassName": ObjectClassName.KEYSET,
                     "handle": keyset.handle,
                     "links": [
                         {
@@ -211,7 +214,7 @@ def delete_candidate_domain_to_dict(struct):
         self_link = settings.RDAP_DOMAIN_URL_TMPL % {"handle": struct.handle}
 
         result = {
-            "objectClassName": "domain",
+            "objectClassName": ObjectClassName.DOMAIN,
             "rdapConformance": ["rdap_level_0", "cznic_version_0"],
             "handle": struct.handle,
             "ldhName": struct.handle,
