@@ -1,3 +1,7 @@
+2016-01-20 (0.3.0)
+
+  * changes according to rfc document standardization
+
 2015-01-27 Jan Korous (0.2.0)
 
   * show 'delete pending' status for domains scheduled for deletion
