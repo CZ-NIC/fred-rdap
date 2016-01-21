@@ -1,5 +1,7 @@
 from rest_framework.negotiation import BaseContentNegotiation
-from renderer import UnicodeRDAPJSONRenderer
+
+from .renderer import UnicodeRDAPJSONRenderer
+
 
 class RdapJsonForAllContentNegotiation(BaseContentNegotiation):
     def select_renderer(self, request, renderers, format_suffix):

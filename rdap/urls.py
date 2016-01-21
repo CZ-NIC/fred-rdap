@@ -1,8 +1,7 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, patterns, url
 
-from rdap.rdap_rest.views import DomainViewSet, EntityViewSet, KeySetViewSet, MalformedRdapPathViewSet, \
-    NameserverViewSet, NSSetViewSet, UnsupportedViewSet, HelpViewSet
-
+from rdap.rdap_rest.views import DomainViewSet, EntityViewSet, HelpViewSet, KeySetViewSet, MalformedRdapPathViewSet, \
+    NameserverViewSet, NSSetViewSet, UnsupportedViewSet
 
 entity_detail = EntityViewSet.as_view({'get': 'retrieve'})
 domain_detail = DomainViewSet.as_view({'get': 'retrieve'})

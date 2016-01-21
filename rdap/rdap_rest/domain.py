@@ -7,11 +7,9 @@ from django.conf import settings
 from django.utils.functional import SimpleLazyObject
 
 from rdap.utils.corba import Corba, importIDL
-from rdap.utils.corbarecoder import u2c, c2u
-from .rdap_utils import unwrap_date, unwrap_datetime
-from .rdap_utils import nonempty
-from .rdap_utils import ObjectClassName
-from .rdap_utils import rdap_status_mapping
+from rdap.utils.corbarecoder import c2u, u2c
+
+from .rdap_utils import ObjectClassName, nonempty, rdap_status_mapping, unwrap_date, unwrap_datetime
 
 importIDL('%s/%s' % (settings.CORBA_IDL_ROOT_PATH, settings.CORBA_IDL_WHOIS_FILENAME))
 _CORBA = Corba(ior=settings.CORBA_NS_HOST_PORT, context_name=settings.CORBA_NS_CONTEXT,

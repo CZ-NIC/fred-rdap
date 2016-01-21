@@ -5,10 +5,7 @@ import logging
 
 from django.conf import settings
 
-from .rdap_utils import unwrap_datetime
-from .rdap_utils import nonempty, disclosable_nonempty
-from .rdap_utils import ObjectClassName
-from .rdap_utils import rdap_status_mapping
+from .rdap_utils import ObjectClassName, disclosable_nonempty, nonempty, rdap_status_mapping, unwrap_datetime
 
 
 def contact_to_dict(struct):

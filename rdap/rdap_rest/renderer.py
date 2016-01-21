@@ -7,4 +7,3 @@ class UnicodeRDAPJSONRenderer(UnicodeJSONRenderer):
     """
 
     media_type = 'application/rdap+json'
-

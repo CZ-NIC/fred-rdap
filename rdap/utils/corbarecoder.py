@@ -1,6 +1,7 @@
-import types
 import codecs
 import exceptions
+import types
+
 
 class UnsupportedEncodingError(Exception):
     pass
