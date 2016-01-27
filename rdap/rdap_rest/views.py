@@ -79,7 +79,7 @@ class EntityViewSet(viewsets.ViewSet):
         log_req = create_log_request(path, handle, request.META.get('REMOTE_ADDR', ''))
         return response_handling(
             get_contact_by_handle,
-            str(handle),
+            handle,
             log_req
         )
 
@@ -92,7 +92,7 @@ class DomainViewSet(viewsets.ViewSet):
         log_req = create_log_request(path, handle, request.META.get('REMOTE_ADDR', ''))
         return response_handling(
             get_domain_by_handle,
-            str(handle),
+            handle,
             log_req
         )
 
@@ -105,7 +105,7 @@ class NameserverViewSet(viewsets.ViewSet):
         log_req = create_log_request(path, handle, request.META.get('REMOTE_ADDR', ''))
         return response_handling(
             get_nameserver_by_handle,
-            str(handle),
+            handle,
             log_req
         )
 
@@ -118,7 +118,7 @@ class NSSetViewSet(viewsets.ViewSet):
         log_req = create_log_request(path, handle, request.META.get('REMOTE_ADDR', ''))
         return response_handling(
             get_nsset_by_handle,
-            str(handle),
+            handle,
             log_req
         )
 
@@ -131,7 +131,7 @@ class KeySetViewSet(viewsets.ViewSet):
         log_req = create_log_request(path, handle, request.META.get('REMOTE_ADDR', ''))
         return response_handling(
             get_keyset_by_handle,
-            str(handle),
+            handle,
             log_req
         )
 
