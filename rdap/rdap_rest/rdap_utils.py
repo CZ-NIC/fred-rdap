@@ -100,3 +100,15 @@ class ObjectClassName(object):
     NAMESERVER = 'nameserver'
     NSSET = 'nsset'
     KEYSET = 'keyset'
+
+
+def preprocess_fqdn(fqdn):
+    """
+    Normalize fqdn input search string for backend call
+    """
+    try:
+        fqdn = fqdn.encode('idna')
+        fqdn.decode('idna')
+    except UnicodeError, e:
+        return None
+    return fqdn
