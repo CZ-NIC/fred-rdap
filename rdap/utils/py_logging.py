@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.utils.functional import SimpleLazyObject
-
 from pylogger.corbalogger import Logger
 
 from .corba import Corba, importIDL

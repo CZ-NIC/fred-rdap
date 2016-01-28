@@ -1,6 +1,6 @@
 from rest_framework.negotiation import BaseContentNegotiation
 
-from .renderer import UnicodeRDAPJSONRenderer
+from .renderer import RDAPJSONRenderer
 
 
 class RdapJsonForAllContentNegotiation(BaseContentNegotiation):
@@ -11,7 +11,7 @@ class RdapJsonForAllContentNegotiation(BaseContentNegotiation):
         "This specification does not define the responses a server returns to a request with any other media types in the Accept: header field, or with no Accept: header field."
         """
         for renderer in renderers:
-            if isinstance(renderer, UnicodeRDAPJSONRenderer):
+            if isinstance(renderer, RDAPJSONRenderer):
                 return (renderer, renderer.media_type)
 
-        raise Exception("Missing UnicodeRDAPJSONRenderer!")
+        raise Exception("Missing RDAPJSONRenderer!")

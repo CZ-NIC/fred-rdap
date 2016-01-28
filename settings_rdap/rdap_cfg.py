@@ -32,8 +32,8 @@ ROOT_URLCONF = 'rdap.urls'
 
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.UnicodeJSONRenderer',
-        'rdap.rdap_rest.renderer.UnicodeRDAPJSONRenderer',
+        'rest_framework.renderers.JSONRenderer',
+        'rdap.rdap_rest.renderer.RDAPJSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
     'DEFAULT_CONTENT_NEGOTIATION_CLASS': 'rdap.rdap_rest.content_negotiation.RdapJsonForAllContentNegotiation',
