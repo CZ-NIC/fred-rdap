@@ -1,7 +1,7 @@
-from rest_framework.renderers import UnicodeJSONRenderer
+from rest_framework.renderers import JSONRenderer
 
 
-class UnicodeRDAPJSONRenderer(UnicodeJSONRenderer):
+class RDAPJSONRenderer(JSONRenderer):
     """
     Renderer which serialize to JSON but uses RDAP specific media type
     """
