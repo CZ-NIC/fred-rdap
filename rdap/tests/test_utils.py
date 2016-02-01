@@ -85,11 +85,12 @@ class TestStatusMappingDefinition(SimpleTestCase):
 class TestInputFqdnProcessing(SimpleTestCase):
 
     def test_ok_a_input(self):
-        self.assertEqual(rdap_utils.preprocess_fqdn(u'skvirukl.example'), u'skvirukl.example')
+        self.assertEqual(rdap_utils.preprocess_fqdn(u'skvirukl.example'), 'skvirukl.example')
+        self.assertEqual(rdap_utils.preprocess_fqdn('skvirukl.example'), 'skvirukl.example')
 
     def test_ok_idn_input(self):
-        self.assertEqual(rdap_utils.preprocess_fqdn(u'skvírůkl.example'), u'xn--skvrkl-5va55h.example')
-        self.assertEqual(rdap_utils.preprocess_fqdn(u'xn--skvrkl-5va55h.example'), u'xn--skvrkl-5va55h.example')
+        self.assertEqual(rdap_utils.preprocess_fqdn(u'skvírůkl.example'), 'xn--skvrkl-5va55h.example')
+        self.assertEqual(rdap_utils.preprocess_fqdn(u'xn--skvrkl-5va55h.example'), 'xn--skvrkl-5va55h.example')
 
     def test_bad_idn_input(self):
         self.assertEqual(rdap_utils.preprocess_fqdn(u'xn--skvrkl-ňúríkl.example'), None)
