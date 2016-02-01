@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.test import SimpleTestCase
 from mock import Mock
 
@@ -79,3 +80,17 @@ class TestStatusMappingDefinition(SimpleTestCase):
         in_list = ['validatedContact', 'contactPassedManualVerification', 'deleteCandidate']
         out_set = set(['validated', 'pending delete'])
         self.assertEqual(rdap_utils.rdap_status_mapping(in_list), out_set)
+
+
+class TestInputFqdnProcessing(SimpleTestCase):
+
+    def test_ok_a_input(self):
+        self.assertEqual(rdap_utils.preprocess_fqdn(u'skvirukl.example'), 'skvirukl.example')
+        self.assertEqual(rdap_utils.preprocess_fqdn('skvirukl.example'), 'skvirukl.example')
+
+    def test_ok_idn_input(self):
+        self.assertEqual(rdap_utils.preprocess_fqdn(u'skvírůkl.example'), 'xn--skvrkl-5va55h.example')
+        self.assertEqual(rdap_utils.preprocess_fqdn(u'xn--skvrkl-5va55h.example'), 'xn--skvrkl-5va55h.example')
+
+    def test_bad_idn_input(self):
+        self.assertRaises(rdap_utils.InvalidIdn, rdap_utils.preprocess_fqdn, u'xn--skvrkl-ňúríkl.example')

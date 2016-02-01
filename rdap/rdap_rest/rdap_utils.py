@@ -100,3 +100,25 @@ class ObjectClassName(object):
     NAMESERVER = 'nameserver'
     NSSET = 'nsset'
     KEYSET = 'keyset'
+
+
+class InvalidIdn(Exception):
+    """
+    Invalid input - internationalized domain name
+    """
+
+def preprocess_fqdn(fqdn):
+    """
+    Normalize fqdn input search string for backend call
+    """
+    try:
+        # Should be replaced by python-idna lib call
+        # fqdn = idna.encode(fqdn)
+        #
+        # Current python (2.7) idna encoding implements rfc3490
+        # but it is obsoleted by rfc5890, rfc5891
+        fqdn = fqdn.encode('idna')
+        fqdn.decode('idna')
+    except UnicodeError, e:
+        raise InvalidIdn()
+    return fqdn
