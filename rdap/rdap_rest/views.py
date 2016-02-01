@@ -7,7 +7,7 @@ from rest_framework.response import Response
 
 from rdap.utils.py_logging import get_logger
 
-from .rdap_utils import get_disclaimer_text, preprocess_fqdn
+from .rdap_utils import InvalidIdn, get_disclaimer_text, preprocess_fqdn
 from .whois import InvalidHandleError, NotFoundError, get_contact_by_handle, get_domain_by_handle, \
     get_keyset_by_handle, get_nameserver_by_handle, get_nsset_by_handle
 
@@ -89,8 +89,9 @@ class DomainViewSet(viewsets.ViewSet):
     Domain View
     """
     def retrieve(self, request, handle=None, path=None):
-        handle = preprocess_fqdn(handle)
-        if not handle:
+        try:
+            handle = preprocess_fqdn(handle)
+        except InvalidIdn:
             return Response(None, status=status.HTTP_400_BAD_REQUEST)
         log_req = create_log_request(path, handle, request.META.get('REMOTE_ADDR', ''))
         return response_handling(
@@ -105,8 +106,9 @@ class NameserverViewSet(viewsets.ViewSet):
     Nameserver View
     """
     def retrieve(self, request, handle=None, path=None):
-        handle = preprocess_fqdn(handle)
-        if not handle:
+        try:
+            handle = preprocess_fqdn(handle)
+        except InvalidIdn:
             return Response(None, status=status.HTTP_400_BAD_REQUEST)
         log_req = create_log_request(path, handle, request.META.get('REMOTE_ADDR', ''))
         return response_handling(

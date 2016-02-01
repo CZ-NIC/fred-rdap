@@ -93,4 +93,4 @@ class TestInputFqdnProcessing(SimpleTestCase):
         self.assertEqual(rdap_utils.preprocess_fqdn(u'xn--skvrkl-5va55h.example'), 'xn--skvrkl-5va55h.example')
 
     def test_bad_idn_input(self):
-        self.assertEqual(rdap_utils.preprocess_fqdn(u'xn--skvrkl-ňúríkl.example'), None)
+        self.assertRaises(rdap_utils.InvalidIdn, rdap_utils.preprocess_fqdn, u'xn--skvrkl-ňúríkl.example')

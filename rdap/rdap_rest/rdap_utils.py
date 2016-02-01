@@ -102,6 +102,11 @@ class ObjectClassName(object):
     KEYSET = 'keyset'
 
 
+class InvalidIdn(Exception):
+    """
+    Invalid input - internationalized domain name
+    """
+
 def preprocess_fqdn(fqdn):
     """
     Normalize fqdn input search string for backend call
@@ -115,5 +120,5 @@ def preprocess_fqdn(fqdn):
         fqdn = fqdn.encode('idna')
         fqdn.decode('idna')
     except UnicodeError, e:
-        return None
+        raise InvalidIdn()
     return fqdn
