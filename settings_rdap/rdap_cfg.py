@@ -11,7 +11,8 @@ TEMPLATE_DEBUG = DEBUG
 
 ALLOWED_HOSTS = []
 
-TIME_ZONE = 'Europe/Prague'
+TIME_ZONE = 'UTC'
+USE_TZ = True
 USE_I18N = True
 USE_L10N = True
 

@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
+
 from django.test import SimpleTestCase
+from django.test.utils import override_settings
+from django.utils import timezone
 from mock import Mock
 
 from rdap.rdap_rest import rdap_utils
+from rdap.rdap_rest.whois import _INTERFACE
 
 
 class TestDisclosableOutput(SimpleTestCase):
@@ -94,3 +99,53 @@ class TestInputFqdnProcessing(SimpleTestCase):
 
     def test_bad_idn_input(self):
         self.assertRaises(rdap_utils.InvalidIdn, rdap_utils.preprocess_fqdn, u'xn--skvrkl-ňúríkl.example')
+
+
+class TestRfc3339TimestampFormat(SimpleTestCase):
+
+    def test_utc_dt(self):
+        dt = datetime(2015, 5, 9, 10, 31, 51)
+        with override_settings(TIME_ZONE='UTC', USE_TZ=False):
+            self.assertEqual(rdap_utils.to_rfc3339(dt), '2015-05-09T10:31:51+00:00')
+
+        dt = timezone.make_aware(dt, timezone.utc)
+        with override_settings(TIME_ZONE='UTC', USE_TZ=True):
+            self.assertEqual(rdap_utils.to_rfc3339(dt), '2015-05-09T10:31:51+00:00')
+
+    def test_strip_ms(self):
+        dt = datetime(1986, 4, 26, 1, 23, 58, 12345)
+        with override_settings(TIME_ZONE='UTC', USE_TZ=False):
+            self.assertEqual(rdap_utils.to_rfc3339(dt), '1986-04-26T01:23:58+00:00')
+
+    def test_non_utc_dt(self):
+        dt = datetime(1998, 2, 22, 8, 32, 10)
+
+        with override_settings(TIME_ZONE='Europe/Prague', USE_TZ=False):
+            self.assertEqual(rdap_utils.to_rfc3339(dt), '1998-02-22T08:32:10+01:00')
+
+        with override_settings(TIME_ZONE='America/Denver', USE_TZ=True):
+            dttz = timezone.make_aware(dt, timezone.get_default_timezone())
+            self.assertEqual(rdap_utils.to_rfc3339(dttz), '1998-02-22T08:32:10-07:00')
+
+
+class TestUnwrapDatetime(SimpleTestCase):
+
+    def test_use_tz_false(self):
+        idl_date = _INTERFACE.Date(22, 12, 2001)
+        idl_datetime = _INTERFACE.DateTime(idl_date, 23, 2, 30)
+        with override_settings(USE_TZ=False, TIME_ZONE='UTC'):
+            self.assertEqual(rdap_utils.unwrap_datetime(idl_datetime), datetime(2001, 12, 22, 23, 2, 30))
+
+    def test_use_tz_true(self):
+        idl_date = _INTERFACE.Date(22, 12, 2001)
+        idl_datetime = _INTERFACE.DateTime(idl_date, 23, 2, 30)
+        with override_settings(USE_TZ=True, TIME_ZONE='UTC'):
+            self.assertEqual(
+                rdap_utils.unwrap_datetime(idl_datetime),
+                datetime(2001, 12, 22, 23, 2, 30, tzinfo=timezone.utc)
+            )
+
+    def test_junk(self):
+        idl_date = _INTERFACE.Date(22, 14, 2001)
+        idl_datetime = _INTERFACE.DateTime(idl_date, 23, 2, 30)
+        self.assertRaises(ValueError, rdap_utils.unwrap_datetime, idl_datetime)
