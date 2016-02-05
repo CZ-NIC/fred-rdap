@@ -4,11 +4,38 @@ Utils for translating Corba objects to python dictionary
 from datetime import date, datetime
 
 from django.conf import settings
+from django.utils import timezone
 
 
 def unwrap_datetime(idl_datetime):
-    return datetime(idl_datetime.date.year, idl_datetime.date.month, idl_datetime.date.day, idl_datetime.hour,
-                    idl_datetime.minute, idl_datetime.second)
+    """
+    Converts IDL datetime struct to python datetime.datetime.
+    """
+    dt = datetime(
+        idl_datetime.date.year, idl_datetime.date.month, idl_datetime.date.day,
+        idl_datetime.hour, idl_datetime.minute, idl_datetime.second
+    )
+    dt = timezone.make_aware(dt, timezone.utc)
+    if not settings.USE_TZ:
+        dt = timezone.make_naive(dt, timezone.get_default_timezone())
+    return dt
+
+
+def to_rfc3339(dt):
+    """
+    Simple function to format datetime object as in rfc3339 (with stripped microsecond part).
+    """
+    if timezone.is_aware(dt) and not settings.USE_TZ:
+        raise TypeError("can't compare offset-naive and offset-aware datetimes")
+
+    aux = dt.replace(microsecond=0)
+
+    if timezone.is_aware(dt):
+        aux = aux.replace(tzinfo=dt.tzinfo)
+    else:
+        aux = timezone.make_aware(aux, timezone.get_default_timezone())
+
+    return aux.isoformat('T')
 
 
 def unwrap_date(idl_date):

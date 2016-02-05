@@ -8,7 +8,7 @@ from django.utils.functional import SimpleLazyObject
 
 from rdap.utils.corba import Corba, importIDL
 
-from .rdap_utils import ObjectClassName, nonempty, rdap_status_mapping, unwrap_datetime
+from .rdap_utils import ObjectClassName, nonempty, rdap_status_mapping, to_rfc3339, unwrap_datetime
 
 importIDL(settings.CORBA_IDL_ROOT_PATH + '/' + settings.CORBA_IDL_WHOIS_FILENAME)
 
@@ -44,7 +44,7 @@ def nsset_to_dict(struct):
             "events": [
                 {
                     "eventAction" : "registration",
-                    "eventDate" : unwrap_datetime(struct.created),
+                    "eventDate" : to_rfc3339(unwrap_datetime(struct.created)),
                 }
             ],
             "links": [
@@ -110,12 +110,12 @@ def nsset_to_dict(struct):
         if nonempty(struct.changed):
             result['events'].append({
                 "eventAction": "last changed",
-                "eventDate": unwrap_datetime(struct.changed),
+                "eventDate": to_rfc3339(unwrap_datetime(struct.changed)),
             })
         if nonempty(struct.last_transfer):
             result['events'].append({
                 "eventAction": "transfer",
-                "eventDate": unwrap_datetime(struct.last_transfer),
+                "eventDate": to_rfc3339(unwrap_datetime(struct.last_transfer)),
             })
 
     logging.debug(result)
