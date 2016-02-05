@@ -37,6 +37,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
     'DEFAULT_CONTENT_NEGOTIATION_CLASS': 'rdap.rdap_rest.content_negotiation.RdapJsonForAllContentNegotiation',
+    'EXCEPTION_HANDLER': 'rdap.rdap_rest.exception_handler.rdap_exception_handler'
 }
 
 # CORBA CONFIGURATION
