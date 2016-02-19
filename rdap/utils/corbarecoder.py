@@ -36,7 +36,7 @@ class CorbaRecode(object):
             return answer
         elif type(answer) in self.IterTypes:
             return [ self.decode(x) for x in answer ]
-        elif type(answer) == types.InstanceType:
+        elif type(answer) == types.InstanceType or (hasattr(answer, '__class__') and ('__dict__' in dir(answer) or hasattr(answer, '__slots__'))):
             for name in dir(answer):
                 item = getattr(answer, name)
                 if name.startswith('__'): continue # internal python methods / attributes
@@ -44,7 +44,7 @@ class CorbaRecode(object):
                     answer.__dict__[name] = item.decode(self.coding)
                 if name.startswith('_'): continue # internal module defined methods / attributes
                 if type(item) == types.MethodType: continue # methods - don't call them
-                if type(item) == types.InstanceType:
+                if type(item) == types.InstanceType or (hasattr(answer, '__class__') and ('__dict__' in dir(answer) or hasattr(answer, '__slots__'))):
                     answer.__dict__[name] = self.decode(item)
                 if type(item) in self.IterTypes:
                     answer.__dict__[name] = [ self.decode(x) for x in item ]
@@ -57,7 +57,7 @@ class CorbaRecode(object):
             return answer
         elif type(answer) in self.IterTypes:
             return [ self.encode(x) for x in answer ]
-        elif type(answer) == types.InstanceType:
+        elif type(answer) == types.InstanceType or (hasattr(answer, '__class__') and ('__dict__' in dir(answer) or hasattr(answer, '__slots__'))):
             for name in dir(answer):
                 item = getattr(answer, name)
                 if name.startswith('__'): continue # internal python methods / attributes
@@ -65,7 +65,7 @@ class CorbaRecode(object):
                     answer.__dict__[name] = item.encode(self.coding)
                 if name.startswith('_'): continue # internal module defined methods / attributes
                 if type(item) == types.MethodType: continue # methods - don't call them
-                if type(item) == types.InstanceType:
+                if type(item) == types.InstanceType or (hasattr(answer, '__class__') and ('__dict__' in dir(answer) or hasattr(answer, '__slots__'))):
                     answer.__dict__[name] = self.encode(item)
                 if type(item) in self.IterTypes:
                     answer.__dict__[name] = [ self.encode(x) for x in item ]
