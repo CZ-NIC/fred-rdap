@@ -9,7 +9,8 @@ from django.utils.functional import SimpleLazyObject
 from rdap.utils.corba import Corba, importIDL
 from rdap.utils.corbarecoder import c2u, u2c
 
-from .rdap_utils import ObjectClassName, nonempty, rdap_status_mapping, to_rfc3339, unwrap_date, unwrap_datetime
+from .rdap_utils import ObjectClassName, nonempty, rdap_status_mapping, to_rfc3339, unwrap_date, unwrap_datetime, \
+    add_unicode_name
 
 importIDL('%s/%s' % (settings.CORBA_IDL_ROOT_PATH, settings.CORBA_IDL_WHOIS_FILENAME))
 _CORBA = Corba(ior=settings.CORBA_NS_HOST_PORT, context_name=settings.CORBA_NS_CONTEXT,
@@ -38,7 +39,6 @@ def domain_to_dict(struct):
             "objectClassName": ObjectClassName.DOMAIN,
             "handle": struct.handle,
             "ldhName": struct.handle,
-#            "unicodeName": struct.handle, # should be present only when containing non-ASCII chars
             "links": [
                 {
                     "value": self_link,
@@ -79,6 +79,8 @@ def domain_to_dict(struct):
                 },
             ]
         }
+
+        add_unicode_name(result, struct.handle)
 
         for admin_contact in struct.admin_contact_handles:
             result['entities'].append(
@@ -145,6 +147,9 @@ def domain_to_dict(struct):
                             },
                         ],
                     }
+
+                    add_unicode_name(ns_obj, ns.fqdn)
+
                     if ns.ip_addresses:
                         addrs_v4 = []
                         addrs_v6 = []
@@ -216,7 +221,6 @@ def delete_candidate_domain_to_dict(struct):
             "rdapConformance": ["rdap_level_0", "cznic_version_0"],
             "handle": struct.handle,
             "ldhName": struct.handle,
-#            "unicodeName": struct.handle, # should be present only when containing non-ASCII chars
             "links": [
                 {
                     "value": self_link,
@@ -227,6 +231,8 @@ def delete_candidate_domain_to_dict(struct):
             ],
             "port43": settings.UNIX_WHOIS_HOST
         }
+
+        add_unicode_name(result, struct.handle)
 
         if struct.statuses:
             result["status"] = ["pending delete"]

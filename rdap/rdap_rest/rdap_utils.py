@@ -149,3 +149,12 @@ def preprocess_fqdn(fqdn):
     except UnicodeError, e:
         raise InvalidIdn()
     return fqdn
+
+
+def add_unicode_name(dst_dict, ldh_name):
+    """
+    Add optional unicodeName key to dictionary if contains non-ascii characters
+    """
+    unicode_name = ldh_name.decode("idna")
+    if unicode_name != ldh_name:
+        dst_dict["unicodeName"] = unicode_name
