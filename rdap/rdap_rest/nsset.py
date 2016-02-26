@@ -8,8 +8,7 @@ from django.utils.functional import SimpleLazyObject
 
 from rdap.utils.corba import Corba, importIDL
 
-from .rdap_utils import ObjectClassName, nonempty, rdap_status_mapping, to_rfc3339, unwrap_datetime, \
-    add_unicode_name
+from .rdap_utils import ObjectClassName, add_unicode_name, nonempty, rdap_status_mapping, to_rfc3339, unwrap_datetime
 
 importIDL(settings.CORBA_IDL_ROOT_PATH + '/' + settings.CORBA_IDL_WHOIS_FILENAME)
 
