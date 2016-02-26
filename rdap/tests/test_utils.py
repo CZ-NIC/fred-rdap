@@ -149,3 +149,29 @@ class TestUnwrapDatetime(SimpleTestCase):
         idl_date = _INTERFACE.Date(22, 14, 2001)
         idl_datetime = _INTERFACE.DateTime(idl_date, 23, 2, 30)
         self.assertRaises(ValueError, rdap_utils.unwrap_datetime, idl_datetime)
+
+
+class TestAddUnicodeName(SimpleTestCase):
+
+    def test_no_add(self):
+        dst_dict = {}
+        rdap_utils.add_unicode_name(dst_dict, '42.cz')
+        self.assertEqual(dst_dict, {})
+
+        dst_dict = {'k': 'v'}
+        rdap_utils.add_unicode_name(dst_dict, '42.cz')
+        self.assertEqual(dst_dict, {'k': 'v'})
+
+
+    def test_add(self):
+        dst_dict = {}
+        rdap_utils.add_unicode_name(dst_dict, 'xn--skvrkl-5va55h.example')
+        self.assertEqual(dst_dict, {'unicodeName': u'skvírůkl.example'})
+
+        dst_dict = {'k': 'v'}
+        rdap_utils.add_unicode_name(dst_dict, 'xn--skvrkl-5va55h.example')
+        self.assertEqual(dst_dict, {'k': 'v', 'unicodeName': u'skvírůkl.example'})
+
+        dst_dict = {'unicodeName': 'please rewrite!'}
+        rdap_utils.add_unicode_name(dst_dict, 'xn--skvrkl-5va55h.example')
+        self.assertEqual(dst_dict, {'unicodeName': u'skvírůkl.example'})
