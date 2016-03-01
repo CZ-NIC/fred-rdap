@@ -34,6 +34,11 @@ def domain_to_dict(struct):
 
         self_link = settings.RDAP_DOMAIN_URL_TMPL % {"handle": struct.handle}
 
+        if struct.expire_time_actual:
+            expiration_datetime = struct.expire_time_actual
+        else:
+            expiration_datetime = struct.expire_time_estimate
+
         result = {
             "rdapConformance": ["rdap_level_0", "cznic_version_0"],
             "objectClassName": ObjectClassName.DOMAIN,
@@ -55,7 +60,7 @@ def domain_to_dict(struct):
                 },
                 {
                     "eventAction": "expiration",
-                    "eventDate": unwrap_date(struct.expire),
+                    "eventDate": to_rfc3339(unwrap_datetime(expiration_datetime)),
                 },
             ],
             "entities": [
@@ -111,10 +116,16 @@ def domain_to_dict(struct):
                 "eventAction": "transfer",
                 "eventDate": to_rfc3339(unwrap_datetime(struct.last_transfer)),
             })
-        if nonempty(struct.validated_to):
+        if struct.validated_to_time_actual:
+            validated_to_datetime = struct.validated_to_time_actual
+        elif struct.validated_to_time_estimate:
+            validated_to_datetime = struct.validated_to_time_estimate
+        else:
+            validated_to_datetime = None
+        if validated_to_datetime:
             result['events'].append({
                 "eventAction": "enum validation expiration",
-                "eventDate": unwrap_date(struct.validated_to),
+                "eventDate": to_rfc3339(unwrap_datetime(validated_to_datetime)),
             })
         if nonempty(struct.nsset_handle):
             nsset = c2u(_WHOIS.get_nsset_by_handle(u2c(struct.nsset_handle)))
