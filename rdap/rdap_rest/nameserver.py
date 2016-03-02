@@ -5,7 +5,7 @@ import logging
 
 from django.conf import settings
 
-from .rdap_utils import ObjectClassName
+from .rdap_utils import ObjectClassName, add_unicode_name
 
 
 def nameserver_to_dict(struct):
@@ -33,6 +33,8 @@ def nameserver_to_dict(struct):
               },
           ],
         }
+
+        add_unicode_name(result, struct.fqdn)
 
     logging.debug(result)
     return result
