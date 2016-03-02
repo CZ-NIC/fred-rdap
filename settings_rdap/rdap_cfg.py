@@ -54,8 +54,8 @@ RDAP_ROOT_URL = ''
 RDAP_DOMAIN_URL_TMPL        = RDAP_ROOT_URL + "/domain/%(handle)s"
 RDAP_ENTITY_URL_TMPL        = RDAP_ROOT_URL + "/entity/%(handle)s"
 RDAP_NAMESERVER_URL_TMPL    = RDAP_ROOT_URL + "/nameserver/%(handle)s"
-RDAP_NSSET_URL_TMPL         = RDAP_ROOT_URL + "/cznic_nsset/%(handle)s"
-RDAP_KEYSET_URL_TMPL        = RDAP_ROOT_URL + "/cznic_keyset/%(handle)s"
+RDAP_NSSET_URL_TMPL         = RDAP_ROOT_URL + "/fred_nsset/%(handle)s"
+RDAP_KEYSET_URL_TMPL        = RDAP_ROOT_URL + "/fred_keyset/%(handle)s"
 UNIX_WHOIS_HOST = ''
 
 # etc

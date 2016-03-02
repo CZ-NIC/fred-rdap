@@ -40,7 +40,7 @@ def domain_to_dict(struct):
             expiration_datetime = struct.expire_time_estimate
 
         result = {
-            "rdapConformance": ["rdap_level_0", "cznic_version_0"],
+            "rdapConformance": ["rdap_level_0", "fred_version_0"],
             "objectClassName": ObjectClassName.DOMAIN,
             "handle": struct.handle,
             "ldhName": struct.handle,
@@ -131,7 +131,7 @@ def domain_to_dict(struct):
             nsset = c2u(_WHOIS.get_nsset_by_handle(u2c(struct.nsset_handle)))
             if nsset is not None:
                 result["nameservers"] = []
-                result['cznic_nsset'] = {
+                result['fred_nsset'] = {
                     "objectClassName": ObjectClassName.NSSET,
                     "handle": nsset.handle,
                     "links": [
@@ -175,7 +175,7 @@ def domain_to_dict(struct):
                         if addrs_v6:
                             ns_obj["ipAddresses"]["v6"] = addrs_v6
                     result['nameservers'].append(ns_obj)
-                    result['cznic_nsset']['nameservers'].append(ns_obj)
+                    result['fred_nsset']['nameservers'].append(ns_obj)
 
         if nonempty(struct.keyset_handle):
             keyset = c2u(_WHOIS.get_keyset_by_handle(u2c(struct.keyset_handle)))
@@ -186,7 +186,7 @@ def domain_to_dict(struct):
                     "maxSigLife": settings.DNS_MAX_SIG_LIFE,
                     "keyData": [],
                 }
-                result['cznic_keyset'] = {
+                result['fred_keyset'] = {
                     "objectClassName": ObjectClassName.KEYSET,
                     "handle": keyset.handle,
                     "links": [
@@ -206,7 +206,7 @@ def domain_to_dict(struct):
                         "algorithm": key.alg,
                         "publicKey": key.public_key,
                     })
-                    result["cznic_keyset"]['dns_keys'].append({
+                    result["fred_keyset"]['dns_keys'].append({
                         "flags": key.flags,
                         "protocol": key.protocol,
                         "algorithm": key.alg,
@@ -229,7 +229,7 @@ def delete_candidate_domain_to_dict(struct):
 
         result = {
             "objectClassName": ObjectClassName.DOMAIN,
-            "rdapConformance": ["rdap_level_0", "cznic_version_0"],
+            "rdapConformance": ["rdap_level_0", "fred_version_0"],
             "handle": struct.handle,
             "ldhName": struct.handle,
             "links": [

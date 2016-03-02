@@ -19,9 +19,9 @@ def translate_rest_path_to_request_type(path):
         return 'DomainLookup'
     if path == 'nameserver':
         return 'NameserverLookup'
-    if path == 'cznic_nsset':
+    if path == 'fred_nsset':
         return 'NSSetLookup'
-    if path == 'cznic_keyset':
+    if path == 'fred_keyset':
         return 'KeySetLookup'
     return ''
 

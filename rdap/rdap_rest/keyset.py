@@ -30,7 +30,7 @@ def keyset_to_dict(struct):
         self_link = settings.RDAP_KEYSET_URL_TMPL  % {"handle": struct.handle}
 
         result = {
-            "rdapConformance" : ["rdap_level_0", "cznic_version_0"],
+            "rdapConformance" : ["rdap_level_0", "fred_version_0"],
             "objectClassName": ObjectClassName.KEYSET,
             "handle": struct.handle,
             "entities": [
