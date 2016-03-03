@@ -126,8 +126,8 @@ class ObjectClassName(object):
     DOMAIN = 'domain'
     ENTITY = 'entity'
     NAMESERVER = 'nameserver'
-    NSSET = 'nsset'
-    KEYSET = 'keyset'
+    NSSET = 'fred_nsset'
+    KEYSET = 'fred_keyset'
 
 
 class InvalidIdn(Exception):
