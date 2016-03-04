@@ -48,9 +48,9 @@ def get_domain_by_handle(handle):
     logging.debug('get_domain_by_handle: %s', handle)
     try:
         return domain_to_dict(c2u(_WHOIS.get_domain_by_handle(u2c(handle))))
-    except _INTERFACE.Whois.OBJECT_NOT_FOUND, e:
+    except (_INTERFACE.Whois.OBJECT_NOT_FOUND, _INTERFACE.Whois.TOO_MANY_LABELS, _INTERFACE.Whois.UNMANAGED_ZONE), e:
         raise NotFoundError()
-    except (_INTERFACE.Whois.INVALID_LABEL, _INTERFACE.Whois.TOO_MANY_LABELS, _INTERFACE.Whois.UNMANAGED_ZONE), e:
+    except _INTERFACE.Whois.INVALID_LABEL, e:
         raise InvalidHandleError()
 
 
