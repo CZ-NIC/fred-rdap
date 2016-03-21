@@ -52,6 +52,7 @@ class ModuleInstall(install):
             content = content.replace("UNIX_WHOIS_HOST = ''", "UNIX_WHOIS_HOST = '" + self.unixwhoishost + "'")
         if self.disclaimerfile is not None:
             content = content.replace("DISCLAIMER_FILE = ''", "DISCLAIMER_FILE = '" + self.disclaimerfile + "'")
+        content = content.replace("LOG_FILENAME = ''", "LOG_FILENAME = '" + self.expand_filename('$localstate/log/fred-rdap.log') + "'")
 
         open(filename, 'w').write(content)
         self.announce("File '%s' was updated" % filename)

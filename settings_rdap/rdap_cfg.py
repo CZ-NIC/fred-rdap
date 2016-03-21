@@ -61,3 +61,37 @@ UNIX_WHOIS_HOST = ''
 # etc
 DNS_MAX_SIG_LIFE = 1209600
 DISCLAIMER_FILE = ''
+
+LOG_FILENAME = ''
+LOGGING = {
+    'version': 1,
+    'formatters': {
+        'simple': {
+            'format': '%(asctime)s - %(name)s - %(levelname)-8s - %(message)s',
+        },
+    },
+    'handlers': {
+        'dummy': {
+            'class': 'logging.NullHandler',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'formatter': 'simple',
+            'filename': LOG_FILENAME,
+            'mode': 'a',
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}
