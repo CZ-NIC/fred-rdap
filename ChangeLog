@@ -4,6 +4,8 @@
 
   * patch corba recoder for omniorb 4.2.0
 
+  * add logging setup to config
+
 2016-01-20 (0.3.0)
 
   * changes according to rfc document standardization
