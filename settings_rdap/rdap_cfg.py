@@ -16,6 +16,9 @@ USE_TZ = True
 USE_I18N = True
 USE_L10N = True
 
+# Must be present when django-guardian (dep. for restframework) is installed
+ANONYMOUS_USER_ID = -1
+
 INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.staticfiles',
