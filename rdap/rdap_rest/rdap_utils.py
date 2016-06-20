@@ -135,6 +135,7 @@ class InvalidIdn(Exception):
     Invalid input - internationalized domain name
     """
 
+
 def preprocess_fqdn(fqdn):
     """
     Normalize fqdn input search string for backend call
@@ -142,7 +143,7 @@ def preprocess_fqdn(fqdn):
     try:
         fqdn = idna.encode(fqdn)
         idna.decode(fqdn)
-    except UnicodeError, e:
+    except UnicodeError:
         raise InvalidIdn()
     return fqdn
 

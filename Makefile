@@ -1,6 +1,6 @@
 APP = rdap
 
-.PHONY: default isort check-isort
+.PHONY: default isort check-isort check-flake8
 
 default:
 	echo "No default action, specify the target"
@@ -10,3 +10,6 @@ isort:
 
 check-isort:
 	isort --recursive --check-only --diff ${APP}
+
+check-flake8:
+	flake8 --config=.flake8 --format=pylint --show-source ${APP}

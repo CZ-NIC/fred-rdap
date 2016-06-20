@@ -9,8 +9,7 @@ from django.utils.functional import SimpleLazyObject
 from rdap.utils.corba import Corba, importIDL
 from rdap.utils.corbarecoder import c2u, u2c
 
-from .rdap_utils import ObjectClassName, add_unicode_name, nonempty, rdap_status_mapping, to_rfc3339, unwrap_date, \
-    unwrap_datetime
+from .rdap_utils import ObjectClassName, add_unicode_name, nonempty, rdap_status_mapping, to_rfc3339, unwrap_datetime
 
 importIDL('%s/%s' % (settings.CORBA_IDL_ROOT_PATH, settings.CORBA_IDL_WHOIS_FILENAME))
 _CORBA = Corba(ior=settings.CORBA_NS_HOST_PORT, context_name=settings.CORBA_NS_CONTEXT,
@@ -142,7 +141,7 @@ def domain_to_dict(struct):
                           "type": "application/rdap+json"
                         },
                     ],
-                    "nameservers" : [],
+                    "nameservers": [],
                 }
                 for ns in nsset.nservers:
                     ns_obj = {
@@ -191,13 +190,13 @@ def domain_to_dict(struct):
                     "handle": keyset.handle,
                     "links": [
                         {
-                          "value": settings.RDAP_KEYSET_URL_TMPL  % {"handle": keyset.handle},
-                          "rel":"self",
-                          "href": settings.RDAP_KEYSET_URL_TMPL  % {"handle": keyset.handle},
-                          "type":"application/rdap+json",
+                          "value": settings.RDAP_KEYSET_URL_TMPL % {"handle": keyset.handle},
+                          "rel": "self",
+                          "href": settings.RDAP_KEYSET_URL_TMPL % {"handle": keyset.handle},
+                          "type": "application/rdap+json",
                         },
                     ],
-                    "dns_keys" : [],
+                    "dns_keys": [],
                 }
                 for key in keyset.dns_keys:
                     result["secureDNS"]['keyData'].append({
@@ -215,6 +214,7 @@ def domain_to_dict(struct):
 
     logging.debug(result)
     return result
+
 
 def delete_candidate_domain_to_dict(struct):
     """

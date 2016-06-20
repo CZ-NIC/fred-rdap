@@ -41,12 +41,12 @@ def response_handling(data_getter, getter_input_handle, log_request):
         query_result = data_getter(getter_input_handle)
 
         if settings.DISCLAIMER_FILE:
-            if not 'notices' in query_result:
+            if 'notices' not in query_result:
                 query_result["notices"] = []
             query_result["notices"].append(
                 {
                     "title": "Disclaimer",
-                    "description": [ get_disclaimer_text() ]
+                    "description": [get_disclaimer_text()]
                 }
             )
 

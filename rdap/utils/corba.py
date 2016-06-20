@@ -13,16 +13,27 @@ from omniORB import CORBA, importIDL
 # own exceptions
 class IorNotFoundError(Exception):
     pass
+
+
 class AlreadyLoggedInError(Exception):
     pass
+
+
 class NotLoggedInError(Exception):
     pass
+
+
 class LanguageNotSupportedError(Exception):
     pass
+
+
 class SetLangAfterLoginError(Exception):
     pass
+
+
 class ParameterIsNotListOrTupleError(Exception):
     pass
+
 
 def transientFailure(cookie, retries, exc):
     if retries > 10:
@@ -30,11 +41,13 @@ def transientFailure(cookie, retries, exc):
     else:
         return True
 
+
 def commFailure(cookie, retries, exc):
     if retries > 20:
         return False
     else:
         return True
+
 
 def systemFailure(cookie, retries, exc):
     if retries > 5:
@@ -50,14 +63,17 @@ omniORB.installSystemExceptionHandler(cookie, systemFailure)
 
 
 # http://omniorb.sourceforge.net/omnipy3/omniORBpy/omniORBpy004.html
-#["-ORBnativeCharCodeSet", "UTF-8",
+# ["-ORBnativeCharCodeSet", "UTF-8",
 # "-ORBtraceLevel", "40"
 # "-ORBtraceExceptions", "1",
 # "-ORBtraceFile", "/tmp/debug-corba.log"]
 orb = CORBA.ORB_init(["-ORBnativeCharCodeSet", "UTF-8"], CORBA.ORB_ID)
 
-corbas = {} # list of corba objects, one per each module that needs it (key to dict is name of module)
-imported_idls = [] # list of path of already imported idl modules, so we dont import same modules multiple times (it's time consuming)
+corbas = {}  # list of corba objects, one per each module that needs it (key to dict is name of module)
+# list of path of already imported idl modules, so we dont import same modules multiple times (it's time consuming)
+imported_idls = []
+
+
 class Corba(object):
     def __init__(self, ior='localhost', context_name='fred', export_modules=None):
         object.__init__(self)
@@ -84,7 +100,7 @@ class Corba(object):
 
         # get idl type from idl_type_str:
         idl_type_parts = idl_type_str.split('.')
-        idl_type = getattr(self, idl_type_parts[0]) # e.g. self.ccReg
+        idl_type = getattr(self, idl_type_parts[0])  # e.g. self.ccReg
         for part in idl_type_parts[1:]:
             idl_type = getattr(idl_type, part)
 
@@ -104,14 +120,13 @@ def create_corba_for_module(mod_name):
     if isinstance(idls, types.StringTypes):
         idls = [idls]
     for idl in idls:
-        if idl not in imported_idls: # check to avoid multiple import of the same idl
+        if idl not in imported_idls:  # check to avoid multiple import of the same idl
             importIDL(idl)
             imported_idls.append(idl)
 
     corbas[mod_name] = Corba(ior=mod_settings.CORBA_IOR,
                              context_name=mod_settings.CORBA_CONTEXT,
-                             export_modules=getattr(mod_settings, 'CORBA_EXPORT_MODULES', None)
-                            )
+                             export_modules=getattr(mod_settings, 'CORBA_EXPORT_MODULES', None))
 
 
 def create_corba_in_dynamic_modules():

@@ -18,18 +18,18 @@ def contact_to_dict(struct):
     if struct is None:
         result = None
     else:
-        self_link = settings.RDAP_ENTITY_URL_TMPL  % {"handle": struct.handle}
-        if not "linked" in struct.statuses:
+        self_link = settings.RDAP_ENTITY_URL_TMPL % {"handle": struct.handle}
+        if "linked" not in struct.statuses:
             result = {
-                "rdapConformance" : ["rdap_level_0"],
+                "rdapConformance": ["rdap_level_0"],
                 "objectClassName": ObjectClassName.ENTITY,
                 "handle": struct.handle,
                 "links": [
                     {
                         "value": self_link,
-                        "rel":"self",
+                        "rel": "self",
                         "href": self_link,
-                        "type":"application/rdap+json",
+                        "type": "application/rdap+json",
                     },
                 ],
                 "entities": [
@@ -40,8 +40,8 @@ def contact_to_dict(struct):
                     },
                 ],
                 "port43": settings.UNIX_WHOIS_HOST,
-                "remarks":[
-                    { "description":[ "Omitting data because contact is not linked to any registry object."] }
+                "remarks": [
+                    {"description": ["Omitting data because contact is not linked to any registry object."]}
                 ],
             }
         else:
@@ -85,15 +85,15 @@ def contact_to_dict(struct):
 
             result = {
                 "objectClassName": ObjectClassName.ENTITY,
-                "rdapConformance" : ["rdap_level_0"],
+                "rdapConformance": ["rdap_level_0"],
                 "handle": struct.handle,
                 "vcardArray": ["vcard", vcard],
                 "links": [
                     {
                         "value": self_link,
-                        "rel":"self",
+                        "rel": "self",
                         "href": self_link,
-                        "type":"application/rdap+json",
+                        "type": "application/rdap+json",
                     },
                 ],
                 "port43": settings.UNIX_WHOIS_HOST,

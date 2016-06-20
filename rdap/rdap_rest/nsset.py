@@ -30,7 +30,7 @@ def nsset_to_dict(struct):
         self_link = settings.RDAP_NSSET_URL_TMPL % {"handle": struct.handle}
 
         result = {
-            "rdapConformance" : ["rdap_level_0", "fred_version_0"],
+            "rdapConformance": ["rdap_level_0", "fred_version_0"],
             "objectClassName": ObjectClassName.NSSET,
             "handle": struct.handle,
             "entities": [
@@ -43,8 +43,8 @@ def nsset_to_dict(struct):
             "port43": settings.UNIX_WHOIS_HOST,
             "events": [
                 {
-                    "eventAction" : "registration",
-                    "eventDate" : to_rfc3339(unwrap_datetime(struct.created)),
+                    "eventAction": "registration",
+                    "eventDate": to_rfc3339(unwrap_datetime(struct.created)),
                 }
             ],
             "links": [
@@ -55,7 +55,7 @@ def nsset_to_dict(struct):
                     "type": "application/rdap+json",
                 },
             ],
-            "nameservers" : [],
+            "nameservers": [],
         }
 
         status = rdap_status_mapping(struct.statuses)

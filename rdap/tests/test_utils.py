@@ -162,7 +162,6 @@ class TestAddUnicodeName(SimpleTestCase):
         rdap_utils.add_unicode_name(dst_dict, '42.cz')
         self.assertEqual(dst_dict, {'k': 'v'})
 
-
     def test_add(self):
         dst_dict = {}
         rdap_utils.add_unicode_name(dst_dict, 'xn--skvrkl-5va55h.example')
