@@ -1,4 +1,4 @@
-from django.conf.urls import include, patterns, url
+from django.conf.urls import patterns, url
 
 from rdap.rdap_rest.views import DomainViewSet, EntityViewSet, HelpViewSet, KeySetViewSet, MalformedRdapPathViewSet, \
     NameserverViewSet, NSSetViewSet, UnsupportedViewSet
@@ -13,7 +13,8 @@ unsupported = UnsupportedViewSet.as_view({'get': 'retrieve'})
 help_page = HelpViewSet.as_view({'get': 'retrieve'})
 
 
-urlpatterns = patterns('',
+urlpatterns = patterns(
+    '',
     url(r'(?i)^(?P<path>entity)/(?P<handle>.+)$', entity_detail, name='entity-detail'),
     url(r'(?i)^(?P<path>domain)/(?P<handle>.+)$', domain_detail, name='domain-detail'),
     url(r'(?i)^(?P<path>nameserver)/(?P<handle>.+)$', nameserver_detail, name='nameserver-detail'),

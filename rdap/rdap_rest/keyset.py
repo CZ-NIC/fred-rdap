@@ -27,10 +27,10 @@ def keyset_to_dict(struct):
     if struct is None:
         result = None
     else:
-        self_link = settings.RDAP_KEYSET_URL_TMPL  % {"handle": struct.handle}
+        self_link = settings.RDAP_KEYSET_URL_TMPL % {"handle": struct.handle}
 
         result = {
-            "rdapConformance" : ["rdap_level_0", "fred_version_0"],
+            "rdapConformance": ["rdap_level_0", "fred_version_0"],
             "objectClassName": ObjectClassName.KEYSET,
             "handle": struct.handle,
             "entities": [
@@ -43,16 +43,16 @@ def keyset_to_dict(struct):
             "port43": settings.UNIX_WHOIS_HOST,
             "events": [
                 {
-                    "eventAction" : "registration",
-                    "eventDate" : to_rfc3339(unwrap_datetime(struct.created)),
+                    "eventAction": "registration",
+                    "eventDate": to_rfc3339(unwrap_datetime(struct.created)),
                 },
             ],
             "links": [
                 {
                     "value": self_link,
-                    "rel":"self",
+                    "rel": "self",
                     "href": self_link,
-                    "type":"application/rdap+json",
+                    "type": "application/rdap+json",
                 },
             ]
         }

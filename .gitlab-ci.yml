@@ -1,3 +1,7 @@
 isort:
     image: cznic/ubuntu_python_runner:latest
     script: "make check-isort"
+
+flake8:
+    image: cznic/ubuntu_python_runner:latest
+    script: "make check-flake8"
