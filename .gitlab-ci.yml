@@ -1,3 +1,6 @@
+before_script:
+    - pip list
+
 isort:
     image: cznic/ubuntu_python_runner:latest
     script: "make check-isort"
