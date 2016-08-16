@@ -89,7 +89,8 @@ CORBA_IDL_LOGGER_FILENAME = 'Logger.idl'
 CORBA_NS_HOST_PORT = ''
 # Name service context
 CORBA_NS_CONTEXT = 'fred'
-# Modules exported for RDAP - Don't change this!
+# List of modules exported for RDAP
+#     Important: Unless you know what you're doing, don't change this!
 CORBA_EXPORT_MODULES = ['Registry']
 
 ### WHOIS URLs configuration
@@ -108,7 +109,7 @@ RDAP_KEYSET_URL_TMPL        = RDAP_ROOT_URL + "/fred_keyset/%(handle)s"
 # Unix Whois server address
 UNIX_WHOIS_HOST = ''
 
-# Maximum signature lifetime (seconds)
+# Maximum signature lifetime (seconds) used in secureDNS
 DNS_MAX_SIG_LIFE = 1209600
-# File that is included in each response
+# File path of the disclaimer notice that is included in each response
 DISCLAIMER_FILE = ''
