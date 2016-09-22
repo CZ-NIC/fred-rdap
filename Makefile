@@ -1,15 +1,16 @@
 APP = rdap
 
-.PHONY: default test isort check-isort check-flake8
+.PHONY: default test isort check-isort check-flake8 check-all
 
-default:
-	echo "No default action, specify the target"
+default: check-all
 
 test:
 	PYTHONPATH='./test_cfg:${PYTHONPATH}' DJANGO_SETTINGS_MODULE='settings' django-admin test rdap
 
 isort:
 	isort --recursive ${APP}
+
+cehck_all: check-isort check-flake8
 
 check-isort:
 	isort --recursive --check-only --diff ${APP}
