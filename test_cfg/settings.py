@@ -1,10 +1,6 @@
 import os
 
-INSTALLED_APPS = (
-    'django.contrib.contenttypes',
-    'django.contrib.staticfiles',
-    'rest_framework',
-)
+INSTALLED_APPS = ()
 ROOT_URLCONF = 'rdap.urls'
 SECRET_KEY = 'SECRET'
 

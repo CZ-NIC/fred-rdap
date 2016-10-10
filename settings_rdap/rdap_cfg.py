@@ -22,7 +22,6 @@ ANONYMOUS_USER_ID = -1
 INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.staticfiles',
-    'rest_framework',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -33,16 +32,6 @@ MIDDLEWARE_CLASSES = (
 
 STATIC_URL = '/static/'
 ROOT_URLCONF = 'rdap.urls'
-
-REST_FRAMEWORK = {
-    'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.JSONRenderer',
-        'rdap.rdap_rest.renderer.RDAPJSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
-    ),
-    'DEFAULT_CONTENT_NEGOTIATION_CLASS': 'rdap.rdap_rest.content_negotiation.RdapJsonForAllContentNegotiation',
-    'EXCEPTION_HANDLER': 'rdap.rdap_rest.exception_handler.rdap_exception_handler'
-}
 
 # CORBA CONFIGURATION
 CORBA_IDL_ROOT_PATH = ''
