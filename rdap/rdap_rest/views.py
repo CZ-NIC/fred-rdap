@@ -158,17 +158,3 @@ class UnsupportedViewSet(viewsets.ViewSet):
     """
     def retrieve(self, request, handle=None, path=None):
         return Response(None, status=status.HTTP_501_NOT_IMPLEMENTED)
-
-
-class HelpViewSet(viewsets.ViewSet):
-    """
-    Help View
-    """
-    def retrieve(self, request):
-        help_response = {
-            "rdapConformance": ["rdap_level_0"],
-            "notices": [
-                {"title": "Help", "description": ["No help."]}
-            ]
-        }
-        return Response(help_response, headers={'Access-Control-Allow-Origin': '*'})

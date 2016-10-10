@@ -1,7 +1,8 @@
 from django.conf.urls import patterns, url
 
-from rdap.rdap_rest.views import DomainViewSet, EntityViewSet, HelpViewSet, KeySetViewSet, MalformedRdapPathViewSet, \
+from rdap.rdap_rest.views import DomainViewSet, EntityViewSet, KeySetViewSet, MalformedRdapPathViewSet, \
     NameserverViewSet, NSSetViewSet, UnsupportedViewSet
+from rdap.views import HelpView
 
 entity_detail = EntityViewSet.as_view({'get': 'retrieve'})
 domain_detail = DomainViewSet.as_view({'get': 'retrieve'})
@@ -10,7 +11,6 @@ nsset_detail = NSSetViewSet.as_view({'get': 'retrieve'})
 keyset_detail = KeySetViewSet.as_view({'get': 'retrieve'})
 malformed_rdap_path = MalformedRdapPathViewSet.as_view({'get': 'retrieve'})
 unsupported = UnsupportedViewSet.as_view({'get': 'retrieve'})
-help_page = HelpViewSet.as_view({'get': 'retrieve'})
 
 
 urlpatterns = patterns(
@@ -24,6 +24,6 @@ urlpatterns = patterns(
     url(r'(?i)^(?P<path>domains)$', unsupported, name='unsupported'),
     url(r'(?i)^(?P<path>nameservers)$', unsupported, name='unsupported'),
     url(r'(?i)^(?P<path>entities)$', unsupported, name='unsupported'),
-    url(r'(?i)^help$', help_page, name='help'),
+    url(r'(?i)^help$', HelpView.as_view(), name='help'),
     url(r'.*', malformed_rdap_path, name='malformed-path-view'),
 )
