@@ -19,3 +19,15 @@ class TestHelpView(SimpleTestCase):
             "notices": [{"title": "Help", "description": ["No help."]}],
         }
         self.assertJSONEqual(response.content, data)
+
+
+class TestUnsupportedView(SimpleTestCase):
+    """
+    Test `UnsupportedView` class.
+    """
+    def test_unsupported_view(self):
+        response = self.client.get('/autnum/foo')
+
+        self.assertEqual(response.status_code, 501)
+        self.assertEqual(response['Content-Type'], 'application/rdap+json')
+        self.assertEqual(response.content, '')

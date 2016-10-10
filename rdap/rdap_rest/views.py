@@ -142,19 +142,3 @@ class KeySetViewSet(viewsets.ViewSet):
             handle,
             log_req
         )
-
-
-class MalformedRdapPathViewSet(viewsets.ViewSet):
-    """
-    MalformedRdapPath View
-    """
-    def retrieve(self, request, handle=None, path=None):
-        return Response(None, status=status.HTTP_400_BAD_REQUEST)
-
-
-class UnsupportedViewSet(viewsets.ViewSet):
-    """
-    Unsupported View
-    """
-    def retrieve(self, request, handle=None, path=None):
-        return Response(None, status=status.HTTP_501_NOT_IMPLEMENTED)
