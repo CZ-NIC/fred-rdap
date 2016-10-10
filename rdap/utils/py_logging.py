@@ -9,7 +9,3 @@ _LOGGER_CORBA = Corba(ior=settings.CORBA_NS_HOST_PORT, context_name=settings.COR
 _LOGGER_OBJ = SimpleLazyObject(lambda: _LOGGER_CORBA.get_object('Logger', 'ccReg.Logger'))
 _LOGGER_MODULE = _LOGGER_CORBA.ccReg
 py_logger_obj = SimpleLazyObject(lambda: Logger(_LOGGER_OBJ, _LOGGER_MODULE))
-
-
-def get_logger():
-    return py_logger_obj

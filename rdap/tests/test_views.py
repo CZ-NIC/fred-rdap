@@ -113,6 +113,47 @@ class TestObjectView(SimpleTestCase):
         self.assertEqual(self.logger_mock.mock_calls, calls)
 
 
+class TestFqdnObjectView(SimpleTestCase):
+    """
+    Test `FqdnObjectView` class.
+    """
+    def setUp(self):
+        patcher = patch('rdap.rdap_rest.whois._WHOIS')
+        self.addCleanup(patcher.stop)
+        self.whois_mock = patcher.start()
+
+        log_patcher = patch('rdap.views.LOGGER')
+        self.addCleanup(log_patcher.stop)
+        self.logger_mock = log_patcher.start()
+
+    def test_nameserver(self):
+        self.whois_mock.get_nameserver_by_fqdn.return_value = _INTERFACE.Whois.NameServer('holly', [])
+        response = self.client.get('/nameserver/holly')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/rdap+json')
+        self.assertEqual(response['Access-Control-Allow-Origin'], '*')
+        result = json.loads(response.content)
+        self.assertEqual(result['objectClassName'], 'nameserver')
+        self.assertEqual(result['handle'], 'holly')
+
+        # Check logger
+        calls = [call.create_request('127.0.0.1', 'RDAP', 'NameserverLookup', properties=[('handle', 'holly')]),
+                 call.create_request().close(properties=[])]
+        self.assertEqual(self.logger_mock.mock_calls, calls)
+        self.assertEqual(self.logger_mock.create_request.return_value.result, 'Ok')
+
+    def test_nameserver_invalid_fqdn(self):
+        response = self.client.get(u'/nameserver/-invalid')
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response['Content-Type'], 'application/rdap+json')
+        self.assertEqual(response.content, '')
+
+        # Check logger
+        self.assertEqual(self.logger_mock.mock_calls, [])
+
+
 class TestHelpView(SimpleTestCase):
     """
     Test `HelpView` class.

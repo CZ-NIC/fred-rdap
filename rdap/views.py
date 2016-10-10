@@ -5,7 +5,7 @@ from django.conf import settings
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, JsonResponse
 from django.views.generic import View
 
-from rdap.rdap_rest.rdap_utils import get_disclaimer_text
+from rdap.rdap_rest.rdap_utils import InvalidIdn, get_disclaimer_text, preprocess_fqdn
 from rdap.rdap_rest.whois import InvalidHandleError, NotFoundError
 from rdap.utils.py_logging import py_logger_obj as LOGGER
 
@@ -54,6 +54,19 @@ class ObjectView(View):
             raise error
         finally:
             log_request.close(properties=out_properties)
+
+
+# TODO: IDN should be handled by backend. Once its implemented in FRED this view can be removed.
+class FqdnObjectView(ObjectView):
+    """
+    View for domains and nameservers.
+    """
+    def get(self, request, handle, *args, **kwargs):
+        try:
+            handle = preprocess_fqdn(handle)
+        except InvalidIdn:
+            return HttpResponseBadRequest(content_type=RDAP_CONTENT_TYPE)
+        return super(FqdnObjectView, self).get(request, handle, *args, **kwargs)
 
 
 class HelpView(View):
