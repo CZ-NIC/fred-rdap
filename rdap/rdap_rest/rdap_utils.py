@@ -101,6 +101,8 @@ def rdap_status_mapping(status_list):
 
     ('ok' status is not returned by backend and it is represented
     with empty input list - means no restrictions or pending operations)
+
+    @rtype: list
     """
     if not status_list:
         status_list = ['ok']
@@ -109,7 +111,7 @@ def rdap_status_mapping(status_list):
         mapped_value = RDAP_STATUS_MAPPING.get(status)
         if mapped_value:
             ret.add(mapped_value)
-    return ret
+    return list(ret)
 
 
 def get_disclaimer_text():
