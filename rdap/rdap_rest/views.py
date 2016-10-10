@@ -8,8 +8,7 @@ from rest_framework.response import Response
 from rdap.utils.py_logging import get_logger
 
 from .rdap_utils import InvalidIdn, get_disclaimer_text, preprocess_fqdn
-from .whois import InvalidHandleError, NotFoundError, get_contact_by_handle, get_domain_by_handle, \
-    get_keyset_by_handle, get_nameserver_by_handle, get_nsset_by_handle
+from .whois import InvalidHandleError, NotFoundError, get_domain_by_handle, get_nameserver_by_handle
 
 
 def translate_rest_path_to_request_type(path):
@@ -71,19 +70,6 @@ def response_handling(data_getter, getter_input_handle, log_request):
     return Response(rsp_content, status=rsp_status, headers={'Access-Control-Allow-Origin': '*'})
 
 
-class EntityViewSet(viewsets.ViewSet):
-    """
-    Entity View
-    """
-    def retrieve(self, request, handle=None, path=None):
-        log_req = create_log_request(path, handle, request.META.get('REMOTE_ADDR', ''))
-        return response_handling(
-            get_contact_by_handle,
-            handle,
-            log_req
-        )
-
-
 class DomainViewSet(viewsets.ViewSet):
     """
     Domain View
@@ -113,32 +99,6 @@ class NameserverViewSet(viewsets.ViewSet):
         log_req = create_log_request(path, handle, request.META.get('REMOTE_ADDR', ''))
         return response_handling(
             get_nameserver_by_handle,
-            handle,
-            log_req
-        )
-
-
-class NSSetViewSet(viewsets.ViewSet):
-    """
-    NSSet View
-    """
-    def retrieve(self, request, handle=None, path=None):
-        log_req = create_log_request(path, handle, request.META.get('REMOTE_ADDR', ''))
-        return response_handling(
-            get_nsset_by_handle,
-            handle,
-            log_req
-        )
-
-
-class KeySetViewSet(viewsets.ViewSet):
-    """
-    KeySet View
-    """
-    def retrieve(self, request, handle=None, path=None):
-        log_req = create_log_request(path, handle, request.META.get('REMOTE_ADDR', ''))
-        return response_handling(
-            get_keyset_by_handle,
             handle,
             log_req
         )
