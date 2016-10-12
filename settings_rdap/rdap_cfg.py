@@ -78,7 +78,7 @@ LOGGING = {
 
 ## RDAP Server Settings #######################################################
 
-### CORBA configuration
+#### CORBA configuration
 # Path to the directory with IDL files (absolute path recommended)
 CORBA_IDL_ROOT_PATH = ''
 # Whois IDL file name
@@ -93,7 +93,7 @@ CORBA_NS_CONTEXT = 'fred'
 #     Important: Unless you know what you're doing, don't change this!
 CORBA_EXPORT_MODULES = ['Registry']
 
-### WHOIS URLs configuration
+#### WHOIS URLs configuration
 # Base of URLs
 RDAP_ROOT_URL = ''
 # URL path for domain queries
