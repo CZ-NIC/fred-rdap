@@ -1,3 +1,4 @@
-django >=1.7,<1.10.99
-djangorestframework
+django >=1.7,<1.9.99
+djangorestframework <3.3.99
 idna
+-e git+git@gitlab.office.nic.cz:utils/pylogger.git#egg=pylogger

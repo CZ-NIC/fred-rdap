@@ -5,6 +5,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'rest_framework',
 )
+ROOT_URLCONF = 'rdap.urls'
 SECRET_KEY = 'SECRET'
 
 CORBA_IDL_ROOT_PATH = os.environ.get('FRED_IDL_DIR', './idl/idl')
