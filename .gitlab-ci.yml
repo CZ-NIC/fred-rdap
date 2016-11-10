@@ -1,16 +1,23 @@
+stages:
+    - analysis
+    - test
+
 before_script:
     - pip list
 
 isort:
     image: cznic/ubuntu_python_runner:latest
+    stage: analysis
     script: "make check-isort"
 
 flake8:
     image: cznic/ubuntu_python_runner:latest
+    stage: analysis
     script: "make check-flake8"
 
 .test: &test
     image: cznic/ubuntu_python_runner:latest
+    stage: test
     script:
         # Install omniORB and omniIDL
         - apt-get update && apt-get install -y python-omniorb omniidl-python
