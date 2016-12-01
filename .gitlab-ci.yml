@@ -40,16 +40,6 @@ flake8:
         - pip list
         - make test
 
-test:django1.7:
-    <<: *test
-    variables:
-        DJANGO_VERSION: ">=1.7,<1.7.99"
-
-test:django1.8:
-    <<: *test
-    variables:
-        DJANGO_VERSION: ">=1.8,<1.8.99"
-
 test:django1.9:
     <<: *test
     variables:
