@@ -3,6 +3,7 @@ RDAP views.
 """
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
 
 from rdap.rdap_rest.rdap_utils import InvalidIdn, get_disclaimer_text, preprocess_fqdn
@@ -27,6 +28,10 @@ class ObjectView(View):
     """
     getter = None
     request_type = None
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super(ObjectView, self).dispatch(request, *args, **kwargs)
 
     def get(self, request, handle, *args, **kwargs):
         log_request = LOGGER.create_request(request.META.get('REMOTE_ADDR', ''), LOGGER_SERVICE, self.request_type,
@@ -73,6 +78,10 @@ class HelpView(View):
     """
     Help view for RDAP protocol.
     """
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super(HelpView, self).dispatch(request, *args, **kwargs)
+
     def get(self, request, *args, **kwargs):
         data = {
             'rdapConformance': RDAP_CONFORMANCE,
@@ -90,6 +99,10 @@ class UnsupportedView(View):
     @cvar status: HTTP response code
     """
     status = 501
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super(UnsupportedView, self).dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         return HttpResponse(status=self.status, content_type=RDAP_CONTENT_TYPE)
