@@ -5,9 +5,9 @@ Django settings for rdap project.
 #                      RDAP Server Configuration File                         #
 ###############################################################################
 
-## Django and Django REST Settings ############################################
+## Django ############################################
 #
-# Note: Refer to Django and Django REST framework documentation for description.
+# Note: Refer to Django documentation for description.
 
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
