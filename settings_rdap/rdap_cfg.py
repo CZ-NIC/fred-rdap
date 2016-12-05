@@ -5,9 +5,9 @@ Django settings for rdap project.
 #                      RDAP Server Configuration File                         #
 ###############################################################################
 
-## Django ############################################
+## Django Settings ############################################################
 #
-# Note: Refer to Django documentation for description.
+# Note: Refer to the Django documentation for a description.
 
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -85,9 +85,9 @@ CORBA_IDL_ROOT_PATH = ''
 CORBA_IDL_WHOIS_FILENAME = 'Whois2.idl'
 # Logger IDL file name
 CORBA_IDL_LOGGER_FILENAME = 'Logger.idl'
-# Name service address (host[:port])
+# Naming service address (host[:port])
 CORBA_NS_HOST_PORT = ''
-# Name service context
+# Naming service context
 CORBA_NS_CONTEXT = 'fred'
 # List of modules exported for RDAP
 #     Important: Unless you know what you're doing, don't change this!
