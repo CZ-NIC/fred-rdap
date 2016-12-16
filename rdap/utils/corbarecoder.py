@@ -82,6 +82,7 @@ class CorbaRecode(object):
                     answer.__dict__[name] = [self.encode(x) for x in item]
             return answer
 
+
 recoder = CorbaRecode()
 c2u = recoder.decode  # recode from corba string to unicode
 u2c = recoder.encode  # recode from unicode to strings

@@ -121,6 +121,7 @@ def get_disclaimer_text():
 
     return get_disclaimer_text.text
 
+
 get_disclaimer_text.text = None
 
 
