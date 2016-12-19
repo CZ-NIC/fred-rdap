@@ -1,3 +1,13 @@
+2016-12-19 (0.4.1)
+
+  * disable csrf check on rdap views
+
+  * add comments to configuration file
+
+2016-10-27 (0.4.0)
+
+  * removed django rest framework
+
 2016-05-12 (0.3.3)
 
   * resolve error when django-guardian is installed
