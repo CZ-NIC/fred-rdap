@@ -4,17 +4,27 @@ Tests of RDAP views.
 import json
 import os
 
-from django.test import SimpleTestCase
+from django.test import Client, SimpleTestCase
 from mock import call, patch
 from omniORB.CORBA import TRANSIENT
 
 from rdap.rdap_rest.whois import _INTERFACE
 
 
+class EnforcingCsrfClient(Client):
+    """
+    Test client which enforces CSRF checks.
+    """
+    def __init__(self, **defaults):
+        super(EnforcingCsrfClient, self).__init__(enforce_csrf_checks=True, **defaults)
+
+
 class TestObjectView(SimpleTestCase):
     """
     Test `ObjectView` class.
     """
+    client_class = EnforcingCsrfClient
+
     def setUp(self):
         patcher = patch('rdap.rdap_rest.whois._WHOIS')
         self.addCleanup(patcher.stop)
@@ -112,6 +122,12 @@ class TestObjectView(SimpleTestCase):
                  call.create_request().close(properties=[('error', 'TRANSIENT')])]
         self.assertEqual(self.logger_mock.mock_calls, calls)
 
+    def test_post(self):
+        # Test POST returns `Method Not Allowed` response instead of CSRF check failure.
+        response = self.client.post('/entity/kryten', {})
+        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.content, '')
+
 
 class TestFqdnObjectView(SimpleTestCase):
     """
@@ -158,6 +174,8 @@ class TestHelpView(SimpleTestCase):
     """
     Test `HelpView` class.
     """
+    client_class = EnforcingCsrfClient
+
     def test_get(self):
         response = self.client.get('/help')
 
@@ -170,14 +188,28 @@ class TestHelpView(SimpleTestCase):
         }
         self.assertJSONEqual(response.content, data)
 
+    def test_post(self):
+        # Test POST returns `Method Not Allowed` response instead of CSRF check failure.
+        response = self.client.post('/entity/kryten', {})
+        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.content, '')
+
 
 class TestUnsupportedView(SimpleTestCase):
     """
     Test `UnsupportedView` class.
     """
+    client_class = EnforcingCsrfClient
+
     def test_unsupported_view(self):
         response = self.client.get('/autnum/foo')
 
         self.assertEqual(response.status_code, 501)
         self.assertEqual(response['Content-Type'], 'application/rdap+json')
+        self.assertEqual(response.content, '')
+
+    def test_post(self):
+        # Test POST returns `Method Not Allowed` response instead of CSRF check failure.
+        response = self.client.post('/entity/kryten', {})
+        self.assertEqual(response.status_code, 405)
         self.assertEqual(response.content, '')
