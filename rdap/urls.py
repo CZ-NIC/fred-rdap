@@ -1,11 +1,10 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from rdap.rdap_rest.whois import get_contact_by_handle, get_domain_by_handle, get_keyset_by_handle, \
     get_nameserver_by_handle, get_nsset_by_handle
 from rdap.views import FqdnObjectView, HelpView, ObjectView, UnsupportedView
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(r'(?i)^entity/(?P<handle>.+)$',
         ObjectView.as_view(getter=get_contact_by_handle, request_type='EntityLookup'),
         name='entity-detail'),
@@ -28,4 +27,4 @@ urlpatterns = patterns(
     url(r'(?i)^entities$', UnsupportedView.as_view()),
     url(r'(?i)^help$', HelpView.as_view(), name='help'),
     url(r'.*', UnsupportedView.as_view(status=400)),
-)
+]
