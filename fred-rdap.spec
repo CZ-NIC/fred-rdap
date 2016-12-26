@@ -1,6 +1,7 @@
 %define name fred-rdap
 %define release 1
 %global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
+%define debug_package %{nil}
 
 Summary: CZ.NIC RDAP
 Name: %{name}
@@ -15,7 +16,7 @@ BuildArch: noarch
 Vendor: CZ.NIC <fred@nic.cz>
 Url: https://fred.nic.cz/
 BuildRequires: fred-distutils
-Requires: python python-django python-django-rest-framework fred-idl python-omniORB httpd mod_wsgi python-idna
+Requires: python python-django fred-idl python-omniORB httpd mod_wsgi python-idna
 
 %description
 CZ.NIC RDAP server
