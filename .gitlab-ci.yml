@@ -43,7 +43,17 @@ flake8:
         - pip list
         - make test
 
+test:django1.8:
+    <<: *test
+    variables:
+        DJANGO_VERSION: ">=1.8,<1.8.99"
+
 test:django1.9:
     <<: *test
     variables:
         DJANGO_VERSION: ">=1.9,<1.9.99"
+
+test:django1.10:
+    <<: *test
+    variables:
+        DJANGO_VERSION: ">=1.10,<1.10.99"
