@@ -1,3 +1,11 @@
+2017-03-02 (0.5.0)
+
+  * django 1.10 compatibility changes
+
+  * CI changes/fixes (coverage)
+
+  * fedora packaging
+
 2016-12-19 (0.4.1)
 
   * disable csrf check on rdap views
