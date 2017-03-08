@@ -45,8 +45,8 @@ flake8:
         - git clone git@gitlab.office.nic.cz:fred/idl.git
         - (cd idl && git checkout $IDL_BRANCH)
         - pip install django$DJANGO_VERSION
-        - pip install --find-links=/usr/share/python-wheels -r requirements.txt
-        - pip install --find-links=/usr/share/python-wheels -r requirements-dev.txt
+        - pip install -r requirements.txt
+        - pip install -r requirements-dev.txt
         - pip list
         - make test-coverage
     artifacts:
@@ -75,8 +75,8 @@ test:django1.8:
         - git clone git@gitlab.office.nic.cz:fred/idl.git
         - (cd idl && git checkout $IDL_BRANCH)
         - pip install django$DJANGO_VERSION
-        - pip install --find-links=/usr/share/python-wheels -r requirements.txt
-        - pip install --find-links=/usr/share/python-wheels -r requirements-dev.txt
+        - pip install -r requirements.txt
+        - pip install -r requirements-dev.txt
         - pip list
         - make test
 
