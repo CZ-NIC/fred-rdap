@@ -1,3 +1,6 @@
+variables:
+    DJANGO_VERSION: ">=1.8,<1.8.99"  # Use lowest supported Django
+
 stages:
     - analysis
     - test
@@ -45,11 +48,13 @@ flake8:
         - pip install --find-links=/usr/share/python-wheels -r requirements.txt
         - pip install --find-links=/usr/share/python-wheels -r requirements-dev.txt
         - pip list
-        - COVERAGE_FILE="coverage/.coverage.$CI_BUILD_ID" make test-coverage
+        - make test-coverage
     artifacts:
         expire_in: 1d
         paths:
         - coverage/
+    variables:
+        COVERAGE_FILE: "coverage/.coverage.$CI_BUILD_ID"
 
 test:django1.8:
     <<: *test
@@ -74,17 +79,17 @@ test:django1.8:
         - pip install --find-links=/usr/share/python-wheels -r requirements-dev.txt
         - pip list
         - make test
-    variables:
-        DJANGO_VERSION: ">=1.8,<1.8.99"
 
 test:django1.9:
     <<: *test
     variables:
+        COVERAGE_FILE: "coverage/.coverage.$CI_BUILD_ID"
         DJANGO_VERSION: ">=1.9,<1.9.99"
 
 test:django1.10:
     <<: *test
     variables:
+        COVERAGE_FILE: "coverage/.coverage.$CI_BUILD_ID"
         DJANGO_VERSION: ">=1.10,<1.10.99"
 
 coverage-report:
