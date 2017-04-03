@@ -32,7 +32,7 @@ flake8:
         # Install omniORB and omniIDL
         - apt-get update && apt-get install -y python-omniorb omniidl-python
         # freddist are required to install our dependencies
-        - pip install -e git+git@gitlab.office.nic.cz:utils/freddist.git#egg=freddist
+        - pip install -e git+git@gitlab.office.nic.cz:utils/freddist.git#egg=fred-distutils
         # Get prcal's last commit in master
         - git clone git@gitlab.office.nic.cz:utils/prcal.git --depth 1
         # Parse requirements with prcal library to add required branch dependencies
@@ -62,7 +62,7 @@ test:django1.8:
         # Install omniORB and omniIDL
         - apt-get update && apt-get install -y python-omniorb omniidl-python
         # freddist are required to install our dependencies
-        - pip install -e git+git@gitlab.office.nic.cz:utils/freddist.git#egg=freddist
+        - pip install -e git+git@gitlab.office.nic.cz:utils/freddist.git#egg=fred-distutils
         # Get prcal's last commit in master
         - git clone git@gitlab.office.nic.cz:utils/prcal.git --depth 1
         # Parse requirements with prcal library to add required branch dependencies
