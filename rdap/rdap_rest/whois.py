@@ -1,6 +1,4 @@
-"""
-Wrapper module to whois idl interface
-"""
+"""Wrapper module to whois idl interface."""
 import logging
 
 from django.conf import settings
@@ -24,15 +22,11 @@ _INTERFACE = _CORBA.Registry
 
 
 class NotFoundError(Exception):
-    """
-    Represents error when requested object is not found
-    """
+    """Represents error when requested object is not found."""
 
 
 class InvalidHandleError(Exception):
-    """
-    Requested object identifier is not valid (bad format)
-    """
+    """Requested object identifier is not valid (bad format)."""
 
 
 def get_contact_by_handle(handle):

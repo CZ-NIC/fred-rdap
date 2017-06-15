@@ -1,6 +1,4 @@
-"""
-Wrapper module to whois idl interface
-"""
+"""Wrapper module to whois idl interface."""
 import logging
 
 from django.conf import settings
@@ -10,9 +8,7 @@ from .rdap_utils import ObjectClassName, disclosable_nonempty, nonempty, rdap_st
 
 
 def contact_to_dict(struct):
-    """
-    Transform CORBA contact struct to python dictionary
-    """
+    """Transform CORBA contact struct to python dictionary."""
     logging.debug(struct)
 
     if struct is None:

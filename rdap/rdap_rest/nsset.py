@@ -1,6 +1,4 @@
-"""
-Wrapper module to whois idl interface
-"""
+"""Wrapper module to whois idl interface."""
 import logging
 
 from django.conf import settings
@@ -19,9 +17,7 @@ _INTERFACE = _CORBA.Registry
 
 
 def nsset_to_dict(struct):
-    """
-    Transform CORBA nsset struct to python dictionary
-    """
+    """Transform CORBA nsset struct to python dictionary."""
     logging.debug(struct)
 
     if struct is None:

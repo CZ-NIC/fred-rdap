@@ -1,6 +1,4 @@
-"""
-Utils for translating Corba objects to python dictionary
-"""
+"""Utils for translating Corba objects to python dictionary."""
 from datetime import date, datetime
 
 import idna
@@ -9,9 +7,7 @@ from django.utils import timezone
 
 
 def unwrap_datetime(idl_datetime):
-    """
-    Converts IDL datetime struct to python datetime.datetime.
-    """
+    """Convert IDL datetime struct to python datetime.datetime."""
     dt = datetime(
         idl_datetime.date.year, idl_datetime.date.month, idl_datetime.date.day,
         idl_datetime.hour, idl_datetime.minute, idl_datetime.second
@@ -23,9 +19,7 @@ def unwrap_datetime(idl_datetime):
 
 
 def to_rfc3339(dt):
-    """
-    Simple function to format datetime object as in rfc3339 (with stripped microsecond part).
-    """
+    """Format datetime object as in rfc3339 (with stripped microsecond part)."""
     if timezone.is_aware(dt) and not settings.USE_TZ:
         raise TypeError("can't compare offset-naive and offset-aware datetimes")
 
@@ -48,9 +42,7 @@ def nonempty(input):
 
 
 def disclosable_nonempty(disclosable):
-    """
-    Check if value which can be hidden by user setting should be added to output
-    """
+    """Check if value which can be hidden by user setting should be added to output."""
     if disclosable.disclose:
         return nonempty(disclosable.value)
     else:
@@ -97,7 +89,7 @@ RDAP_STATUS_MAPPING = {
 
 def rdap_status_mapping(status_list):
     """
-    Translates backend status identifiers to rdap values
+    Translate backend status identifiers to rdap values.
 
     ('ok' status is not returned by backend and it is represented
     with empty input list - means no restrictions or pending operations)
@@ -134,15 +126,11 @@ class ObjectClassName(object):
 
 
 class InvalidIdn(Exception):
-    """
-    Invalid input - internationalized domain name
-    """
+    """Invalid input - internationalized domain name."""
 
 
 def preprocess_fqdn(fqdn):
-    """
-    Normalize fqdn input search string for backend call
-    """
+    """Normalize fqdn input search string for backend call."""
     try:
         fqdn = idna.encode(fqdn)
         idna.decode(fqdn)
@@ -152,9 +140,7 @@ def preprocess_fqdn(fqdn):
 
 
 def add_unicode_name(dst_dict, ldh_name):
-    """
-    Add optional unicodeName key to dictionary if contains non-ascii characters
-    """
+    """Add optional unicodeName key to dictionary if contains non-ascii characters."""
     unicode_name = ldh_name.decode("idna")
     if unicode_name != ldh_name:
         dst_dict["unicodeName"] = unicode_name
