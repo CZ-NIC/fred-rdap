@@ -92,6 +92,12 @@ test:django1.10:
         COVERAGE_FILE: "coverage/.coverage.$CI_BUILD_ID"
         DJANGO_VERSION: ">=1.10,<1.10.99"
 
+test:django1.11:
+    <<: *test
+    variables:
+        COVERAGE_FILE: "coverage/.coverage.$CI_BUILD_ID"
+        DJANGO_VERSION: ">=1.11,<1.11.99"
+
 coverage-report:
     image: cznic/ubuntu_python_runner:latest
     stage: coverage
