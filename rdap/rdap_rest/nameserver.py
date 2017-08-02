@@ -1,6 +1,4 @@
-"""
-Wrapper module to whois idl interface
-"""
+"""Wrapper module to whois idl interface."""
 import logging
 
 from django.conf import settings
@@ -9,9 +7,7 @@ from .rdap_utils import ObjectClassName, add_unicode_name
 
 
 def nameserver_to_dict(struct):
-    """
-    Transform CORBA nameserver struct to python dictionary
-    """
+    """Transform CORBA nameserver struct to python dictionary."""
     logging.debug(struct)
 
     if struct is None:

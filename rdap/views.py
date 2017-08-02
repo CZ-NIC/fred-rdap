@@ -1,6 +1,4 @@
-"""
-RDAP views.
-"""
+"""RDAP views."""
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -26,6 +24,7 @@ class ObjectView(View):
     @cvar getter: Function which returns object data or raises exception.
     @cvar request_type: Request type for logger
     """
+
     getter = None
     request_type = None
 
@@ -63,9 +62,8 @@ class ObjectView(View):
 
 # TODO: IDN should be handled by backend. Once its implemented in FRED this view can be removed.
 class FqdnObjectView(ObjectView):
-    """
-    View for domains and nameservers.
-    """
+    """View for domains and nameservers."""
+
     def get(self, request, handle, *args, **kwargs):
         try:
             handle = preprocess_fqdn(handle)
@@ -75,9 +73,8 @@ class FqdnObjectView(ObjectView):
 
 
 class HelpView(View):
-    """
-    Help view for RDAP protocol.
-    """
+    """Help view for RDAP protocol."""
+
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
         return super(HelpView, self).dispatch(request, *args, **kwargs)
@@ -98,6 +95,7 @@ class UnsupportedView(View):
 
     @cvar status: HTTP response code
     """
+
     status = 501
 
     @csrf_exempt
