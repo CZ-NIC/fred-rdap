@@ -1,6 +1,6 @@
 APP = rdap
 
-.PHONY: default test isort check-isort check-flake8 check-doc check-all
+.PHONY: default test test-coverage isort check-all check-isort check-flake8 check-doc
 
 default: check-all
 
@@ -13,7 +13,7 @@ test-coverage:
 isort:
 	isort --recursive ${APP}
 
-cehck_all: check-isort check-flake8 check-doc
+check-all: check-isort check-flake8 check-doc
 
 check-isort:
 	isort --recursive --check-only --diff ${APP}
