@@ -1,5 +1,6 @@
 """Wrapper module to whois idl interface."""
 import logging
+from urlparse import urljoin
 
 from django.conf import settings
 from django.utils.functional import SimpleLazyObject
@@ -7,6 +8,12 @@ from django.utils.functional import SimpleLazyObject
 from rdap.utils.corba import Corba, importIDL
 
 from .rdap_utils import ObjectClassName, add_unicode_name, nonempty, rdap_status_mapping, to_rfc3339, unwrap_datetime
+
+try:
+    from django.urls import reverse
+except ImportError:
+    # Support Django < 1.10
+    from django.core.urlresolvers import reverse
 
 importIDL('%s/%s' % (settings.CORBA_IDL_ROOT_PATH, settings.CORBA_IDL_WHOIS_FILENAME))
 _CORBA = Corba(ior=settings.CORBA_NS_HOST_PORT, context_name=settings.CORBA_NS_CONTEXT,
@@ -27,12 +34,14 @@ def domain_to_dict(struct):
             if "deleteCandidate" in struct.statuses:
                 return delete_candidate_domain_to_dict(struct)
 
-        self_link = settings.RDAP_DOMAIN_URL_TMPL % {"handle": struct.handle}
-
         if struct.expire_time_actual:
             expiration_datetime = struct.expire_time_actual
         else:
             expiration_datetime = struct.expire_time_estimate
+
+        self_link = urljoin(settings.RDAP_ROOT_URL, reverse('domain-detail', kwargs={"handle": struct.handle}))
+        registrant_link = urljoin(settings.RDAP_ROOT_URL,
+                                  reverse('entity-detail', kwargs={"handle": struct.registrant_handle}))
 
         result = {
             "rdapConformance": ["rdap_level_0", "fred_version_0"],
@@ -65,9 +74,9 @@ def domain_to_dict(struct):
                     "roles": ["registrant"],
                     "links": [
                         {
-                            "value": settings.RDAP_ENTITY_URL_TMPL % {"handle": struct.registrant_handle},
+                            "value": registrant_link,
                             "rel": "self",
-                            "href": settings.RDAP_ENTITY_URL_TMPL % {"handle": struct.registrant_handle},
+                            "href": registrant_link,
                             "type": "application/rdap+json",
                         },
                     ]
@@ -83,6 +92,7 @@ def domain_to_dict(struct):
         add_unicode_name(result, struct.handle)
 
         for admin_contact in struct.admin_contact_handles:
+            admin_link = urljoin(settings.RDAP_ROOT_URL, reverse('entity-detail', kwargs={"handle": admin_contact}))
             result['entities'].append(
                 {
                     "objectClassName": ObjectClassName.ENTITY,
@@ -90,9 +100,9 @@ def domain_to_dict(struct):
                     "roles": ["administrative"],
                     "links": [
                         {
-                            "value": settings.RDAP_ENTITY_URL_TMPL % {"handle": admin_contact},
+                            "value": admin_link,
                             "rel": "self",
-                            "href": settings.RDAP_ENTITY_URL_TMPL % {"handle": admin_contact},
+                            "href": admin_link,
                             "type": "application/rdap+json",
                         },
                     ],
@@ -125,30 +135,32 @@ def domain_to_dict(struct):
         if nonempty(struct.nsset_handle):
             nsset = RECODER.decode(_WHOIS.get_nsset_by_handle(RECODER.encode(struct.nsset_handle)))
             if nsset is not None:
+                nsset_link = urljoin(settings.RDAP_ROOT_URL, reverse('nsset-detail', kwargs={"handle": nsset.handle}))
                 result["nameservers"] = []
                 result['fred_nsset'] = {
                     "objectClassName": ObjectClassName.NSSET,
                     "handle": nsset.handle,
                     "links": [
                         {
-                          "value": settings.RDAP_NSSET_URL_TMPL % {"handle": nsset.handle},
+                          "value": nsset_link,
                           "rel": "self",
-                          "href": settings.RDAP_NSSET_URL_TMPL % {"handle": nsset.handle},
+                          "href": nsset_link,
                           "type": "application/rdap+json"
                         },
                     ],
                     "nameservers": [],
                 }
                 for ns in nsset.nservers:
+                    ns_link = urljoin(settings.RDAP_ROOT_URL, reverse('nameserver-detail', kwargs={"handle": ns.fqdn}))
                     ns_obj = {
                         "objectClassName": ObjectClassName.NAMESERVER,
                         "handle": ns.fqdn,
                         "ldhName": ns.fqdn,
                         "links": [
                             {
-                                "value": settings.RDAP_NAMESERVER_URL_TMPL % {"handle": ns.fqdn},
+                                "value": ns_link,
                                 "rel": "self",
-                                "href": settings.RDAP_NAMESERVER_URL_TMPL % {"handle": ns.fqdn},
+                                "href": ns_link,
                                 "type": "application/rdap+json",
                             },
                         ],
@@ -181,14 +193,16 @@ def domain_to_dict(struct):
                     "maxSigLife": settings.DNS_MAX_SIG_LIFE,
                     "keyData": [],
                 }
+                keyset_link = urljoin(settings.RDAP_ROOT_URL,
+                                      reverse('keyset-detail', kwargs={"handle": keyset.handle}))
                 result['fred_keyset'] = {
                     "objectClassName": ObjectClassName.KEYSET,
                     "handle": keyset.handle,
                     "links": [
                         {
-                          "value": settings.RDAP_KEYSET_URL_TMPL % {"handle": keyset.handle},
+                          "value": keyset_link,
                           "rel": "self",
-                          "href": settings.RDAP_KEYSET_URL_TMPL % {"handle": keyset.handle},
+                          "href": keyset_link,
                           "type": "application/rdap+json",
                         },
                     ],
@@ -219,7 +233,7 @@ def delete_candidate_domain_to_dict(struct):
     if struct is None:
         result = None
     else:
-        self_link = settings.RDAP_DOMAIN_URL_TMPL % {"handle": struct.handle}
+        self_link = urljoin(settings.RDAP_ROOT_URL, reverse('domain-detail', kwargs={"handle": struct.handle}))
 
         result = {
             "objectClassName": ObjectClassName.DOMAIN,

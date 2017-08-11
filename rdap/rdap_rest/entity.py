@@ -1,10 +1,17 @@
 """Wrapper module to whois idl interface."""
 import logging
+from urlparse import urljoin
 
 from django.conf import settings
 
 from .rdap_utils import ObjectClassName, disclosable_nonempty, nonempty, rdap_status_mapping, to_rfc3339, \
     unwrap_datetime
+
+try:
+    from django.urls import reverse
+except ImportError:
+    # Support Django < 1.10
+    from django.core.urlresolvers import reverse
 
 
 def contact_to_dict(struct):
@@ -14,7 +21,7 @@ def contact_to_dict(struct):
     if struct is None:
         result = None
     else:
-        self_link = settings.RDAP_ENTITY_URL_TMPL % {"handle": struct.handle}
+        self_link = urljoin(settings.RDAP_ROOT_URL, reverse('entity-detail', kwargs={"handle": struct.handle}))
         if "linked" not in struct.statuses:
             result = {
                 "rdapConformance": ["rdap_level_0"],
