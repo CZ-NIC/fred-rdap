@@ -96,16 +96,6 @@ CORBA_EXPORT_MODULES = ['Registry']
 #### WHOIS URLs configuration
 # Base of URLs
 RDAP_ROOT_URL = ''
-# URL path for domain queries
-RDAP_DOMAIN_URL_TMPL        = RDAP_ROOT_URL + "/domain/%(handle)s"
-# URL path for entity queries
-RDAP_ENTITY_URL_TMPL        = RDAP_ROOT_URL + "/entity/%(handle)s"
-# URL path for nameserver queries
-RDAP_NAMESERVER_URL_TMPL    = RDAP_ROOT_URL + "/nameserver/%(handle)s"
-# URL path for NSSET queries
-RDAP_NSSET_URL_TMPL         = RDAP_ROOT_URL + "/fred_nsset/%(handle)s"
-# URL path for keyset queries
-RDAP_KEYSET_URL_TMPL        = RDAP_ROOT_URL + "/fred_keyset/%(handle)s"
 # Unix Whois server address
 UNIX_WHOIS_HOST = ''
 

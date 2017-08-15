@@ -1,9 +1,16 @@
 """Wrapper module to whois idl interface."""
 import logging
+from urlparse import urljoin
 
 from django.conf import settings
 
 from .rdap_utils import ObjectClassName, add_unicode_name
+
+try:
+    from django.urls import reverse
+except ImportError:
+    # Support Django < 1.10
+    from django.core.urlresolvers import reverse
 
 
 def nameserver_to_dict(struct):
@@ -13,7 +20,7 @@ def nameserver_to_dict(struct):
     if struct is None:
         result = None
     else:
-        self_link = settings.RDAP_NAMESERVER_URL_TMPL % {"handle": struct.fqdn}
+        self_link = urljoin(settings.RDAP_ROOT_URL, reverse('nameserver-detail', kwargs={"handle": struct.fqdn}))
 
         result = {
           "rdapConformance": ["rdap_level_0"],

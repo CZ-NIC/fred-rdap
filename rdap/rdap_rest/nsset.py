@@ -1,5 +1,6 @@
 """Wrapper module to whois idl interface."""
 import logging
+from urlparse import urljoin
 
 from django.conf import settings
 from django.utils.functional import SimpleLazyObject
@@ -7,6 +8,12 @@ from django.utils.functional import SimpleLazyObject
 from rdap.utils.corba import Corba, importIDL
 
 from .rdap_utils import ObjectClassName, add_unicode_name, nonempty, rdap_status_mapping, to_rfc3339, unwrap_datetime
+
+try:
+    from django.urls import reverse
+except ImportError:
+    # Support Django < 1.10
+    from django.core.urlresolvers import reverse
 
 importIDL(settings.CORBA_IDL_ROOT_PATH + '/' + settings.CORBA_IDL_WHOIS_FILENAME)
 
@@ -23,7 +30,7 @@ def nsset_to_dict(struct):
     if struct is None:
         result = None
     else:
-        self_link = settings.RDAP_NSSET_URL_TMPL % {"handle": struct.handle}
+        self_link = urljoin(settings.RDAP_ROOT_URL, reverse('nsset-detail', kwargs={"handle": struct.handle}))
 
         result = {
             "rdapConformance": ["rdap_level_0", "fred_version_0"],
@@ -59,30 +66,32 @@ def nsset_to_dict(struct):
             result["status"] = status
 
         for tech_c in struct.tech_contact_handles:
+            tech_link = urljoin(settings.RDAP_ROOT_URL, reverse('entity-detail', kwargs={"handle": tech_c}))
             result['entities'].append({
                 "objectClassName": ObjectClassName.ENTITY,
                 "handle": tech_c,
                 "roles": ["technical"],
                 "links": [
                     {
-                        "value": settings.RDAP_ENTITY_URL_TMPL % {"handle": tech_c},
+                        "value": tech_link,
                         "rel": "self",
-                        "href": settings.RDAP_ENTITY_URL_TMPL % {"handle": tech_c},
+                        "href": tech_link,
                         "type": "application/rdap+json",
                     },
                 ],
             })
 
         for ns in struct.nservers:
+            ns_link = urljoin(settings.RDAP_ROOT_URL, reverse('nameserver-detail', kwargs={"handle": ns.fqdn}))
             ns_json = {
                 "objectClassName": ObjectClassName.NAMESERVER,
                 "handle": ns.fqdn,
                 "ldhName": ns.fqdn,
                 "links": [
                     {
-                        "value": settings.RDAP_NAMESERVER_URL_TMPL % {"handle": ns.fqdn},
+                        "value": ns_link,
                         "rel": "self",
-                        "href": settings.RDAP_NAMESERVER_URL_TMPL % {"handle": ns.fqdn},
+                        "href": ns_link,
                         "type": "application/rdap+json",
                     },
                 ],
