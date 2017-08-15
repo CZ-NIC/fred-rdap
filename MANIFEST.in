@@ -1,2 +1,4 @@
 include MANIFEST.in
 include fred-rdap.spec
+graft examples
+graft rdap/tests/data
