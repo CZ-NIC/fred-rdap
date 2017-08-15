@@ -5,7 +5,6 @@ from django.conf import settings
 from django.utils.functional import SimpleLazyObject
 
 from rdap.utils.corba import Corba, importIDL
-from rdap.utils.corbarecoder import c2u, u2c
 
 from .rdap_utils import ObjectClassName, add_unicode_name, nonempty, rdap_status_mapping, to_rfc3339, unwrap_datetime
 
@@ -18,6 +17,7 @@ _INTERFACE = _CORBA.Registry
 
 def domain_to_dict(struct):
     """Transform CORBA domain struct to python dictionary."""
+    from .whois import RECODER
     logging.debug(struct)
 
     if struct is None:
@@ -123,7 +123,7 @@ def domain_to_dict(struct):
                 "eventDate": to_rfc3339(unwrap_datetime(validated_to_datetime)),
             })
         if nonempty(struct.nsset_handle):
-            nsset = c2u(_WHOIS.get_nsset_by_handle(u2c(struct.nsset_handle)))
+            nsset = RECODER.decode(_WHOIS.get_nsset_by_handle(RECODER.encode(struct.nsset_handle)))
             if nsset is not None:
                 result["nameservers"] = []
                 result['fred_nsset'] = {
@@ -173,7 +173,7 @@ def domain_to_dict(struct):
                     result['fred_nsset']['nameservers'].append(ns_obj)
 
         if nonempty(struct.keyset_handle):
-            keyset = c2u(_WHOIS.get_keyset_by_handle(u2c(struct.keyset_handle)))
+            keyset = RECODER.decode(_WHOIS.get_keyset_by_handle(RECODER.encode(struct.keyset_handle)))
             if keyset is not None:
                 result["secureDNS"] = {
                     "zoneSigned": True,
