@@ -3,9 +3,6 @@ import logging
 from urlparse import urljoin
 
 from django.conf import settings
-from django.utils.functional import SimpleLazyObject
-
-from rdap.utils.corba import Corba, importIDL
 
 from .rdap_utils import ObjectClassName, nonempty, rdap_status_mapping, to_rfc3339, unwrap_datetime
 
@@ -14,13 +11,6 @@ try:
 except ImportError:
     # Support Django < 1.10
     from django.core.urlresolvers import reverse
-
-importIDL(settings.CORBA_IDL_ROOT_PATH + '/' + settings.CORBA_IDL_WHOIS_FILENAME)
-
-_CORBA = Corba(ior=settings.CORBA_NS_HOST_PORT, context_name=settings.CORBA_NS_CONTEXT,
-               export_modules=settings.CORBA_EXPORT_MODULES)
-_WHOIS = SimpleLazyObject(lambda: _CORBA.get_object('Whois2', 'Registry.Whois.WhoisIntf'))
-_INTERFACE = _CORBA.Registry
 
 
 def keyset_to_dict(struct):

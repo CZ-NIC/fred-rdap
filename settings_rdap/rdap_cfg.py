@@ -89,9 +89,6 @@ CORBA_IDL_LOGGER_FILENAME = 'Logger.idl'
 CORBA_NS_HOST_PORT = ''
 # Naming service context
 CORBA_NS_CONTEXT = 'fred'
-# List of modules exported for RDAP
-#     Important: Unless you know what you're doing, don't change this!
-CORBA_EXPORT_MODULES = ['Registry']
 
 #### WHOIS URLs configuration
 # Base of URLs
