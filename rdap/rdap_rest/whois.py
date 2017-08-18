@@ -1,49 +1,14 @@
 """Wrapper module to whois idl interface."""
 import logging
-from datetime import date, datetime
 
-from django.conf import settings
-from django.utils import timezone
-from pyfco.recoder import CorbaRecoder
-
-from rdap.utils.corba import REGISTRY_MODULE, WHOIS
+from rdap.exceptions import InvalidHandleError, NotFoundError
+from rdap.utils.corba import RECODER, REGISTRY_MODULE, WHOIS
 
 from .domain import domain_to_dict
 from .entity import contact_to_dict
 from .keyset import keyset_to_dict
 from .nameserver import nameserver_to_dict
 from .nsset import nsset_to_dict
-
-
-class RdapCorbaRecoder(CorbaRecoder):
-    """Corba recoder for RDAP."""
-
-    def __init__(self, coding='utf-8'):
-        super(RdapCorbaRecoder, self).__init__(coding)
-        self.add_recode_function(REGISTRY_MODULE.Date, self._decode_date, self._identity)
-        self.add_recode_function(REGISTRY_MODULE.DateTime, self._decode_datetime, self._identity)
-
-    def _decode_date(self, value):
-        return date(value.year, value.month, value.day)
-
-    def _decode_datetime(self, value):
-        result = datetime(value.date.year, value.date.month, value.date.day, value.hour, value.minute, value.second)
-        result = timezone.make_aware(result, timezone.utc)
-        # If time zones are disabled, change the time to the default timezone and remove the time zone.
-        if not settings.USE_TZ:
-            result = timezone.make_naive(result, timezone.get_default_timezone())
-        return result
-
-
-RECODER = RdapCorbaRecoder()
-
-
-class NotFoundError(Exception):
-    """Represents error when requested object is not found."""
-
-
-class InvalidHandleError(Exception):
-    """Requested object identifier is not valid (bad format)."""
 
 
 def get_contact_by_handle(handle):

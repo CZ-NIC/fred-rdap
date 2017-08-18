@@ -4,8 +4,8 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFou
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
 
+from rdap.exceptions import InvalidHandleError, NotFoundError
 from rdap.rdap_rest.rdap_utils import InvalidIdn, get_disclaimer_text, preprocess_fqdn
-from rdap.rdap_rest.whois import InvalidHandleError, NotFoundError
 from rdap.utils.py_logging import py_logger_obj as LOGGER
 
 RDAP_CONTENT_TYPE = 'application/rdap+json'

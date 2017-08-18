@@ -4,7 +4,7 @@ from urlparse import urljoin
 
 from django.conf import settings
 
-from rdap.utils.corba import REGISTRY_MODULE, WHOIS
+from rdap.utils.corba import RECODER, REGISTRY_MODULE, WHOIS
 
 from .rdap_utils import ObjectClassName, add_unicode_name, nonempty, rdap_status_mapping, to_rfc3339, unwrap_datetime
 
@@ -17,7 +17,6 @@ except ImportError:
 
 def domain_to_dict(struct):
     """Transform CORBA domain struct to python dictionary."""
-    from .whois import RECODER
     logging.debug(struct)
 
     if struct is None:

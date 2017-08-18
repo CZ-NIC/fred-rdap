@@ -4,8 +4,7 @@ from datetime import date, datetime
 from django.test import SimpleTestCase, override_settings
 from django.utils import timezone
 
-from rdap.rdap_rest.whois import RdapCorbaRecoder
-from rdap.utils.corba import REGISTRY_MODULE
+from rdap.utils.corba import REGISTRY_MODULE, RdapCorbaRecoder
 
 
 class TestRdapCorbaRecoder(SimpleTestCase):
