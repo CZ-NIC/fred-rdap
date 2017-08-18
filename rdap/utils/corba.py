@@ -48,6 +48,8 @@ class RdapCorbaRecoder(CorbaRecoder):
 
     def __init__(self, coding='utf-8'):
         super(RdapCorbaRecoder, self).__init__(coding)
+        self.add_recode_function(CCREG_MODULE.DateType, self._decode_date, self._identity)
+        self.add_recode_function(CCREG_MODULE.DateTimeType, self._decode_datetime, self._identity)
         self.add_recode_function(REGISTRY_MODULE.Date, self._decode_date, self._identity)
         self.add_recode_function(REGISTRY_MODULE.DateTime, self._decode_datetime, self._identity)
 
