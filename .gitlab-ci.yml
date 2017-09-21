@@ -35,9 +35,7 @@ flake8:
         - pip install -e git+git@gitlab.office.nic.cz:utils/freddist.git#egg=fred-distutils
         # Get pr-version and update requirements
         - git clone git@gitlab.office.nic.cz:pr-utils/pr-version.git --depth 1
-        # Clone to old location
-        - git clone git@gitlab.office.nic.cz:pr-utils/pr-version.git prcal --depth 1
-        - prcal.py
+        - pervert-requirements.py
         # Parse IDL requirements
         - if [ -e pr-version/devel/$CI_BUILD_REF_NAME.conf ]; then IDL_BRANCH=$(python -c "import json;obj=json.loads(open('pr-version/devel/${CI_BUILD_REF_NAME}.conf').read());print obj.get('idl',{}).get('revision', 'master')"); fi
         # Control print of requirements
@@ -66,9 +64,7 @@ test:django1.8:
         - pip install -e git+git@gitlab.office.nic.cz:utils/freddist.git#egg=fred-distutils
         # Get pr-version and update requirements
         - git clone git@gitlab.office.nic.cz:pr-utils/pr-version.git --depth 1
-        # Clone to old location
-        - git clone git@gitlab.office.nic.cz:pr-utils/pr-version.git prcal --depth 1
-        - prcal.py
+        - pervert-requirements.py
         # Parse IDL requirements
         - if [ -e pr-version/devel/$CI_BUILD_REF_NAME.conf ]; then IDL_BRANCH=$(python -c "import json;obj=json.loads(open('pr-version/devel/${CI_BUILD_REF_NAME}.conf').read());print obj.get('idl',{}).get('revision', 'master')"); fi
         # Control print of requirements
