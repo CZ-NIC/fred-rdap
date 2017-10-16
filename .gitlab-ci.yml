@@ -7,7 +7,8 @@ stages:
     - coverage
 
 isort:
-    image: cznic/ubuntu_python_runner:latest
+    tags:
+        - python2
     stage: analysis
     before_script:
         - pip install isort
@@ -15,7 +16,8 @@ isort:
     script: "make check-isort"
 
 flake8:
-    image: cznic/ubuntu_python_runner:latest
+    tags:
+        - python2
     stage: analysis
     before_script:
         - pip install flake8
@@ -23,7 +25,8 @@ flake8:
     script: "make check-flake8"
 
 .test: &test
-    image: cznic/ubuntu_python_runner:latest
+    tags:
+        - python2
     stage: test
     script:
         # Install coverage
@@ -97,7 +100,8 @@ test:django1.11:
         DJANGO_VERSION: ">=1.11,<1.11.99"
 
 coverage-report:
-    image: cznic/ubuntu_python_runner:latest
+    tags:
+        - python2
     stage: coverage
     script:
         - pip install coverage
