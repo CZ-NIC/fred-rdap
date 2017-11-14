@@ -1,53 +1,45 @@
 variables:
-    DJANGO_VERSION: ">=1.8,<1.8.99"  # Use lowest supported Django
+    DJANGO_VERSION: ">=1.8,<1.11.99"
 
 stages:
     - analysis
     - test
     - coverage
 
-isort:
+########################################################################################################################
+# Basic declarations
+.requires-python: &requires-python
     tags:
-        - python2
-    stage: analysis
-    before_script:
-        - pip install isort
-        - pip list
-    script: "make check-isort"
+        - python
 
-flake8:
-    tags:
-        - python2
-    stage: analysis
-    before_script:
-        - pip install flake8
-        - pip list
-    script: "make check-flake8"
+.python2-xenial: &python2-xenial
+    image: cznic/ubuntu_xenial_python2:latest
 
-.test: &test
-    tags:
-        - python2
-    stage: test
-    script:
-        # Install coverage
-        - pip install coverage
-        - mkdir coverage
-        # Install omniORB and omniIDL
-        - apt-get update && apt-get install -y python-omniorb omniidl-python
+.install-dependencies: &install-dependencies
+    before_script:
+        - pip list
+        # Install package dependencies
+        - apt-get update && apt-get install -y omniidl-python python-omniorb
         # Get pr-version and update requirements
         - git clone git@gitlab.office.nic.cz:pr-utils/pr-version.git --depth 1
         - pervert-requirements.py
+        - cat requirements.txt
         # Parse IDL requirements
         - if [ -e pr-version/devel/$CI_BUILD_REF_NAME.conf ]; then IDL_BRANCH=$(python -c "import json;obj=json.loads(open('pr-version/devel/${CI_BUILD_REF_NAME}.conf').read());print obj.get('idl',{}).get('revision', 'master')"); fi
-        # Control print of requirements
-        - cat requirements.txt
-        # IDL's are required for rdap
         - git clone git@gitlab.office.nic.cz:fred/idl.git
         - (cd idl && git checkout $IDL_BRANCH)
+        # Install dependencies
         - pip install django$DJANGO_VERSION
-        - pip install -r requirements.txt
-        - pip install -r requirements-dev.txt
+        - pip install -r requirements.txt $EXTRA_REQUIREMENTS
         - pip list
+
+.test: &test
+    <<: *requires-python
+    <<: *python2-xenial
+    <<: *install-dependencies
+    stage: test
+    script:
+        - mkdir coverage
         - make test-coverage
     artifacts:
         expire_in: 1d
@@ -55,52 +47,61 @@ flake8:
         - coverage/
     variables:
         COVERAGE_FILE: "coverage/.coverage.$CI_BUILD_ID"
+        EXTRA_REQUIREMENTS: "-r requirements-dev.txt coverage"
+
+########################################################################################################################
+# Individual jobs
+isort:
+    <<: *requires-python
+    <<: *python2-xenial
+    stage: analysis
+    before_script:
+        - pip install isort
+        - pip list
+    script: "make check-isort"
+
+flake8:
+    <<: *requires-python
+    <<: *python2-xenial
+    stage: analysis
+    before_script:
+        - pip install flake8
+        - pip list
+    script: "make check-flake8"
 
 test:django1.8:
     <<: *test
     script:
-        # Install omniORB and omniIDL
-        - apt-get update && apt-get install -y python-omniorb omniidl-python
-        # Get pr-version and update requirements
-        - git clone git@gitlab.office.nic.cz:pr-utils/pr-version.git --depth 1
-        - pervert-requirements.py
-        # Parse IDL requirements
-        - if [ -e pr-version/devel/$CI_BUILD_REF_NAME.conf ]; then IDL_BRANCH=$(python -c "import json;obj=json.loads(open('pr-version/devel/${CI_BUILD_REF_NAME}.conf').read());print obj.get('idl',{}).get('revision', 'master')"); fi
-        # Control print of requirements
-        - cat requirements.txt
-        # IDL's are required for rdap
-        - git clone git@gitlab.office.nic.cz:fred/idl.git
-        - (cd idl && git checkout $IDL_BRANCH)
-        - pip install django$DJANGO_VERSION
-        - pip install -r requirements.txt
-        - pip install -r requirements-dev.txt
-        - pip list
+        # Coverage target doesn't work with Django 1.8
         - make test
+    variables:
+        DJANGO_VERSION: ">=1.8,<1.8.99"
+        EXTRA_REQUIREMENTS: "-r requirements-dev.txt"
 
 test:django1.9:
     <<: *test
     variables:
         COVERAGE_FILE: "coverage/.coverage.$CI_BUILD_ID"
         DJANGO_VERSION: ">=1.9,<1.9.99"
+        EXTRA_REQUIREMENTS: "-r requirements-dev.txt coverage"
 
 test:django1.10:
     <<: *test
     variables:
         COVERAGE_FILE: "coverage/.coverage.$CI_BUILD_ID"
         DJANGO_VERSION: ">=1.10,<1.10.99"
+        EXTRA_REQUIREMENTS: "-r requirements-dev.txt coverage"
 
 test:django1.11:
     <<: *test
-    variables:
-        COVERAGE_FILE: "coverage/.coverage.$CI_BUILD_ID"
-        DJANGO_VERSION: ">=1.11,<1.11.99"
 
 coverage-report:
-    tags:
-        - python2
+    <<: *requires-python
+    <<: *python2-xenial
     stage: coverage
     script:
         - pip install coverage
+        - pip list
         - coverage combine coverage/
         - coverage report --include=*/tests/* --fail-under=100
         - coverage report
