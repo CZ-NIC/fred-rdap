@@ -50,10 +50,6 @@ LOGGING = {
 # ## RDAP Server Settings #####################################################
 
 # #### CORBA configuration
-# Path to the directory with IDL files (absolute path recommended)
-CORBA_IDL_ROOT_PATH = ''
-# Logger IDL file name
-CORBA_IDL_LOGGER_FILENAME = 'Logger.idl'
 # Naming service address (host[:port])
 CORBA_NS_HOST_PORT = ''
 # Naming service context
