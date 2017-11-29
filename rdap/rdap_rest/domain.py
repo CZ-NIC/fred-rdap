@@ -8,7 +8,7 @@ from fred_idl.Registry.Whois import IPv4, IPv6
 
 from rdap.utils.corba import WHOIS
 
-from .rdap_utils import ObjectClassName, add_unicode_name, nonempty, rdap_status_mapping, to_rfc3339, unwrap_datetime
+from .rdap_utils import ObjectClassName, add_unicode_name, nonempty, rdap_status_mapping, to_rfc3339
 
 
 def domain_to_dict(struct):
@@ -48,11 +48,11 @@ def domain_to_dict(struct):
             "events": [
                 {
                     "eventAction": "registration",
-                    "eventDate": to_rfc3339(unwrap_datetime(struct.registered)),
+                    "eventDate": to_rfc3339(struct.registered),
                 },
                 {
                     "eventAction": "expiration",
-                    "eventDate": to_rfc3339(unwrap_datetime(expiration_datetime)),
+                    "eventDate": to_rfc3339(expiration_datetime),
                 },
             ],
             "entities": [
@@ -102,12 +102,12 @@ def domain_to_dict(struct):
         if nonempty(struct.changed):
             result['events'].append({
                 "eventAction": "last changed",
-                "eventDate": to_rfc3339(unwrap_datetime(struct.changed)),
+                "eventDate": to_rfc3339(struct.changed),
             })
         if nonempty(struct.last_transfer):
             result['events'].append({
                 "eventAction": "transfer",
-                "eventDate": to_rfc3339(unwrap_datetime(struct.last_transfer)),
+                "eventDate": to_rfc3339(struct.last_transfer),
             })
         if struct.validated_to_time_actual:
             validated_to_datetime = struct.validated_to_time_actual
@@ -118,7 +118,7 @@ def domain_to_dict(struct):
         if validated_to_datetime:
             result['events'].append({
                 "eventAction": "enum validation expiration",
-                "eventDate": to_rfc3339(unwrap_datetime(validated_to_datetime)),
+                "eventDate": to_rfc3339(validated_to_datetime),
             })
         if nonempty(struct.nsset_handle):
             nsset = WHOIS.get_nsset_by_handle(struct.nsset_handle)

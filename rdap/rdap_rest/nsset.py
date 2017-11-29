@@ -6,7 +6,7 @@ from django.conf import settings
 from django.urls import reverse
 from fred_idl.Registry.Whois import IPv4, IPv6
 
-from .rdap_utils import ObjectClassName, add_unicode_name, nonempty, rdap_status_mapping, to_rfc3339, unwrap_datetime
+from .rdap_utils import ObjectClassName, add_unicode_name, nonempty, rdap_status_mapping, to_rfc3339
 
 
 def nsset_to_dict(struct):
@@ -33,7 +33,7 @@ def nsset_to_dict(struct):
             "events": [
                 {
                     "eventAction": "registration",
-                    "eventDate": to_rfc3339(unwrap_datetime(struct.created)),
+                    "eventDate": to_rfc3339(struct.created),
                 }
             ],
             "links": [
@@ -104,12 +104,12 @@ def nsset_to_dict(struct):
         if nonempty(struct.changed):
             result['events'].append({
                 "eventAction": "last changed",
-                "eventDate": to_rfc3339(unwrap_datetime(struct.changed)),
+                "eventDate": to_rfc3339(struct.changed),
             })
         if nonempty(struct.last_transfer):
             result['events'].append({
                 "eventAction": "transfer",
-                "eventDate": to_rfc3339(unwrap_datetime(struct.last_transfer)),
+                "eventDate": to_rfc3339(struct.last_transfer),
             })
 
     logging.debug(result)
