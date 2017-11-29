@@ -4,10 +4,10 @@ from datetime import datetime
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils import timezone
+from fred_idl.Registry import Date, DateTime
 from mock import Mock
 
 from rdap.rdap_rest import rdap_utils
-from rdap.utils.corba import REGISTRY_MODULE
 
 
 class TestDisclosableOutput(SimpleTestCase):
@@ -131,14 +131,14 @@ class TestRfc3339TimestampFormat(SimpleTestCase):
 class TestUnwrapDatetime(SimpleTestCase):
 
     def test_use_tz_false(self):
-        idl_date = REGISTRY_MODULE.Date(22, 12, 2001)
-        idl_datetime = REGISTRY_MODULE.DateTime(idl_date, 23, 2, 30)
+        idl_date = Date(22, 12, 2001)
+        idl_datetime = DateTime(idl_date, 23, 2, 30)
         with override_settings(USE_TZ=False, TIME_ZONE='UTC'):
             self.assertEqual(rdap_utils.unwrap_datetime(idl_datetime), datetime(2001, 12, 22, 23, 2, 30))
 
     def test_use_tz_true(self):
-        idl_date = REGISTRY_MODULE.Date(22, 12, 2001)
-        idl_datetime = REGISTRY_MODULE.DateTime(idl_date, 23, 2, 30)
+        idl_date = Date(22, 12, 2001)
+        idl_datetime = DateTime(idl_date, 23, 2, 30)
         with override_settings(USE_TZ=True, TIME_ZONE='UTC'):
             self.assertEqual(
                 rdap_utils.unwrap_datetime(idl_datetime),
@@ -146,8 +146,8 @@ class TestUnwrapDatetime(SimpleTestCase):
             )
 
     def test_junk(self):
-        idl_date = REGISTRY_MODULE.Date(22, 14, 2001)
-        idl_datetime = REGISTRY_MODULE.DateTime(idl_date, 23, 2, 30)
+        idl_date = Date(22, 14, 2001)
+        idl_datetime = DateTime(idl_date, 23, 2, 30)
         self.assertRaises(ValueError, rdap_utils.unwrap_datetime, idl_datetime)
 
 

@@ -52,8 +52,6 @@ LOGGING = {
 # #### CORBA configuration
 # Path to the directory with IDL files (absolute path recommended)
 CORBA_IDL_ROOT_PATH = ''
-# Whois IDL file name
-CORBA_IDL_WHOIS_FILENAME = 'Whois2.idl'
 # Logger IDL file name
 CORBA_IDL_LOGGER_FILENAME = 'Logger.idl'
 # Naming service address (host[:port])

@@ -7,20 +7,8 @@ import omniORB
 from django.conf import settings
 from django.utils import timezone
 from django.utils.functional import SimpleLazyObject
+from fred_idl.Registry import Date, DateTime, Whois
 from pyfco import CorbaClient, CorbaClientProxy, CorbaNameServiceClient, CorbaRecoder
-
-
-def _get_registry_module():
-    """Return `Registry` module."""
-    try:
-        import Registry
-    except ImportError:
-        Registry = None
-
-    if not hasattr(Registry, 'Whois'):
-        omniORB.importIDL(os.path.join(settings.CORBA_IDL_ROOT_PATH, settings.CORBA_IDL_WHOIS_FILENAME))
-        import Registry
-    return Registry
 
 
 def _get_ccreg_module():
@@ -36,10 +24,9 @@ def _get_ccreg_module():
     return ccReg
 
 
-REGISTRY_MODULE = SimpleLazyObject(_get_registry_module)
 CCREG_MODULE = SimpleLazyObject(_get_ccreg_module)
 _CORBA = CorbaNameServiceClient(host_port=settings.CORBA_NS_HOST_PORT, context_name=settings.CORBA_NS_CONTEXT)
-_WHOIS = SimpleLazyObject(lambda: _CORBA.get_object('Whois2', REGISTRY_MODULE.Whois.WhoisIntf))
+_WHOIS = SimpleLazyObject(lambda: _CORBA.get_object('Whois2', Whois.WhoisIntf))
 _LOGGER = SimpleLazyObject(lambda: _CORBA.get_object('Logger', CCREG_MODULE.Logger))
 
 
@@ -50,8 +37,8 @@ class RdapCorbaRecoder(CorbaRecoder):
         super(RdapCorbaRecoder, self).__init__(coding)
         self.add_recode_function(CCREG_MODULE.DateType, self._decode_date, self._identity)
         self.add_recode_function(CCREG_MODULE.DateTimeType, self._decode_datetime, self._identity)
-        self.add_recode_function(REGISTRY_MODULE.Date, self._decode_date, self._identity)
-        self.add_recode_function(REGISTRY_MODULE.DateTime, self._decode_datetime, self._identity)
+        self.add_recode_function(Date, self._decode_date, self._identity)
+        self.add_recode_function(DateTime, self._decode_datetime, self._identity)
 
     def _decode_date(self, value):
         return date(value.year, value.month, value.day)
@@ -65,5 +52,5 @@ class RdapCorbaRecoder(CorbaRecoder):
         return result
 
 
-WHOIS = CorbaClientProxy(CorbaClient(_WHOIS, RdapCorbaRecoder(), REGISTRY_MODULE.Whois.INTERNAL_SERVER_ERROR))
+WHOIS = CorbaClientProxy(CorbaClient(_WHOIS, RdapCorbaRecoder(), Whois.INTERNAL_SERVER_ERROR))
 LOGGER = CorbaClientProxy(CorbaClient(_LOGGER, CorbaRecoder('utf-8'), CCREG_MODULE.Logger.INTERNAL_SERVER_ERROR))
