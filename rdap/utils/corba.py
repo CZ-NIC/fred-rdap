@@ -7,7 +7,7 @@ import omniORB
 from django.conf import settings
 from django.utils import timezone
 from django.utils.functional import SimpleLazyObject
-from pyfco import CorbaNameServiceClient, CorbaRecoder
+from pyfco import CorbaClient, CorbaClientProxy, CorbaNameServiceClient, CorbaRecoder
 
 
 def _get_registry_module():
@@ -39,8 +39,8 @@ def _get_ccreg_module():
 REGISTRY_MODULE = SimpleLazyObject(_get_registry_module)
 CCREG_MODULE = SimpleLazyObject(_get_ccreg_module)
 _CORBA = CorbaNameServiceClient(host_port=settings.CORBA_NS_HOST_PORT, context_name=settings.CORBA_NS_CONTEXT)
-WHOIS = SimpleLazyObject(lambda: _CORBA.get_object('Whois2', REGISTRY_MODULE.Whois.WhoisIntf))
-LOGGER = SimpleLazyObject(lambda: _CORBA.get_object('Logger', CCREG_MODULE.Logger))
+_WHOIS = SimpleLazyObject(lambda: _CORBA.get_object('Whois2', REGISTRY_MODULE.Whois.WhoisIntf))
+_LOGGER = SimpleLazyObject(lambda: _CORBA.get_object('Logger', CCREG_MODULE.Logger))
 
 
 class RdapCorbaRecoder(CorbaRecoder):
@@ -65,4 +65,5 @@ class RdapCorbaRecoder(CorbaRecoder):
         return result
 
 
-RECODER = RdapCorbaRecoder()
+WHOIS = CorbaClientProxy(CorbaClient(_WHOIS, RdapCorbaRecoder(), REGISTRY_MODULE.Whois.INTERNAL_SERVER_ERROR))
+LOGGER = CorbaClientProxy(CorbaClient(_LOGGER, CorbaRecoder('utf-8'), CCREG_MODULE.Logger.INTERNAL_SERVER_ERROR))

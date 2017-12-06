@@ -7,7 +7,7 @@ from rdap.rdap_rest.entity import contact_to_dict
 from rdap.rdap_rest.keyset import keyset_to_dict
 from rdap.rdap_rest.nameserver import nameserver_to_dict
 from rdap.rdap_rest.nsset import nsset_to_dict
-from rdap.utils.corba import REGISTRY_MODULE
+from rdap.utils.corba import REGISTRY_MODULE, WHOIS
 
 
 def get_contact():
@@ -69,7 +69,7 @@ class TestDomainToDict(SimpleTestCase):
         self.assertEqual(admin['links'][0]['value'], 'http://rdap.example.cz/entity/HOLLY')
 
     def test_nsset(self):
-        with patch('rdap.rdap_rest.domain.WHOIS') as whois_mock:
+        with patch.object(WHOIS, 'client', spec=('get_nsset_by_handle', )) as whois_mock:
             whois_mock.get_nsset_by_handle.return_value = get_nsset()
 
             result = domain_to_dict(get_domain(nsset_handle='new-saturn'))
@@ -78,7 +78,7 @@ class TestDomainToDict(SimpleTestCase):
 
     def test_nameservers(self):
         nservers = [REGISTRY_MODULE.Whois.NameServer(fqdn='nameserver.example.cz', ip_addresses=[])]
-        with patch('rdap.rdap_rest.domain.WHOIS') as whois_mock:
+        with patch.object(WHOIS, 'client', spec=('get_nsset_by_handle', )) as whois_mock:
             whois_mock.get_nsset_by_handle.return_value = get_nsset(nservers=nservers)
 
             result = domain_to_dict(get_domain(nsset_handle='new-saturn'))
@@ -87,7 +87,7 @@ class TestDomainToDict(SimpleTestCase):
                          'http://rdap.example.cz/nameserver/nameserver.example.cz')
 
     def test_keyset(self):
-        with patch('rdap.rdap_rest.domain.WHOIS') as whois_mock:
+        with patch.object(WHOIS, 'client', spec=('get_keyset_by_handle', )) as whois_mock:
             whois_mock.get_keyset_by_handle.return_value = get_keyset()
 
             result = domain_to_dict(get_domain(keyset_handle='gazpacho'))

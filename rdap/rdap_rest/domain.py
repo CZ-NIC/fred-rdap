@@ -5,7 +5,7 @@ from urlparse import urljoin
 from django.conf import settings
 from django.urls import reverse
 
-from rdap.utils.corba import RECODER, REGISTRY_MODULE, WHOIS
+from rdap.utils.corba import REGISTRY_MODULE, WHOIS
 
 from .rdap_utils import ObjectClassName, add_unicode_name, nonempty, rdap_status_mapping, to_rfc3339, unwrap_datetime
 
@@ -120,7 +120,7 @@ def domain_to_dict(struct):
                 "eventDate": to_rfc3339(unwrap_datetime(validated_to_datetime)),
             })
         if nonempty(struct.nsset_handle):
-            nsset = RECODER.decode(WHOIS.get_nsset_by_handle(RECODER.encode(struct.nsset_handle)))
+            nsset = WHOIS.get_nsset_by_handle(struct.nsset_handle)
             if nsset is not None:
                 nsset_link = urljoin(settings.RDAP_ROOT_URL, reverse('nsset-detail', kwargs={"handle": nsset.handle}))
                 result["nameservers"] = []
@@ -172,7 +172,7 @@ def domain_to_dict(struct):
                     result['fred_nsset']['nameservers'].append(ns_obj)
 
         if nonempty(struct.keyset_handle):
-            keyset = RECODER.decode(WHOIS.get_keyset_by_handle(RECODER.encode(struct.keyset_handle)))
+            keyset = WHOIS.get_keyset_by_handle(struct.keyset_handle)
             if keyset is not None:
                 result["secureDNS"] = {
                     "zoneSigned": True,
