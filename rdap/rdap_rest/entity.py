@@ -5,8 +5,7 @@ from urlparse import urljoin
 from django.conf import settings
 from django.urls import reverse
 
-from .rdap_utils import ObjectClassName, disclosable_nonempty, nonempty, rdap_status_mapping, to_rfc3339, \
-    unwrap_datetime
+from .rdap_utils import ObjectClassName, disclosable_nonempty, nonempty, rdap_status_mapping, to_rfc3339
 
 
 def contact_to_dict(struct):
@@ -98,7 +97,7 @@ def contact_to_dict(struct):
                 "events": [
                     {
                         "eventAction": "registration",
-                        "eventDate": to_rfc3339(unwrap_datetime(struct.created)),
+                        "eventDate": to_rfc3339(struct.created),
                         "eventActor": struct.creating_registrar_handle,
                     }
                 ],
@@ -116,12 +115,12 @@ def contact_to_dict(struct):
             if nonempty(struct.changed):
                 result['events'].append({
                     "eventAction": 'last changed',
-                    "eventDate": to_rfc3339(unwrap_datetime(struct.changed)),
+                    "eventDate": to_rfc3339(struct.changed),
                 })
             if nonempty(struct.last_transfer):
                 result['events'].append({
                     "eventAction": 'transfer',
-                    "eventDate": to_rfc3339(unwrap_datetime(struct.last_transfer)),
+                    "eventDate": to_rfc3339(struct.last_transfer),
                 })
 
     logging.debug(result)

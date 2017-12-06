@@ -5,10 +5,13 @@ import json
 import os
 
 from django.test import Client, SimpleTestCase
+from fred_idl.Registry import Date, DateTime
+from fred_idl.Registry.Whois import INVALID_HANDLE, OBJECT_NOT_FOUND, Contact, ContactIdentification, \
+    DisclosableContactIdentification, DisclosablePlaceAddress, DisclosableString, NameServer, PlaceAddress
 from mock import call, patch
 from omniORB.CORBA import TRANSIENT
 
-from rdap.utils.corba import REGISTRY_MODULE, WHOIS
+from rdap.utils.corba import WHOIS
 
 
 class EnforcingCsrfClient(Client):
@@ -35,22 +38,22 @@ class TestObjectView(SimpleTestCase):
         self.logger_mock = log_patcher.start()
 
     def get_contact(self):
-        address = REGISTRY_MODULE.Whois.PlaceAddress('', '', '', '', '', '', '')
-        ident = REGISTRY_MODULE.Whois.ContactIdentification('OP', '')
-        return REGISTRY_MODULE.Whois.Contact(
+        address = PlaceAddress('', '', '', '', '', '', '')
+        ident = ContactIdentification('OP', '')
+        return Contact(
             'kryten',
-            REGISTRY_MODULE.Whois.DisclosableString('', True),
-            REGISTRY_MODULE.Whois.DisclosableString('', True),
-            REGISTRY_MODULE.Whois.DisclosablePlaceAddress(address, True),
-            REGISTRY_MODULE.Whois.DisclosableString('', True),
-            REGISTRY_MODULE.Whois.DisclosableString('', True),
-            REGISTRY_MODULE.Whois.DisclosableString('', True),
-            REGISTRY_MODULE.Whois.DisclosableString('', True),
-            REGISTRY_MODULE.Whois.DisclosableString('', True),
-            REGISTRY_MODULE.Whois.DisclosableContactIdentification(ident, True),
+            DisclosableString('', True),
+            DisclosableString('', True),
+            DisclosablePlaceAddress(address, True),
+            DisclosableString('', True),
+            DisclosableString('', True),
+            DisclosableString('', True),
+            DisclosableString('', True),
+            DisclosableString('', True),
+            DisclosableContactIdentification(ident, True),
             '',
             '',
-            REGISTRY_MODULE.DateTime(REGISTRY_MODULE.Date(6, 9, 1988), 20, 0, 0),
+            DateTime(Date(6, 9, 1988), 20, 0, 0),
             None,
             None,
             [])
@@ -86,7 +89,7 @@ class TestObjectView(SimpleTestCase):
         self.assertIn({'title': 'Disclaimer', 'description': ['Quagaars!\n']}, result['notices'])
 
     def test_entity_not_found(self):
-        WHOIS.get_contact_by_handle.side_effect = REGISTRY_MODULE.Whois.OBJECT_NOT_FOUND
+        WHOIS.get_contact_by_handle.side_effect = OBJECT_NOT_FOUND
         response = self.client.get('/entity/kryten')
 
         self.assertEqual(response.status_code, 404)
@@ -100,7 +103,7 @@ class TestObjectView(SimpleTestCase):
         self.assertEqual(self.logger_mock.create_request.return_value.result, 'NotFound')
 
     def test_entity_invalid_handle(self):
-        WHOIS.get_contact_by_handle.side_effect = REGISTRY_MODULE.Whois.INVALID_HANDLE
+        WHOIS.get_contact_by_handle.side_effect = INVALID_HANDLE
         response = self.client.get('/entity/kryten')
 
         self.assertEqual(response.status_code, 400)
@@ -144,7 +147,7 @@ class TestFqdnObjectView(SimpleTestCase):
         self.logger_mock = log_patcher.start()
 
     def test_nameserver(self):
-        WHOIS.get_nameserver_by_fqdn.return_value = REGISTRY_MODULE.Whois.NameServer('holly', [])
+        WHOIS.get_nameserver_by_fqdn.return_value = NameServer('holly', [])
         response = self.client.get('/nameserver/holly')
 
         self.assertEqual(response.status_code, 200)

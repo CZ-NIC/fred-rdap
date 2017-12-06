@@ -4,10 +4,9 @@ from urlparse import urljoin
 
 from django.conf import settings
 from django.urls import reverse
+from fred_idl.Registry.Whois import IPv4, IPv6
 
-from rdap.utils.corba import REGISTRY_MODULE
-
-from .rdap_utils import ObjectClassName, add_unicode_name, nonempty, rdap_status_mapping, to_rfc3339, unwrap_datetime
+from .rdap_utils import ObjectClassName, add_unicode_name, nonempty, rdap_status_mapping, to_rfc3339
 
 
 def nsset_to_dict(struct):
@@ -34,7 +33,7 @@ def nsset_to_dict(struct):
             "events": [
                 {
                     "eventAction": "registration",
-                    "eventDate": to_rfc3339(unwrap_datetime(struct.created)),
+                    "eventDate": to_rfc3339(struct.created),
                 }
             ],
             "links": [
@@ -90,9 +89,9 @@ def nsset_to_dict(struct):
                 addrs_v4 = []
                 addrs_v6 = []
                 for ip_addr in ns.ip_addresses:
-                    if ip_addr.version._v == REGISTRY_MODULE.Whois.IPv4._v:
+                    if ip_addr.version._v == IPv4._v:
                         addrs_v4.append(ip_addr.address)
-                    if ip_addr.version._v == REGISTRY_MODULE.Whois.IPv6._v:
+                    if ip_addr.version._v == IPv6._v:
                         addrs_v6.append(ip_addr.address)
                 ns_json["ipAddresses"] = {}
                 if addrs_v4:
@@ -105,12 +104,12 @@ def nsset_to_dict(struct):
         if nonempty(struct.changed):
             result['events'].append({
                 "eventAction": "last changed",
-                "eventDate": to_rfc3339(unwrap_datetime(struct.changed)),
+                "eventDate": to_rfc3339(struct.changed),
             })
         if nonempty(struct.last_transfer):
             result['events'].append({
                 "eventAction": "transfer",
-                "eventDate": to_rfc3339(unwrap_datetime(struct.last_transfer)),
+                "eventDate": to_rfc3339(struct.last_transfer),
             })
 
     logging.debug(result)
