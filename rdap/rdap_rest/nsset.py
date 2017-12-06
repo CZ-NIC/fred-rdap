@@ -3,16 +3,11 @@ import logging
 from urlparse import urljoin
 
 from django.conf import settings
+from django.urls import reverse
 
 from rdap.utils.corba import REGISTRY_MODULE
 
 from .rdap_utils import ObjectClassName, add_unicode_name, nonempty, rdap_status_mapping, to_rfc3339, unwrap_datetime
-
-try:
-    from django.urls import reverse
-except ImportError:
-    # Support Django < 1.10
-    from django.core.urlresolvers import reverse
 
 
 def nsset_to_dict(struct):
