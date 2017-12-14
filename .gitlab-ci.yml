@@ -104,4 +104,4 @@ coverage-report:
         - pip list
         - coverage combine coverage/
         - coverage report --include=*/tests/* --fail-under=100
-        - coverage report
+        - coverage report --omit=*/tests/*
