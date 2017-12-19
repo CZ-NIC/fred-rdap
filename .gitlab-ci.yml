@@ -1,5 +1,7 @@
 variables:
-    DJANGO_VERSION: ">=1.8,<1.11.99"
+    DJANGO_VERSION: ">=1.10,<1.11.99"
+    # Add path to the IDL directory
+    PYTHONPATH: "idl"
 
 stages:
     - analysis
@@ -27,7 +29,7 @@ stages:
         # Parse IDL requirements
         - if [ -e pr-version/devel/$CI_BUILD_REF_NAME.conf ]; then IDL_BRANCH=$(python -c "import json;obj=json.loads(open('pr-version/devel/${CI_BUILD_REF_NAME}.conf').read());print obj.get('idl',{}).get('revision', 'master')"); fi
         - git clone git@gitlab.office.nic.cz:fred/idl.git
-        - (cd idl && git checkout $IDL_BRANCH)
+        - (cd idl && git checkout $IDL_BRANCH && omniidl -bpython -Wbmodules=fred_idl -Wbstubs=fred_idl._stubs idl/*.idl)
         # Install dependencies
         - pip install django$DJANGO_VERSION
         - pip install -r requirements.txt $EXTRA_REQUIREMENTS
@@ -69,22 +71,6 @@ flake8:
         - pip list
     script: "make check-flake8"
 
-test:django1.8:
-    <<: *test
-    script:
-        # Coverage target doesn't work with Django 1.8
-        - make test
-    variables:
-        DJANGO_VERSION: ">=1.8,<1.8.99"
-        EXTRA_REQUIREMENTS: "-r requirements-dev.txt"
-
-test:django1.9:
-    <<: *test
-    variables:
-        COVERAGE_FILE: "coverage/.coverage.$CI_BUILD_ID"
-        DJANGO_VERSION: ">=1.9,<1.9.99"
-        EXTRA_REQUIREMENTS: "-r requirements-dev.txt coverage"
-
 test:django1.10:
     <<: *test
     variables:
@@ -92,7 +78,7 @@ test:django1.10:
         DJANGO_VERSION: ">=1.10,<1.10.99"
         EXTRA_REQUIREMENTS: "-r requirements-dev.txt coverage"
 
-test:django1.11:
+test:
     <<: *test
 
 coverage-report:

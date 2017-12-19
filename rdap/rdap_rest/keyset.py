@@ -3,14 +3,9 @@ import logging
 from urlparse import urljoin
 
 from django.conf import settings
+from django.urls import reverse
 
-from .rdap_utils import ObjectClassName, nonempty, rdap_status_mapping, to_rfc3339, unwrap_datetime
-
-try:
-    from django.urls import reverse
-except ImportError:
-    # Support Django < 1.10
-    from django.core.urlresolvers import reverse
+from .rdap_utils import ObjectClassName, nonempty, rdap_status_mapping, to_rfc3339
 
 
 def keyset_to_dict(struct):
@@ -37,7 +32,7 @@ def keyset_to_dict(struct):
             "events": [
                 {
                     "eventAction": "registration",
-                    "eventDate": to_rfc3339(unwrap_datetime(struct.created)),
+                    "eventDate": to_rfc3339(struct.created),
                 },
             ],
             "links": [
@@ -73,12 +68,12 @@ def keyset_to_dict(struct):
         if nonempty(struct.changed):
             result['events'].append({
                 "eventAction": "last changed",
-                "eventDate": to_rfc3339(unwrap_datetime(struct.changed)),
+                "eventDate": to_rfc3339(struct.changed),
             })
         if nonempty(struct.last_transfer):
             result['events'].append({
                 "eventAction": "transfer",
-                "eventDate": to_rfc3339(unwrap_datetime(struct.last_transfer)),
+                "eventDate": to_rfc3339(struct.last_transfer),
             })
 
         if struct.dns_keys:

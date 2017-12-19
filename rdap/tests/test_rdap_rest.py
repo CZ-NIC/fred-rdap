@@ -1,5 +1,9 @@
 """Tests for `rdap.rdap_rest` package."""
+from datetime import date, datetime
+
 from django.test import SimpleTestCase, override_settings
+from fred_idl.Registry.Whois import Contact, ContactIdentification, DisclosableContactIdentification, \
+    DisclosablePlaceAddress, DisclosableString, Domain, KeySet, NameServer, NSSet, PlaceAddress
 from mock import patch, sentinel
 
 from rdap.rdap_rest.domain import delete_candidate_domain_to_dict, domain_to_dict
@@ -7,50 +11,45 @@ from rdap.rdap_rest.entity import contact_to_dict
 from rdap.rdap_rest.keyset import keyset_to_dict
 from rdap.rdap_rest.nameserver import nameserver_to_dict
 from rdap.rdap_rest.nsset import nsset_to_dict
-from rdap.utils.corba import REGISTRY_MODULE
+from rdap.utils.corba import WHOIS
 
 
 def get_contact():
-    nothing = REGISTRY_MODULE.Whois.DisclosableString(value='', disclose=False)
-    place = REGISTRY_MODULE.Whois.PlaceAddress(street1='', street2='', street3='', city='', stateorprovince='',
-                                               postalcode='', country_code='')
-    address = REGISTRY_MODULE.Whois.DisclosablePlaceAddress(value=place, disclose=False)
-    ident = REGISTRY_MODULE.Whois.DisclosableContactIdentification(
-        value=REGISTRY_MODULE.Whois.ContactIdentification(identification_type='PASS', identification_data=''),
+    nothing = DisclosableString(value='', disclose=False)
+    place = PlaceAddress(street1='', street2='', street3='', city='', stateorprovince='', postalcode='',
+                         country_code='')
+    address = DisclosablePlaceAddress(value=place, disclose=False)
+    ident = DisclosableContactIdentification(
+        value=ContactIdentification(identification_type='PASS', identification_data=''),
         disclose=False,
     )
-    created = REGISTRY_MODULE.DateTime(REGISTRY_MODULE.Date(day=4, month=1, year=1980), hour=11, minute=14, second=10)
-    return REGISTRY_MODULE.Whois.Contact(
+    return Contact(
         handle='KRYTEN', organization=nothing, name=nothing, address=address, phone=nothing, fax=nothing, email=nothing,
         notify_email=nothing, vat_number=nothing, identification=ident, creating_registrar_handle='HOLLY',
-        sponsoring_registrar_handle='LISTER', created=created, changed=None, last_transfer=None, statuses=[])
+        sponsoring_registrar_handle='LISTER', created=datetime(1980, 1, 4, 11, 14, 10), changed=None,
+        last_transfer=None, statuses=[])
 
 
 def get_domain(admin_contact_handles=None, nsset_handle=None, keyset_handle=None):
-    registered = REGISTRY_MODULE.DateTime(REGISTRY_MODULE.Date(day=1, month=1, year=1980),
-                                          hour=12, minute=24, second=42)
-    expire = REGISTRY_MODULE.Date(day=31, month=12, year=2032)
-    expire_time = REGISTRY_MODULE.DateTime(REGISTRY_MODULE.Date(day=31, month=12, year=2032),
-                                           hour=22, minute=35, second=59)
-    return REGISTRY_MODULE.Whois.Domain(
+    return Domain(
         handle='example.cz', registrant_handle='KRYTEN', admin_contact_handles=(admin_contact_handles or []),
         nsset_handle=nsset_handle, keyset_handle=keyset_handle, registrar_handle=sentinel.registrar_handle, statuses=[],
-        registered=registered, changed=None, last_transfer=None, expire=expire, expire_time_estimate=expire_time,
-        expire_time_actual=None, validated_to=None, validated_to_time_estimate=None, validated_to_time_actual=None)
+        registered=datetime(1980, 1, 1, 12, 24, 42), changed=None, last_transfer=None, expire=date(2032, 12, 31),
+        expire_time_estimate=datetime(2032, 12, 31, 22, 35, 59), expire_time_actual=None, validated_to=None,
+        validated_to_time_estimate=None, validated_to_time_actual=None)
 
 
 def get_nsset(nservers=None, tech_contact_handles=None):
-    created = REGISTRY_MODULE.DateTime(REGISTRY_MODULE.Date(day=2, month=1, year=1980), hour=8, minute=35, second=47)
-    return REGISTRY_MODULE.Whois.NSSet(
+    return NSSet(
         handle='new-saturn', nservers=(nservers or []), tech_contact_handles=(tech_contact_handles or []),
-        registrar_handle='LISTER', created=created, changed=None, last_transfer=None, statuses=[])
+        registrar_handle='LISTER', created=datetime(1980, 1, 2, 8, 35, 47), changed=None, last_transfer=None,
+        statuses=[])
 
 
 def get_keyset(tech_contact_handles=None):
-    created = REGISTRY_MODULE.DateTime(REGISTRY_MODULE.Date(day=3, month=1, year=1980), hour=10, minute=9, second=34)
-    return REGISTRY_MODULE.Whois.KeySet(
+    return KeySet(
         handle='gazpacho', dns_keys=[], tech_contact_handles=(tech_contact_handles or []), registrar_handle='RIMMER',
-        created=created, changed=None, last_transfer=None, statuses=[])
+        created=datetime(1980, 1, 3, 10, 9, 34), changed=None, last_transfer=None, statuses=[])
 
 
 @override_settings(RDAP_ROOT_URL='http://rdap.example.cz/')
@@ -69,7 +68,7 @@ class TestDomainToDict(SimpleTestCase):
         self.assertEqual(admin['links'][0]['value'], 'http://rdap.example.cz/entity/HOLLY')
 
     def test_nsset(self):
-        with patch('rdap.rdap_rest.domain.WHOIS') as whois_mock:
+        with patch.object(WHOIS, 'client', spec=('get_nsset_by_handle', )) as whois_mock:
             whois_mock.get_nsset_by_handle.return_value = get_nsset()
 
             result = domain_to_dict(get_domain(nsset_handle='new-saturn'))
@@ -77,8 +76,8 @@ class TestDomainToDict(SimpleTestCase):
         self.assertEqual(result['fred_nsset']['links'][0]['value'], 'http://rdap.example.cz/fred_nsset/new-saturn')
 
     def test_nameservers(self):
-        nservers = [REGISTRY_MODULE.Whois.NameServer(fqdn='nameserver.example.cz', ip_addresses=[])]
-        with patch('rdap.rdap_rest.domain.WHOIS') as whois_mock:
+        nservers = [NameServer(fqdn='nameserver.example.cz', ip_addresses=[])]
+        with patch.object(WHOIS, 'client', spec=('get_nsset_by_handle', )) as whois_mock:
             whois_mock.get_nsset_by_handle.return_value = get_nsset(nservers=nservers)
 
             result = domain_to_dict(get_domain(nsset_handle='new-saturn'))
@@ -87,7 +86,7 @@ class TestDomainToDict(SimpleTestCase):
                          'http://rdap.example.cz/nameserver/nameserver.example.cz')
 
     def test_keyset(self):
-        with patch('rdap.rdap_rest.domain.WHOIS') as whois_mock:
+        with patch.object(WHOIS, 'client', spec=('get_keyset_by_handle', )) as whois_mock:
             whois_mock.get_keyset_by_handle.return_value = get_keyset()
 
             result = domain_to_dict(get_domain(keyset_handle='gazpacho'))
@@ -133,7 +132,7 @@ class TestNameserverToDict(SimpleTestCase):
     """Test `rdap.rdap_rest.domain.nameserver_to_dict` function."""
 
     def test_simple(self):
-        nameserver = REGISTRY_MODULE.Whois.NameServer(fqdn='nameserver.example.cz', ip_addresses=[])
+        nameserver = NameServer(fqdn='nameserver.example.cz', ip_addresses=[])
         result = nameserver_to_dict(nameserver)
         self.assertEqual(result['links'][0]['value'], 'http://rdap.example.cz/nameserver/nameserver.example.cz')
 
@@ -153,7 +152,7 @@ class TestNssetToDict(SimpleTestCase):
         self.assertEqual(tech['links'][0]['value'], 'http://rdap.example.cz/entity/KOCHANSKI')
 
     def test_nameservers(self):
-        nservers = [REGISTRY_MODULE.Whois.NameServer(fqdn='nameserver.example.cz', ip_addresses=[])]
+        nservers = [NameServer(fqdn='nameserver.example.cz', ip_addresses=[])]
         result = nsset_to_dict(get_nsset(nservers=nservers))
         self.assertEqual(result['nameservers'][0]['links'][0]['value'],
                          'http://rdap.example.cz/nameserver/nameserver.example.cz')

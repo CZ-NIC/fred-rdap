@@ -1,21 +1,7 @@
 """Utils for translating Corba objects to python dictionary."""
-from datetime import date, datetime
-
 import idna
 from django.conf import settings
 from django.utils import timezone
-
-
-def unwrap_datetime(idl_datetime):
-    """Convert IDL datetime struct to python datetime.datetime."""
-    dt = datetime(
-        idl_datetime.date.year, idl_datetime.date.month, idl_datetime.date.day,
-        idl_datetime.hour, idl_datetime.minute, idl_datetime.second
-    )
-    dt = timezone.make_aware(dt, timezone.utc)
-    if not settings.USE_TZ:
-        dt = timezone.make_naive(dt, timezone.get_default_timezone())
-    return dt
 
 
 def to_rfc3339(dt):
@@ -31,10 +17,6 @@ def to_rfc3339(dt):
         aux = timezone.make_aware(aux, timezone.get_default_timezone())
 
     return aux.isoformat('T')
-
-
-def unwrap_date(idl_date):
-    return date(idl_date.year, idl_date.month, idl_date.day)
 
 
 def nonempty(input):

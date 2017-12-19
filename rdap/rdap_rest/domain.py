@@ -3,16 +3,12 @@ import logging
 from urlparse import urljoin
 
 from django.conf import settings
+from django.urls import reverse
+from fred_idl.Registry.Whois import IPv4, IPv6
 
-from rdap.utils.corba import RECODER, REGISTRY_MODULE, WHOIS
+from rdap.utils.corba import WHOIS
 
-from .rdap_utils import ObjectClassName, add_unicode_name, nonempty, rdap_status_mapping, to_rfc3339, unwrap_datetime
-
-try:
-    from django.urls import reverse
-except ImportError:
-    # Support Django < 1.10
-    from django.core.urlresolvers import reverse
+from .rdap_utils import ObjectClassName, add_unicode_name, nonempty, rdap_status_mapping, to_rfc3339
 
 
 def domain_to_dict(struct):
@@ -52,11 +48,11 @@ def domain_to_dict(struct):
             "events": [
                 {
                     "eventAction": "registration",
-                    "eventDate": to_rfc3339(unwrap_datetime(struct.registered)),
+                    "eventDate": to_rfc3339(struct.registered),
                 },
                 {
                     "eventAction": "expiration",
-                    "eventDate": to_rfc3339(unwrap_datetime(expiration_datetime)),
+                    "eventDate": to_rfc3339(expiration_datetime),
                 },
             ],
             "entities": [
@@ -106,12 +102,12 @@ def domain_to_dict(struct):
         if nonempty(struct.changed):
             result['events'].append({
                 "eventAction": "last changed",
-                "eventDate": to_rfc3339(unwrap_datetime(struct.changed)),
+                "eventDate": to_rfc3339(struct.changed),
             })
         if nonempty(struct.last_transfer):
             result['events'].append({
                 "eventAction": "transfer",
-                "eventDate": to_rfc3339(unwrap_datetime(struct.last_transfer)),
+                "eventDate": to_rfc3339(struct.last_transfer),
             })
         if struct.validated_to_time_actual:
             validated_to_datetime = struct.validated_to_time_actual
@@ -122,10 +118,10 @@ def domain_to_dict(struct):
         if validated_to_datetime:
             result['events'].append({
                 "eventAction": "enum validation expiration",
-                "eventDate": to_rfc3339(unwrap_datetime(validated_to_datetime)),
+                "eventDate": to_rfc3339(validated_to_datetime),
             })
         if nonempty(struct.nsset_handle):
-            nsset = RECODER.decode(WHOIS.get_nsset_by_handle(RECODER.encode(struct.nsset_handle)))
+            nsset = WHOIS.get_nsset_by_handle(struct.nsset_handle)
             if nsset is not None:
                 nsset_link = urljoin(settings.RDAP_ROOT_URL, reverse('nsset-detail', kwargs={"handle": nsset.handle}))
                 result["nameservers"] = []
@@ -164,9 +160,9 @@ def domain_to_dict(struct):
                         addrs_v4 = []
                         addrs_v6 = []
                         for ip_addr in ns.ip_addresses:
-                            if ip_addr.version._v == REGISTRY_MODULE.Whois.IPv4._v:
+                            if ip_addr.version._v == IPv4._v:
                                 addrs_v4.append(ip_addr.address)
-                            if ip_addr.version._v == REGISTRY_MODULE.Whois.IPv6._v:
+                            if ip_addr.version._v == IPv6._v:
                                 addrs_v6.append(ip_addr.address)
                         ns_obj["ipAddresses"] = {}
                         if addrs_v4:
@@ -177,7 +173,7 @@ def domain_to_dict(struct):
                     result['fred_nsset']['nameservers'].append(ns_obj)
 
         if nonempty(struct.keyset_handle):
-            keyset = RECODER.decode(WHOIS.get_keyset_by_handle(RECODER.encode(struct.keyset_handle)))
+            keyset = WHOIS.get_keyset_by_handle(struct.keyset_handle)
             if keyset is not None:
                 result["secureDNS"] = {
                     "zoneSigned": True,
