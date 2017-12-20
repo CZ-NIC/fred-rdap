@@ -1,7 +1,6 @@
 2017-03-02 (0.5.0)
 
   * django 1.10 compatibility changes
-
   * CI changes/fixes (coverage)
 
 2017-03-07 (0.4.2)
@@ -11,7 +10,6 @@
 2016-12-19 (0.4.1)
 
   * disable csrf check on rdap views
-
   * add comments to configuration file
 
 2016-10-27 (0.4.0)
@@ -29,28 +27,26 @@
 2016-03-22 (0.3.1)
 
   * fix rpm build
-
   * patch corba recoder for omniorb 4.2.0
-
   * add logging setup to config
 
 2016-01-20 (0.3.0)
 
   * changes according to rfc document standardization
 
-2015-01-27 Jan Korous (0.2.0)
+2015-01-27 (0.2.0)
 
   * show 'delete pending' status for domains scheduled for deletion
 
-2014-09-03 Jan Korous (0.1.1)
+2014-09-03 (0.1.1)
 
   * add optional disclaimer text from file (settings)
 
-2014-08-01 Jan Korous, Jiri Sadek (0.1.0)
+2014-08-01 (0.1.0)
 
   * prototype of RDAP implementation for FRED registry system
     - implemented queries for - entity, domain, nameserver
-    - extension for FRED specific types - cznic_nsset, cznic_keyset
+    - extension for FRED specific types - ``cznic_nsset``, ``cznic_keyset``
     - used drafts:
       - http://tools.ietf.org/html/draft-ietf-weirds-rdap-query-10
       - http://tools.ietf.org/html/draft-ietf-weirds-json-response-07
