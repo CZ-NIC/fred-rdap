@@ -1,4 +1,7 @@
 include MANIFEST.in
-include fred-rdap.spec
+include contrib/fedora/fred-rdap.spec
+include contrib/fedora/uwsgi.ini
+include contrib/fedora/apache.conf
+include contrib/fedora/rdap_cfg.py
 graft examples
 graft rdap/tests/data
