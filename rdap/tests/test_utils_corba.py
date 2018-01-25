@@ -61,3 +61,13 @@ class TestRdapCorbaRecoder(SimpleTestCase):
         recoder = RdapCorbaRecoder()
         value = DateTime(Date(1, 3, 2001), 12, 1, 89)
         self.assertRaises(ValueError, recoder.decode, value)
+
+    def test_decode_delete_date(self):
+        # Convert zero date - regression test for #20984
+        recoder = RdapCorbaRecoder()
+        self.assertIsNone(recoder.decode(DateType(0, 0, 0)))
+
+    def test_decode_delete_datetime(self):
+        # Convert zero datetime - Regression test for #20984
+        recoder = RdapCorbaRecoder()
+        self.assertIsNone(recoder.decode(DateTime(DateType(0, 0, 0), 0, 0, 0)))
