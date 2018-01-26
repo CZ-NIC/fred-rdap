@@ -25,9 +25,17 @@ class RdapCorbaRecoder(CorbaRecoder):
         self.add_recode_function(DateTime, self._decode_datetime, self._identity)
 
     def _decode_date(self, value):
+        # Delete candidates returns dates with zeros, see #20984.
+        # TODO: Remove once #16223 is resolved.
+        if value.year == 0 and value.month == 0 and value.day == 0:
+            return None
         return date(value.year, value.month, value.day)
 
     def _decode_datetime(self, value):
+        # Delete candidates returns dates with zeros, see #20984.
+        # TODO: Remove once #16223 is resolved.
+        if value.date.year == 0 and value.date.month == 0 and value.date.day == 0:
+            return None
         result = datetime(value.date.year, value.date.month, value.date.day, value.hour, value.minute, value.second)
         result = timezone.make_aware(result, timezone.utc)
         # If time zones are disabled, change the time to the default timezone and remove the time zone.
