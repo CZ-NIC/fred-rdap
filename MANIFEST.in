@@ -1,3 +1,4 @@
+include *.md
 include contrib/fedora/fred-rdap.spec
 include contrib/fedora/uwsgi.ini
 include contrib/fedora/apache.conf
