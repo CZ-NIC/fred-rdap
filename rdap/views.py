@@ -49,7 +49,6 @@ class ObjectView(View):
 
             log_request.result = LOGGER_SUCCESS
             response = JsonResponse(data, content_type=RDAP_CONTENT_TYPE)
-            response['Access-Control-Allow-Origin'] = '*'
             return response
         except NotFoundError:
             log_request.result = LOGGER_NOT_FOUND
@@ -89,7 +88,6 @@ class HelpView(View):
             'notices': [{'title': 'Help', 'description': ['No help.']}],
         }
         response = JsonResponse(data, content_type=RDAP_CONTENT_TYPE)
-        response['Access-Control-Allow-Origin'] = '*'
         return response
 
 

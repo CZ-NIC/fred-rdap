@@ -64,7 +64,6 @@ class TestObjectView(SimpleTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/rdap+json')
-        self.assertEqual(response['Access-Control-Allow-Origin'], '*')
         result = json.loads(response.content)
         self.assertEqual(result['objectClassName'], 'entity')
         self.assertEqual(result['handle'], 'kryten')
@@ -82,7 +81,6 @@ class TestObjectView(SimpleTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/rdap+json')
-        self.assertEqual(response['Access-Control-Allow-Origin'], '*')
         result = json.loads(response.content)
         self.assertEqual(result['objectClassName'], 'entity')
         self.assertEqual(result['handle'], 'kryten')
@@ -152,7 +150,6 @@ class TestFqdnObjectView(SimpleTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/rdap+json')
-        self.assertEqual(response['Access-Control-Allow-Origin'], '*')
         result = json.loads(response.content)
         self.assertEqual(result['objectClassName'], 'nameserver')
         self.assertEqual(result['handle'], 'holly')
@@ -185,7 +182,6 @@ class TestHelpView(SimpleTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/rdap+json')
-        self.assertEqual(response['Access-Control-Allow-Origin'], '*')
         data = {
             "rdapConformance": ["rdap_level_0", "fred_version_0"],
             "notices": [{"title": "Help", "description": ["No help."]}],
