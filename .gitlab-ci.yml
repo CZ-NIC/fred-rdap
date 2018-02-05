@@ -1,7 +1,7 @@
 variables:
     DJANGO_VERSION: ">=1.10,<1.11.99"
     # Add path to the IDL directory
-    PYTHONPATH: "idl"
+    PYTHONPATH: ":idl"
 
 stages:
     - analysis
@@ -91,3 +91,29 @@ coverage-report:
         - coverage combine coverage/
         - coverage report --include=*/tests/* --fail-under=100
         - coverage report --omit=*/tests/*
+
+
+conformance:
+    <<: *requires-python
+    <<: *python2-xenial
+    stage: test
+    only:
+        - schedules
+    before_script:
+        - apt-get update
+        - apt-get install --quiet=2 --yes maven openjdk-8-jdk omniidl-python omniorb-nameserver python-omniorb
+        # Prepare RDAP dependencies
+        - git clone git@gitlab.office.nic.cz:fred/idl.git
+        - (cd idl && omniidl -bpython -Wbmodules=fred_idl -Wbstubs=fred_idl._stubs idl/*.idl)
+        - pip install -r requirements.txt
+        # Start fake RDAP backend
+        - omniNames -start &
+        - python test_cfg/conformance/mock_fred.py &
+        # Start RDAP
+        - PYTHONPATH="./test_cfg/conformance:$PYTHONPATH" DJANGO_SETTINGS_MODULE='settings' django-admin runserver localhost:8000 &
+        # Prepare conformance tests
+        - git clone https://github.com/APNIC-net/rdap-conformance.git
+        - (cd rdap-conformance && git checkout v0.5)
+        - (cd rdap-conformance && mvn package --quiet)
+    script:
+        - java -jar rdap-conformance/target/rdap-conformance-0.5.jar test_cfg/conformance/rdap_conformance.json

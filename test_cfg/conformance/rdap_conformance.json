@@ -1,0 +1,40 @@
+{
+    "baseUrl": "http://localhost:8000",
+    "objectClasses": {
+        "ip": {
+            "supported": false
+        },
+        "autnum": {
+            "supported": false
+        },
+        "domain": {
+            "supported": true,
+            "exists": ["lister.cz"],
+            "notExists": ["kochanski.cz"],
+            "search": {
+                "name": {
+                    "supported": false
+                }
+            }
+
+        },
+        "nameserver": {
+            "supported": true,
+            "exists": ["smeghead.rimmer.cz"],
+            "notExists": ["ace.rimmer.cz"]
+        },
+        "entity": {
+            "supported": true,
+            "exists": ["LISTER"],
+            "notExists": ["KOCHANSKI"],
+            "search": {
+                "fn": {
+                    "supported": false
+                },
+                "handle": {
+                    "supported": false
+                }
+            }
+        }
+    }
+}
