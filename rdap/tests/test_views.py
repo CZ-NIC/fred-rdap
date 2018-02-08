@@ -18,6 +18,7 @@ class EnforcingCsrfClient(Client):
     """
     Test client which enforces CSRF checks.
     """
+
     def __init__(self, **defaults):
         super(EnforcingCsrfClient, self).__init__(enforce_csrf_checks=True, **defaults)
 
@@ -135,6 +136,7 @@ class TestFqdnObjectView(SimpleTestCase):
     """
     Test `FqdnObjectView` class.
     """
+
     def setUp(self):
         patcher = patch.object(WHOIS, 'client', spec=('get_nameserver_by_fqdn', ))
         self.addCleanup(patcher.stop)

@@ -18,18 +18,18 @@ def nameserver_to_dict(struct):
         self_link = urljoin(settings.RDAP_ROOT_URL, reverse('nameserver-detail', kwargs={"handle": struct.fqdn}))
 
         result = {
-          "rdapConformance": ["rdap_level_0"],
-          "objectClassName": ObjectClassName.NAMESERVER,
-          "handle": struct.fqdn,
-          "ldhName": struct.fqdn,
-          "links": [
-              {
-                  "value": self_link,
-                  "rel": "self",
-                  "href": self_link,
-                  "type": "application/rdap+json",
-              },
-          ],
+            "rdapConformance": ["rdap_level_0"],
+            "objectClassName": ObjectClassName.NAMESERVER,
+            "handle": struct.fqdn,
+            "ldhName": struct.fqdn,
+            "links": [
+                {
+                    "value": self_link,
+                    "rel": "self",
+                    "href": self_link,
+                    "type": "application/rdap+json",
+                },
+            ],
         }
 
         add_unicode_name(result, struct.fqdn)

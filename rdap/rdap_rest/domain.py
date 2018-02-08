@@ -130,10 +130,10 @@ def domain_to_dict(struct):
                     "handle": nsset.handle,
                     "links": [
                         {
-                          "value": nsset_link,
-                          "rel": "self",
-                          "href": nsset_link,
-                          "type": "application/rdap+json"
+                            "value": nsset_link,
+                            "rel": "self",
+                            "href": nsset_link,
+                            "type": "application/rdap+json"
                         },
                     ],
                     "nameservers": [],
@@ -188,10 +188,10 @@ def domain_to_dict(struct):
                     "handle": keyset.handle,
                     "links": [
                         {
-                          "value": keyset_link,
-                          "rel": "self",
-                          "href": keyset_link,
-                          "type": "application/rdap+json",
+                            "value": keyset_link,
+                            "rel": "self",
+                            "href": keyset_link,
+                            "type": "application/rdap+json",
                         },
                     ],
                     "dns_keys": [],

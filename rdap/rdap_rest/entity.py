@@ -56,14 +56,14 @@ def contact_to_dict(struct):
                         {"type": ""},
                         "text",
                         [
-                          '',  # P. O. BOX
-                          address.street1,
-                          address.street2,
-                          address.street3,
-                          address.city,
-                          address.stateorprovince,
-                          address.postalcode,
-                          address.country_code,
+                            '',  # P. O. BOX
+                            address.street1,
+                            address.street2,
+                            address.street3,
+                            address.city,
+                            address.stateorprovince,
+                            address.postalcode,
+                            address.country_code,
                         ]
                     ]
                 )
