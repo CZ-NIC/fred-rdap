@@ -22,3 +22,6 @@ and other domain registry objects, but provides results in a machine-readable fo
     or use RDAP's URLs directly as a `ROOT_URLCONF` in your settings
 
         ROOT_URLCONF = 'rdap.urls'
+
+2. According to [RDAP specification](https://tools.ietf.org/html/rfc7480#section-5.6) it is recommended to set the `Access-Control-Allow-Origin` header.
+   It may be added by HTTP server or [django-cors-headers](https://github.com/ottoyiu/django-cors-headers) application.
