@@ -1,3 +1,9 @@
+2018-02-12 (0.10.0)
+
+ * Remove CORS headers from the rdap application itself.
+ * Add README
+ * Add conformance tests to CI
+
 2017-12-20 (0.9.0)
 
  * Drop support for Django < 1.10.
