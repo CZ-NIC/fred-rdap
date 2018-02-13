@@ -14,5 +14,4 @@ setup(name='fred-rdap',
       long_description='CZ.NIC RDAP server',
       packages=find_packages(),
       include_package_data=True,
-      install_requires=['django', 'idna', 'fred-pylogger', 'pyfco'],
-      )
+      install_requires=['django', 'idna', 'fred-pylogger', 'fred-pyfco'])
