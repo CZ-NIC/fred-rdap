@@ -6,7 +6,7 @@ from datetime import date, datetime
 from django.test import SimpleTestCase, override_settings
 from django.utils import timezone
 from fred_idl.ccReg import DateTimeType, DateType
-from fred_idl.Registry import Date, DateTime
+from fred_idl.Registry import Date, DateTime, IsoDateTime
 
 from rdap.utils.corba import RdapCorbaRecoder
 
@@ -73,3 +73,15 @@ class TestRdapCorbaRecoder(SimpleTestCase):
         # Convert zero datetime - Regression test for #20984
         recoder = RdapCorbaRecoder()
         self.assertIsNone(recoder.decode(DateTime(DateType(0, 0, 0), 0, 0, 0)))
+
+    def test_decode_isodatetime_aware(self):
+        recoder = RdapCorbaRecoder()
+        with self.settings(USE_TZ=True):
+            self.assertEqual(recoder.decode(IsoDateTime('2001-02-03T12:13:14Z')),
+                             datetime(2001, 2, 3, 12, 13, 14, tzinfo=timezone.utc))
+
+    def test_decode_isodatetime_naive(self):
+        recoder = RdapCorbaRecoder()
+        with self.settings(USE_TZ=False, TIME_ZONE='Europe/Prague'):
+            self.assertEqual(recoder.decode(IsoDateTime('2001-02-03T12:13:14Z')),
+                             datetime(2001, 2, 3, 13, 13, 14))

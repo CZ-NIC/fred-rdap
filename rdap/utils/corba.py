@@ -8,8 +8,9 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.functional import SimpleLazyObject
 from fred_idl.ccReg import DateTimeType, DateType, Logger
-from fred_idl.Registry import Date, DateTime, Whois
+from fred_idl.Registry import Date, DateTime, IsoDate, IsoDateTime, Whois
 from pyfco import CorbaClient, CorbaClientProxy, CorbaNameServiceClient, CorbaRecoder
+from pyfco.recoder import decode_iso_date, decode_iso_datetime
 
 _CORBA = CorbaNameServiceClient(host_port=settings.CORBA_NS_HOST_PORT, context_name=settings.CORBA_NS_CONTEXT)
 _WHOIS = SimpleLazyObject(lambda: _CORBA.get_object('Whois2', Whois.WhoisIntf))
@@ -25,6 +26,8 @@ class RdapCorbaRecoder(CorbaRecoder):
         self.add_recode_function(DateTimeType, self._decode_datetime, self._identity)
         self.add_recode_function(Date, self._decode_date, self._identity)
         self.add_recode_function(DateTime, self._decode_datetime, self._identity)
+        self.add_recode_function(IsoDate, decode_iso_date, self._identity)
+        self.add_recode_function(IsoDateTime, self._decode_iso_datetime, self._identity)
 
     def _decode_date(self, value):
         # Delete candidates returns dates with zeros, see #20984.
@@ -41,6 +44,13 @@ class RdapCorbaRecoder(CorbaRecoder):
         result = datetime(value.date.year, value.date.month, value.date.day, value.hour, value.minute, value.second)
         result = timezone.make_aware(result, timezone.utc)
         # If time zones are disabled, change the time to the default timezone and remove the time zone.
+        if not settings.USE_TZ:
+            result = timezone.make_naive(result, timezone.get_default_timezone())
+        return result
+
+    def _decode_iso_datetime(self, value):
+        """Decode `IsoDateTime` struct to datetime object with respect to the timezone settings."""
+        result = decode_iso_datetime(value)
         if not settings.USE_TZ:
             result = timezone.make_naive(result, timezone.get_default_timezone())
         return result

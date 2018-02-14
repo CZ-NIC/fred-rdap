@@ -3,7 +3,8 @@ from __future__ import unicode_literals
 
 import logging
 
-from fred_idl.Registry.Whois import INVALID_HANDLE, INVALID_LABEL, OBJECT_NOT_FOUND, TOO_MANY_LABELS, UNMANAGED_ZONE
+from fred_idl.Registry.Whois import INVALID_HANDLE, INVALID_LABEL, OBJECT_DELETE_CANDIDATE, OBJECT_NOT_FOUND, \
+    TOO_MANY_LABELS, UNMANAGED_ZONE
 
 from rdap.exceptions import InvalidHandleError, NotFoundError
 from rdap.utils.corba import WHOIS
@@ -29,7 +30,7 @@ def get_domain_by_handle(handle):
     logging.debug('get_domain_by_handle: %s', handle)
     try:
         return domain_to_dict(WHOIS.get_domain_by_handle(handle))
-    except (OBJECT_NOT_FOUND, TOO_MANY_LABELS, UNMANAGED_ZONE):
+    except (OBJECT_DELETE_CANDIDATE, OBJECT_NOT_FOUND, TOO_MANY_LABELS, UNMANAGED_ZONE):
         raise NotFoundError()
     except INVALID_LABEL:
         raise InvalidHandleError()
