@@ -1,4 +1,7 @@
 include *.md
+include dependency_links.txt
+include requirements.txt
+include constraints.txt
 include contrib/fedora/fred-rdap.spec
 include contrib/fedora/uwsgi.ini
 include contrib/fedora/apache.conf

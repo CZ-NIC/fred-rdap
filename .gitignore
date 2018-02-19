@@ -9,3 +9,5 @@ RELEASE-VERSION
 *~
 rdap/settings.py
 install.log
+/.coverage*
+/.tox
