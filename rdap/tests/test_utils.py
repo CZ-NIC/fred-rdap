@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from datetime import datetime
 
 from django.test import SimpleTestCase
@@ -89,15 +91,15 @@ class TestStatusMappingDefinition(SimpleTestCase):
 class TestInputFqdnProcessing(SimpleTestCase):
 
     def test_ok_a_input(self):
-        self.assertEqual(rdap_utils.preprocess_fqdn(u'skvirukl.example'), 'skvirukl.example')
+        self.assertEqual(rdap_utils.preprocess_fqdn('skvirukl.example'), 'skvirukl.example')
         self.assertEqual(rdap_utils.preprocess_fqdn('skvirukl.example'), 'skvirukl.example')
 
     def test_ok_idn_input(self):
-        self.assertEqual(rdap_utils.preprocess_fqdn(u'skvírůkl.example'), 'xn--skvrkl-5va55h.example')
-        self.assertEqual(rdap_utils.preprocess_fqdn(u'xn--skvrkl-5va55h.example'), 'xn--skvrkl-5va55h.example')
+        self.assertEqual(rdap_utils.preprocess_fqdn('skvírůkl.example'), 'xn--skvrkl-5va55h.example')
+        self.assertEqual(rdap_utils.preprocess_fqdn('xn--skvrkl-5va55h.example'), 'xn--skvrkl-5va55h.example')
 
     def test_bad_idn_input(self):
-        self.assertRaises(rdap_utils.InvalidIdn, rdap_utils.preprocess_fqdn, u'xn--skvrkl-ňúríkl.example')
+        self.assertRaises(rdap_utils.InvalidIdn, rdap_utils.preprocess_fqdn, 'xn--skvrkl-ňúríkl.example')
 
 
 class TestRfc3339TimestampFormat(SimpleTestCase):
@@ -141,12 +143,12 @@ class TestAddUnicodeName(SimpleTestCase):
     def test_add(self):
         dst_dict = {}
         rdap_utils.add_unicode_name(dst_dict, 'xn--skvrkl-5va55h.example')
-        self.assertEqual(dst_dict, {'unicodeName': u'skvírůkl.example'})
+        self.assertEqual(dst_dict, {'unicodeName': 'skvírůkl.example'})
 
         dst_dict = {'k': 'v'}
         rdap_utils.add_unicode_name(dst_dict, 'xn--skvrkl-5va55h.example')
-        self.assertEqual(dst_dict, {'k': 'v', 'unicodeName': u'skvírůkl.example'})
+        self.assertEqual(dst_dict, {'k': 'v', 'unicodeName': 'skvírůkl.example'})
 
         dst_dict = {'unicodeName': 'please rewrite!'}
         rdap_utils.add_unicode_name(dst_dict, 'xn--skvrkl-5va55h.example')
-        self.assertEqual(dst_dict, {'unicodeName': u'skvírůkl.example'})
+        self.assertEqual(dst_dict, {'unicodeName': 'skvírůkl.example'})

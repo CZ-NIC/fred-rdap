@@ -1,4 +1,6 @@
 """Utils for translating Corba objects to python dictionary."""
+from __future__ import unicode_literals
+
 import idna
 from django.conf import settings
 from django.utils import timezone
@@ -16,7 +18,7 @@ def to_rfc3339(dt):
     else:
         aux = timezone.make_aware(aux, timezone.get_default_timezone())
 
-    return aux.isoformat('T')
+    return aux.isoformat(b'T')
 
 
 def nonempty(input):

@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.conf.urls import url
 
 from rdap.rdap_rest.whois import get_contact_by_handle, get_domain_by_handle, get_keyset_by_handle, \

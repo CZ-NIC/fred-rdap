@@ -1,4 +1,6 @@
 """Tests for `rdap.rdap_rest.whois` module."""
+from __future__ import unicode_literals
+
 from datetime import date, datetime
 
 from django.test import SimpleTestCase, override_settings
