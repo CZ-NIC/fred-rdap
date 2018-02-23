@@ -1,4 +1,6 @@
 """RDAP views."""
+from __future__ import unicode_literals
+
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, JsonResponse
 from django.utils.functional import SimpleLazyObject

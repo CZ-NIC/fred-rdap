@@ -1,4 +1,6 @@
 """Wrapper module to whois idl interface."""
+from __future__ import unicode_literals
+
 import logging
 
 from fred_idl.Registry.Whois import INVALID_HANDLE, INVALID_LABEL, OBJECT_NOT_FOUND, TOO_MANY_LABELS, UNMANAGED_ZONE

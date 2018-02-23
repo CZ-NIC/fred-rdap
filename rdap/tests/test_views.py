@@ -1,6 +1,8 @@
 """
 Tests of RDAP views.
 """
+from __future__ import unicode_literals
+
 import json
 import os
 
@@ -163,7 +165,7 @@ class TestFqdnObjectView(SimpleTestCase):
         self.assertEqual(self.logger_mock.create_request.return_value.result, 'Ok')
 
     def test_nameserver_invalid_fqdn(self):
-        response = self.client.get(u'/nameserver/-invalid')
+        response = self.client.get('/nameserver/-invalid')
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response['Content-Type'], 'application/rdap+json')

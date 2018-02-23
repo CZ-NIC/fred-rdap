@@ -1,4 +1,6 @@
 """Wrapper module to whois idl interface."""
+from __future__ import unicode_literals
+
 import logging
 from urlparse import urljoin
 

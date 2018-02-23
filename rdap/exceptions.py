@@ -1,4 +1,5 @@
 """RDAP exceptions."""
+from __future__ import unicode_literals
 
 
 class RdapError(Exception):
