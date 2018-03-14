@@ -1,3 +1,8 @@
+2018-03-08 (0.11.0)
+
+ * Prepare for Python 3 - clean up code and use ``unicode_literals``.
+ * Support new ISO date time structures from IDLs.
+
 2018-02-12 (0.10.0)
 
  * Remove CORS headers from the rdap application itself.
