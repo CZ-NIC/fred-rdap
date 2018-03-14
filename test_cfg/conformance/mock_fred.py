@@ -5,7 +5,7 @@ import sys
 import CosNaming
 from fred_idl import Registry__POA, ccReg__POA
 from fred_idl.ccReg import RequestServiceListItem, RequestTypeListItem, ResultCodeListItem
-from fred_idl.Registry import Date, DateTime
+from fred_idl.Registry import IsoDate, IsoDateTime
 from fred_idl.Registry.Whois import Contact, ContactIdentification, DisclosableContactIdentification, \
     DisclosablePlaceAddress, DisclosableString, Domain, KeySet, NameServer, NSSet, PlaceAddress, OBJECT_NOT_FOUND
 from omniORB import CORBA
@@ -53,11 +53,11 @@ class FakeWhois(Registry__POA.Whois.WhoisIntf):
         no_address = DisclosablePlaceAddress(PlaceAddress('', '', '', '', '', '', ''), False)
         no_ident = DisclosableContactIdentification(ContactIdentification('OP', ''), False)
         return Contact(handle, nothing, nothing, no_address, nothing, nothing, nothing, nothing, nothing, no_ident,
-                       'REGGIE', 'REGGIE', DateTime(Date(1, 1, 1970), 0, 0, 0), None, None, [])
+                       'REGGIE', 'REGGIE', IsoDateTime('1970-01-01T00:00:00Z'), None, None, [])
 
     def get_nsset_by_handle(self, handle):
         print("{}.get_nsset_by_handle({})".format(self.__class__.__name__, handle))
-        return NSSet(handle, [], [], 'REGGIE', DateTime(Date(1, 1, 1970), 0, 0, 0), None, None, [])
+        return NSSet(handle, [], [], 'REGGIE', IsoDateTime('1970-01-01T00:00:00Z'), None, None, [])
 
     def get_nameserver_by_fqdn(self, fqdn):
         print("{}.get_nameserver_by_fqdn({})".format(self.__class__.__name__, fqdn))
@@ -67,14 +67,14 @@ class FakeWhois(Registry__POA.Whois.WhoisIntf):
 
     def get_keyset_by_handle(self, handle):
         print("{}.get_keyset_by_handle({})".format(self.__class__.__name__, handle))
-        return KeySet(handle, [], [], 'REGGIE', DateTime(Date(1, 1, 1970), 0, 0, 0), None, None, [])
+        return KeySet(handle, [], [], 'REGGIE', IsoDateTime('1970-01-01T00:00:00Z'), None, None, [])
 
     def get_domain_by_handle(self, handle):
         print("{}.get_domain_by_handle({})".format(self.__class__.__name__, handle))
         if handle == 'kochanski.cz':
             raise OBJECT_NOT_FOUND()
-        return Domain(handle, 'LISTER', [], None, None, 'REGGIE', [], DateTime(Date(1, 1, 1970), 0, 0, 0), None, None,
-                      Date(1, 1, 2030), DateTime(Date(1, 1, 2030), 0, 0, 0), None, None, None, None)
+        return Domain(handle, 'LISTER', [], None, None, 'REGGIE', [], IsoDateTime('1970-01-01T00:00:00Z'), None, None,
+                      IsoDate('2030-01-01'), IsoDateTime('2030-01-01T00:00:00Z'), None, None, None, None)
 
 
 def bind_interface(context, interface, name):

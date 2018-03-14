@@ -7,7 +7,7 @@ import json
 import os
 
 from django.test import Client, SimpleTestCase
-from fred_idl.Registry import Date, DateTime
+from fred_idl.Registry import IsoDateTime
 from fred_idl.Registry.Whois import INVALID_HANDLE, OBJECT_NOT_FOUND, Contact, ContactIdentification, \
     DisclosableContactIdentification, DisclosablePlaceAddress, DisclosableString, NameServer, PlaceAddress
 from mock import call, patch
@@ -56,7 +56,7 @@ class TestObjectView(SimpleTestCase):
             DisclosableContactIdentification(ident, True),
             '',
             '',
-            DateTime(Date(6, 9, 1988), 20, 0, 0),
+            IsoDateTime('1988-09-06T20:00:00Z'),
             None,
             None,
             [])
