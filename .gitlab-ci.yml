@@ -1,12 +1,9 @@
 variables:
-    DJANGO_VERSION: ">=1.10,<1.11.99"
-    # Add path to the IDL directory
-    PYTHONPATH: ":idl"
+    IDL_DIR: "idl"
 
 stages:
     - analysis
     - test
-    - coverage
 
 ########################################################################################################################
 # Basic declarations
@@ -19,21 +16,18 @@ stages:
 
 .install-dependencies: &install-dependencies
     before_script:
-        - pip list
         # Install package dependencies
-        - apt-get update && apt-get install -y omniidl-python python-omniorb
-        # Get pr-version and update requirements
+        - apt-get update && apt-get install -y omniidl-python
+        # Get pr-version and update dependency_links
         - git clone git@gitlab.office.nic.cz:pr-utils/pr-version.git --depth 1
-        - pervert-requirements.py
-        - cat requirements.txt
+        - pervert-requirements.py -r dependency_links.txt
+        - cat dependency_links.txt
         # Parse IDL requirements
         - if [ -e pr-version/devel/$CI_BUILD_REF_NAME.conf ]; then IDL_BRANCH=$(python -c "import json;obj=json.loads(open('pr-version/devel/${CI_BUILD_REF_NAME}.conf').read());print obj.get('idl',{}).get('revision', 'master')"); fi
         - git clone git@gitlab.office.nic.cz:fred/idl.git
         - (cd idl && git checkout $IDL_BRANCH && omniidl -bpython -Wbmodules=fred_idl -Wbstubs=fred_idl._stubs idl/*.idl)
-        # Install dependencies
-        - pip install django$DJANGO_VERSION
-        - pip install -r requirements.txt $EXTRA_REQUIREMENTS
-        - pip list
+        - pip install tox
+        - pip install git+https://github.com/balabit/tox-debian-plugin.git
 
 .test: &test
     <<: *requires-python
@@ -41,57 +35,41 @@ stages:
     <<: *install-dependencies
     stage: test
     script:
-        - mkdir coverage
-        - make test-coverage
-    artifacts:
-        expire_in: 1d
-        paths:
-        - coverage/
-    variables:
-        COVERAGE_FILE: "coverage/.coverage.$CI_BUILD_ID"
-        EXTRA_REQUIREMENTS: "-r requirements-dev.txt coverage"
+        - tox
 
 ########################################################################################################################
 # Individual jobs
-isort:
+quality:
     <<: *requires-python
     <<: *python2-xenial
     stage: analysis
     before_script:
-        - pip install isort
-        - pip list
-    script: "make check-isort"
+        - pip install tox
+    script:
+        - tox -e quality
 
-flake8:
+depcheck:
     <<: *requires-python
     <<: *python2-xenial
     stage: analysis
+    only:
+        - schedules
     before_script:
-        - pip install flake8
-        - pip list
-    script: "make check-flake8"
-
-test:django1.10:
-    <<: *test
-    variables:
-        COVERAGE_FILE: "coverage/.coverage.$CI_BUILD_ID"
-        DJANGO_VERSION: ">=1.10,<1.10.99"
-        EXTRA_REQUIREMENTS: "-r requirements-dev.txt coverage"
+        # Install package with testing dependencies to verify versions
+        - pip install --process-dependency-links .[testing]
+    script:
+        - check-constraints.py constraints.txt
+    allow_failure: true
 
 test:
     <<: *test
 
-coverage-report:
-    <<: *requires-python
-    <<: *python2-xenial
-    stage: coverage
+test-thawed:
+    <<: *test
+    only:
+        - schedules
     script:
-        - pip install coverage
-        - pip list
-        - coverage combine coverage/
-        - coverage report --include=*/tests/* --fail-under=100
-        - coverage report --omit=*/tests/*
-
+        - tox -e thaw
 
 conformance:
     <<: *requires-python
@@ -105,7 +83,7 @@ conformance:
         # Prepare RDAP dependencies
         - git clone git@gitlab.office.nic.cz:fred/idl.git
         - (cd idl && omniidl -bpython -Wbmodules=fred_idl -Wbstubs=fred_idl._stubs idl/*.idl)
-        - pip install -r requirements.txt
+        - pip install --process-dependency-links .
         # Start fake RDAP backend
         - omniNames -start &
         - python test_cfg/conformance/mock_fred.py &
@@ -117,3 +95,5 @@ conformance:
         - (cd rdap-conformance && mvn package --quiet)
     script:
         - java -jar rdap-conformance/target/rdap-conformance-0.5.jar test_cfg/conformance/rdap_conformance.json
+    variables:
+        PYTHONPATH: "$IDL_DIR:$PYTHONPATH"

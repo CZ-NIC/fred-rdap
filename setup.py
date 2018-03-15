@@ -14,4 +14,7 @@ setup(name='fred-rdap',
       long_description='CZ.NIC RDAP server',
       packages=find_packages(),
       include_package_data=True,
-      install_requires=['django', 'idna', 'fred-pylogger', 'fred-pyfco'])
+      install_requires=open('requirements.txt').read().splitlines(),
+      extras_require={'testing': ['mock'],
+                      'quality': ['isort', 'flake8', 'pydocstyle']},
+      dependency_links=open('dependency_links.txt').read().splitlines())
