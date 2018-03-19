@@ -1,10 +1,6 @@
 variables:
     IDL_DIR: "idl"
 
-stages:
-    - analysis
-    - test
-
 ########################################################################################################################
 # Basic declarations
 .requires-python: &requires-python
@@ -33,25 +29,14 @@ stages:
     <<: *requires-python
     <<: *python2-xenial
     <<: *install-dependencies
-    stage: test
     script:
         - tox
 
 ########################################################################################################################
 # Individual jobs
-quality:
-    <<: *requires-python
-    <<: *python2-xenial
-    stage: analysis
-    before_script:
-        - pip install tox
-    script:
-        - tox -e quality
-
 depcheck:
     <<: *requires-python
     <<: *python2-xenial
-    stage: analysis
     only:
         - schedules
     before_script:
@@ -74,7 +59,6 @@ test-thawed:
 conformance:
     <<: *requires-python
     <<: *python2-xenial
-    stage: test
     only:
         - schedules
     before_script:
