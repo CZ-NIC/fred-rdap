@@ -93,7 +93,7 @@ exit 0
 
 %files -f INSTALLED_FILES
 %defattr(-,root,root)
-%{_sysconfdir}/httpd/conf.d/fred-rdap-apache.conf
-%{_sysconfdir}/fred/rdap_cfg.py
-%attr(-,uwsgi,uwsgi) %{_sysconfdir}/uwsgi.d/rdap.ini
+%config %{_sysconfdir}/httpd/conf.d/fred-rdap-apache.conf
+%config %{_sysconfdir}/fred/rdap_cfg.py
+%config %attr(-,uwsgi,uwsgi) %{_sysconfdir}/uwsgi.d/rdap.ini
 %ghost %attr(-,uwsgi,uwsgi) /var/run/rdap/
