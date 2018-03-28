@@ -2,6 +2,7 @@
 
  * Prepare for Python 3 - clean up code and use ``unicode_literals``.
  * Support new ISO date time structures from IDLs.
+ * Fix RPM builds
 
 2018-02-12 (0.10.0)
 

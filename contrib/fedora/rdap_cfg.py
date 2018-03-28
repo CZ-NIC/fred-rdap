@@ -1,8 +1,6 @@
-"""
-Example django settings for RDAP project.
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
-Do not use on production - DEBUG settings are turned on.
-"""
 ###############################################################################
 #                      RDAP Server Configuration File                         #
 ###############################################################################
@@ -14,9 +12,9 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-SECRET_KEY = 'SecretKey'
-DEBUG = True
-ALLOWED_HOSTS = ['*']
+SECRET_KEY = ''
+DEBUG = False
+ALLOWED_HOSTS = []
 
 TIME_ZONE = 'UTC'
 USE_TZ = True
@@ -36,16 +34,16 @@ LOGGING = {
         'simple': {'format': '%(asctime)s - %(name)s - %(levelname)-8s - %(message)s'},
     },
     'handlers': {
-        'console': {'level': 'DEBUG',
-                    'class': 'logging.StreamHandler',
-                    'formatter': 'simple'},
+        'file': {'level': 'DEBUG',
+                 'class': 'logging.handlers.WatchedFileHandler',
+                 'formatter': 'simple',
+                 'filename': '/var/log/fred-rdap.log'},
     },
     'loggers': {
-        '': {'handlers': ['console'],
+        '': {'handlers': ['file'],
              'level': 'DEBUG'},
     },
 }
-
 
 # ## RDAP Server Settings #####################################################
 
