@@ -54,7 +54,7 @@ test-thawed:
     only:
         - schedules
     script:
-        - tox -e thaw
+        - tox -e py27-thaw
 
 conformance:
     <<: *requires-python
