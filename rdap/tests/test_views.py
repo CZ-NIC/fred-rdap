@@ -67,7 +67,7 @@ class TestObjectView(SimpleTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/rdap+json')
-        result = json.loads(response.content)
+        result = json.loads(response.content.decode())
         self.assertEqual(result['objectClassName'], 'entity')
         self.assertEqual(result['handle'], 'kryten')
 
@@ -84,7 +84,7 @@ class TestObjectView(SimpleTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/rdap+json')
-        result = json.loads(response.content)
+        result = json.loads(response.content.decode())
         self.assertEqual(result['objectClassName'], 'entity')
         self.assertEqual(result['handle'], 'kryten')
         self.assertIn({'title': 'Disclaimer', 'description': ['Quagaars!\n']}, result['notices'])
@@ -95,7 +95,7 @@ class TestObjectView(SimpleTestCase):
 
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response['Content-Type'], 'application/rdap+json')
-        self.assertEqual(response.content, '')
+        self.assertEqual(response.content, ''.encode())
 
         # Check logger
         calls = [call.create_request('127.0.0.1', 'RDAP', 'EntityLookup', properties=[('handle', 'kryten')]),
@@ -109,7 +109,7 @@ class TestObjectView(SimpleTestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response['Content-Type'], 'application/rdap+json')
-        self.assertEqual(response.content, '')
+        self.assertEqual(response.content, ''.encode())
 
         # Check logger
         calls = [call.create_request('127.0.0.1', 'RDAP', 'EntityLookup', properties=[('handle', 'kryten')]),
@@ -131,7 +131,7 @@ class TestObjectView(SimpleTestCase):
         # Test POST returns `Method Not Allowed` response instead of CSRF check failure.
         response = self.client.post('/entity/kryten', {})
         self.assertEqual(response.status_code, 405)
-        self.assertEqual(response.content, '')
+        self.assertEqual(response.content, ''.encode())
 
 
 class TestFqdnObjectView(SimpleTestCase):
@@ -154,12 +154,13 @@ class TestFqdnObjectView(SimpleTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/rdap+json')
-        result = json.loads(response.content)
+        result = json.loads(response.content.decode())
         self.assertEqual(result['objectClassName'], 'nameserver')
         self.assertEqual(result['handle'], 'holly')
 
         # Check logger
-        calls = [call.create_request('127.0.0.1', 'RDAP', 'NameserverLookup', properties=[('handle', 'holly')]),
+        calls = [call.create_request('127.0.0.1', 'RDAP', 'NameserverLookup',
+                                     properties=[('handle', 'holly'.encode())]),
                  call.create_request().close(properties=[])]
         self.assertEqual(self.logger_mock.mock_calls, calls)
         self.assertEqual(self.logger_mock.create_request.return_value.result, 'Ok')
@@ -169,7 +170,7 @@ class TestFqdnObjectView(SimpleTestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response['Content-Type'], 'application/rdap+json')
-        self.assertEqual(response.content, '')
+        self.assertEqual(response.content, ''.encode())
 
         # Check logger
         self.assertEqual(self.logger_mock.mock_calls, [])
@@ -190,13 +191,13 @@ class TestHelpView(SimpleTestCase):
             "rdapConformance": ["rdap_level_0", "fred_version_0"],
             "notices": [{"title": "Help", "description": ["No help."]}],
         }
-        self.assertJSONEqual(response.content, data)
+        self.assertJSONEqual(response.content.decode(), data)
 
     def test_post(self):
         # Test POST returns `Method Not Allowed` response instead of CSRF check failure.
         response = self.client.post('/entity/kryten', {})
         self.assertEqual(response.status_code, 405)
-        self.assertEqual(response.content, '')
+        self.assertEqual(response.content, ''.encode())
 
 
 class TestUnsupportedView(SimpleTestCase):
@@ -210,10 +211,10 @@ class TestUnsupportedView(SimpleTestCase):
 
         self.assertEqual(response.status_code, 501)
         self.assertEqual(response['Content-Type'], 'application/rdap+json')
-        self.assertEqual(response.content, '')
+        self.assertEqual(response.content, ''.encode())
 
     def test_post(self):
         # Test POST returns `Method Not Allowed` response instead of CSRF check failure.
         response = self.client.post('/entity/kryten', {})
         self.assertEqual(response.status_code, 405)
-        self.assertEqual(response.content, '')
+        self.assertEqual(response.content, ''.encode())

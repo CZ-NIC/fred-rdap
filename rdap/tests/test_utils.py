@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from datetime import datetime
 
+import six
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils import timezone
@@ -80,23 +81,23 @@ class TestStatusMappingDefinition(SimpleTestCase):
     def test_combination_4_mapped_1_nomap(self):
         in_list = ['pendingCreate', 'pendingDelete', 'pendingRenew', 'pendingRestore', 'pendingTransfer']
         out_set = ['pending create', 'pending delete', 'pending renew', 'pending transfer']
-        self.assertItemsEqual(rdap_utils.rdap_status_mapping(in_list), out_set)
+        six.assertCountEqual(self, rdap_utils.rdap_status_mapping(in_list), out_set)
 
     def test_combination_same_mapped_value_just_once(self):
         in_list = ['validatedContact', 'contactPassedManualVerification', 'deleteCandidate']
         out_set = ['validated', 'pending delete']
-        self.assertItemsEqual(rdap_utils.rdap_status_mapping(in_list), out_set)
+        six.assertCountEqual(self, rdap_utils.rdap_status_mapping(in_list), out_set)
 
 
 class TestInputFqdnProcessing(SimpleTestCase):
 
     def test_ok_a_input(self):
-        self.assertEqual(rdap_utils.preprocess_fqdn('skvirukl.example'), 'skvirukl.example')
-        self.assertEqual(rdap_utils.preprocess_fqdn('skvirukl.example'), 'skvirukl.example')
+        self.assertEqual(rdap_utils.preprocess_fqdn('skvirukl.example'), 'skvirukl.example'.encode())
+        self.assertEqual(rdap_utils.preprocess_fqdn('skvirukl.example'), 'skvirukl.example'.encode())
 
     def test_ok_idn_input(self):
-        self.assertEqual(rdap_utils.preprocess_fqdn('skvírůkl.example'), 'xn--skvrkl-5va55h.example')
-        self.assertEqual(rdap_utils.preprocess_fqdn('xn--skvrkl-5va55h.example'), 'xn--skvrkl-5va55h.example')
+        self.assertEqual(rdap_utils.preprocess_fqdn('skvírůkl.example'), 'xn--skvrkl-5va55h.example'.encode())
+        self.assertEqual(rdap_utils.preprocess_fqdn('xn--skvrkl-5va55h.example'), 'xn--skvrkl-5va55h.example'.encode())
 
     def test_bad_idn_input(self):
         self.assertRaises(rdap_utils.InvalidIdn, rdap_utils.preprocess_fqdn, 'xn--skvrkl-ňúríkl.example')
