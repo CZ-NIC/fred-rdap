@@ -96,13 +96,27 @@ class TestDomainToDict(SimpleTestCase):
         self.assertEqual(result['fred_keyset']['links'][0]['value'], 'http://rdap.example.cz/fred_keyset/gazpacho')
 
 
-@override_settings(RDAP_ROOT_URL='http://rdap.example.cz/')
+@override_settings(RDAP_ROOT_URL='http://rdap.example.cz/', UNIX_WHOIS_HOST='whois.example.cz')
 class TestDeleteCandidateDomainToDict(SimpleTestCase):
     """Test `rdap.rdap_rest.domain.delete_candidate_domain_to_dict` function."""
 
     def test_simple(self):
-        result = delete_candidate_domain_to_dict(get_domain())
-        self.assertEqual(result['links'][0]['value'], 'http://rdap.example.cz/domain/example.cz')
+        result = delete_candidate_domain_to_dict('example.cz')
+        data = {'objectClassName': 'domain',
+                'rdapConformance': ['rdap_level_0', 'fred_version_0'],
+                'handle': 'example.cz',
+                'ldhName': 'example.cz',
+                'links': [
+                    {
+                        'value': 'http://rdap.example.cz/domain/example.cz',
+                        'rel': 'self',
+                        'href': 'http://rdap.example.cz/domain/example.cz',
+                        'type': 'application/rdap+json',
+                    },
+                ],
+                'port43': 'whois.example.cz',
+                'status': ['pending delete']}
+        self.assertEqual(result, data)
 
 
 @override_settings(RDAP_ROOT_URL='http://rdap.example.cz/')
