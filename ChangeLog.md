@@ -1,3 +1,8 @@
+2018-04-17 (0.12.0)
+
+ * Drop support for old IDL structures
+ * Use tox for testing
+
 2018-03-08 (0.11.0)
 
  * Prepare for Python 3 - clean up code and use ``unicode_literals``.
