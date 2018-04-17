@@ -1,3 +1,7 @@
+2018-04-17 (0.11.1)
+
+ * Fix response for domains in delete candidate status.
+
 2018-03-08 (0.11.0)
 
  * Prepare for Python 3 - clean up code and use ``unicode_literals``.
