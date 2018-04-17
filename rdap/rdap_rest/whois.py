@@ -9,7 +9,7 @@ from fred_idl.Registry.Whois import INVALID_HANDLE, INVALID_LABEL, OBJECT_DELETE
 from rdap.exceptions import InvalidHandleError, NotFoundError
 from rdap.utils.corba import WHOIS
 
-from .domain import domain_to_dict
+from .domain import delete_candidate_domain_to_dict, domain_to_dict
 from .entity import contact_to_dict
 from .keyset import keyset_to_dict
 from .nameserver import nameserver_to_dict
@@ -30,7 +30,9 @@ def get_domain_by_handle(handle):
     logging.debug('get_domain_by_handle: %s', handle)
     try:
         return domain_to_dict(WHOIS.get_domain_by_handle(handle))
-    except (OBJECT_DELETE_CANDIDATE, OBJECT_NOT_FOUND, TOO_MANY_LABELS, UNMANAGED_ZONE):
+    except OBJECT_DELETE_CANDIDATE:
+        return delete_candidate_domain_to_dict(handle)
+    except (OBJECT_NOT_FOUND, TOO_MANY_LABELS, UNMANAGED_ZONE):
         raise NotFoundError()
     except INVALID_LABEL:
         raise InvalidHandleError()

@@ -20,10 +20,6 @@ def domain_to_dict(struct):
     if struct is None:
         result = None
     else:
-        if nonempty(struct.statuses):
-            if "deleteCandidate" in struct.statuses:
-                return delete_candidate_domain_to_dict(struct)
-
         if struct.expire_time_actual:
             expiration_datetime = struct.expire_time_actual
         else:
@@ -216,35 +212,27 @@ def domain_to_dict(struct):
     return result
 
 
-def delete_candidate_domain_to_dict(struct):
-    """Transform CORBA domain struct containing deleteCandidate data to python dictionary."""
-    logging.debug(struct)
+def delete_candidate_domain_to_dict(handle):
+    """Return python dictionary with RDAP data for domain with `deleteCandidate` status."""
+    self_link = urljoin(settings.RDAP_ROOT_URL, reverse('domain-detail', kwargs={"handle": handle}))
 
-    if struct is None:
-        result = None
-    else:
-        self_link = urljoin(settings.RDAP_ROOT_URL, reverse('domain-detail', kwargs={"handle": struct.handle}))
-
-        result = {
-            "objectClassName": ObjectClassName.DOMAIN,
-            "rdapConformance": ["rdap_level_0", "fred_version_0"],
-            "handle": struct.handle,
-            "ldhName": struct.handle,
-            "links": [
-                {
-                    "value": self_link,
-                    "rel": "self",
-                    "href": self_link,
-                    "type": "application/rdap+json",
-                },
-            ],
-            "port43": settings.UNIX_WHOIS_HOST
-        }
-
-        add_unicode_name(result, struct.handle)
-
-        if struct.statuses:
-            result["status"] = ["pending delete"]
+    result = {
+        "objectClassName": ObjectClassName.DOMAIN,
+        "rdapConformance": ["rdap_level_0", "fred_version_0"],
+        "handle": handle,
+        "ldhName": handle,
+        "links": [
+            {
+                "value": self_link,
+                "rel": "self",
+                "href": self_link,
+                "type": "application/rdap+json",
+            },
+        ],
+        "port43": settings.UNIX_WHOIS_HOST,
+        'status': ["pending delete"],
+    }
+    add_unicode_name(result, handle)
 
     logging.debug(result)
     return result
