@@ -2,10 +2,10 @@
 from __future__ import unicode_literals
 
 import logging
-from urlparse import urljoin
 
 from django.conf import settings
 from django.urls import reverse
+from six.moves.urllib.parse import urljoin
 
 from .rdap_utils import ObjectClassName, disclosable_nonempty, nonempty, rdap_status_mapping, to_rfc3339
 
