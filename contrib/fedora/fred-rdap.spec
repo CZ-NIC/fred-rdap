@@ -56,9 +56,9 @@ export rdap_log_file=/var/log/fred-rdap.log
 semanage fcontext -a -t httpd_log_t $rdap_log_file
 restorecon $rdap_log_file
 
-export rdap_socket_dir=/var/run/rdap/
+export rdap_socket_dir=/var/run/rdap
 [[ -f $rdap_socket_dir ]] || install -o uwsgi -g uwsgi -d $rdap_socket_dir
-semanage fcontext -a -t httpd_sys_rw_content_t $rdap_socket_dir
+semanage fcontext -a -t httpd_sys_rw_content_t "$rdap_socket_dir(/.*)?"
 restorecon -R $rdap_socket_dir
 
 # This is necessary because sometimes SIGPIPE is being blocked when the scriptlet
@@ -87,7 +87,7 @@ exit 0
 if [[ $1 -eq 0 ]]
 then
     semanage fcontext -d -t httpd_log_t /var/log/fred-rdap.log
-    semanage fcontext -d -t httpd_sys_rw_content_t /var/run/rdap/
+    semanage fcontext -d -t httpd_sys_rw_content_t "/var/run/rdap(/.*)?"
 fi
 exit 0
 
