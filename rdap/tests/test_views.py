@@ -187,9 +187,10 @@ class TestHelpView(SimpleTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/rdap+json')
+        help_text = 'The API reference can be found at https://fred.nic.cz/documentation/html/RDAPReference.'
         data = {
             "rdapConformance": ["rdap_level_0", "fred_version_0"],
-            "notices": [{"title": "Help", "description": ["No help."]}],
+            "notices": [{"title": "Help", "description": [help_text]}],
         }
         self.assertJSONEqual(response.content.decode(), data)
 

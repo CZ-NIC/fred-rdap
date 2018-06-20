@@ -78,7 +78,12 @@ class FqdnObjectView(ObjectView):
 
 
 class HelpView(View):
-    """Help view for RDAP protocol."""
+    """Help view for RDAP protocol.
+
+    @cvar help_text: The text to be displayed as a help.
+    """
+
+    help_text = 'The API reference can be found at https://fred.nic.cz/documentation/html/RDAPReference.'
 
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
@@ -87,7 +92,7 @@ class HelpView(View):
     def get(self, request, *args, **kwargs):
         data = {
             'rdapConformance': RDAP_CONFORMANCE,
-            'notices': [{'title': 'Help', 'description': ['No help.']}],
+            'notices': [{'title': 'Help', 'description': [self.help_text]}],
         }
         response = JsonResponse(data, content_type=RDAP_CONTENT_TYPE)
         return response
