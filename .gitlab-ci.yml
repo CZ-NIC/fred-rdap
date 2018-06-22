@@ -8,7 +8,7 @@ variables:
         - python
 
 .python2-xenial: &python2-xenial
-    image: cznic/ubuntu_xenial_python2:latest
+    image: $CI_REGISTRY/ginger/base/ubuntu_xenial_python2:latest
 
 .install-dependencies: &install-dependencies
     before_script:
