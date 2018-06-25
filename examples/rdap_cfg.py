@@ -21,7 +21,7 @@ ALLOWED_HOSTS = ['*']
 TIME_ZONE = 'UTC'
 USE_TZ = True
 
-INSTALLED_APPS = ()
+INSTALLED_APPS = ('rdap.apps.RdapAppConfig', )
 
 MIDDLEWARE = (
     'django.middleware.common.CommonMiddleware',
@@ -51,9 +51,9 @@ LOGGING = {
 
 # #### CORBA configuration
 # Naming service address (host[:port])
-CORBA_NS_HOST_PORT = ''
+# RDAP_CORBA_NETLOC = 'localhost'
 # Naming service context
-CORBA_NS_CONTEXT = 'fred'
+# RDAP_CORBA_CONTEXT = 'fred'
 
 # #### WHOIS URLs configuration
 # Base of URLs

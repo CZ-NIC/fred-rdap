@@ -7,7 +7,6 @@ RELEASE-VERSION
 *.pyc
 *.bak
 *~
-rdap/settings.py
 install.log
 /.coverage*
 /.tox

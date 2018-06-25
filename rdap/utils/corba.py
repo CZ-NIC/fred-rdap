@@ -10,7 +10,10 @@ from fred_idl.Registry import IsoDate, IsoDateTime, Whois
 from pyfco import CorbaClient, CorbaClientProxy, CorbaNameServiceClient, CorbaRecoder
 from pyfco.recoder import decode_iso_date, decode_iso_datetime
 
-_CORBA = CorbaNameServiceClient(host_port=settings.CORBA_NS_HOST_PORT, context_name=settings.CORBA_NS_CONTEXT)
+from rdap.settings import RDAP_SETTINGS
+
+_CORBA = CorbaNameServiceClient(host_port=RDAP_SETTINGS.CORBA_NETLOC,
+                                context_name=RDAP_SETTINGS.CORBA_CONTEXT)
 _WHOIS = SimpleLazyObject(lambda: _CORBA.get_object('Whois2', Whois.WhoisIntf))
 _LOGGER = SimpleLazyObject(lambda: _CORBA.get_object('Logger', Logger))
 
