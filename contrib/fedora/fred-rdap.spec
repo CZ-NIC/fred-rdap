@@ -16,9 +16,10 @@ BuildArch: noarch
 Vendor: CZ.NIC <fred@nic.cz>
 Url: https://fred.nic.cz/
 BuildRequires: python-setuptools
-Requires: python python2-django >= 1.10 python-idna fred-idl fred-pyfco uwsgi-plugin-python httpd mod_proxy_uwsgi
+Requires: python python2-django >= 1.10 python-idna fred-idl fred-pyfco uwsgi-plugin-python httpd
 %if 0%{?centos}
 BuildRequires: policycoreutils-python
+Requires: mod_proxy_uwsgi
 %else
 BuildRequires: policycoreutils-python-utils
 %endif
