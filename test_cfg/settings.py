@@ -1,11 +1,7 @@
-import os
-
-INSTALLED_APPS = ()
+INSTALLED_APPS = ('rdap.apps.RdapAppConfig', )
 ROOT_URLCONF = 'rdap.urls'
 SECRET_KEY = 'SECRET'
 
-CORBA_NS_HOST_PORT = 'localhost'
-CORBA_NS_CONTEXT = 'fred'
 RDAP_ROOT_URL = ''
 DNS_MAX_SIG_LIFE = 1209600
 DISCLAIMER_FILE = ''

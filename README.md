@@ -13,7 +13,8 @@ and other domain registry objects, but provides results in a machine-readable fo
 - Other dependencies are listed in [requirements.txt](requirements.txt)
 
 ## Installation ##
-1. Link `rdap` URLs into your `urls.py`
+1. Add `rdap.apps.RdapAppConfig` to your `INSTALLED_APPS`.
+2. Link `rdap` URLs into your `urls.py`
 
         urlpatterns += [
            url(r'', include('rdap.urls')),
@@ -23,5 +24,19 @@ and other domain registry objects, but provides results in a machine-readable fo
 
         ROOT_URLCONF = 'rdap.urls'
 
-2. According to [RDAP specification](https://tools.ietf.org/html/rfc7480#section-5.6) it is recommended to set the `Access-Control-Allow-Origin` header.
+3. According to [RDAP specification](https://tools.ietf.org/html/rfc7480#section-5.6) it is recommended to set the `Access-Control-Allow-Origin` header.
    It may be added by HTTP server or [django-cors-headers](https://github.com/ottoyiu/django-cors-headers) application.
+
+## Settings ##
+RDAP can be configured with a following settings.
+
+### `RDAP_CORBA_NETLOC` ###
+
+Network location, i.e. host and port, of the CORBA server.
+Used to construct Interoperable Object Reference (IOR).
+Default value is ``localhost``.
+
+### `RDAP_CORBA_CONTEXT` ###
+
+The name of the RDAP CORBA context.
+Default value is ``fred``.

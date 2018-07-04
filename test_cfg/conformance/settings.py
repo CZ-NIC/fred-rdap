@@ -14,14 +14,12 @@ class CorsMiddleware(object):
 
 DEBUG = False
 ALLOWED_HOSTS = ['*']
-INSTALLED_APPS = ()
+INSTALLED_APPS = ('rdap.apps.RdapAppConfig', )
 MIDDLEWARE = ['settings.CorsMiddleware',
               'django.middleware.common.CommonMiddleware']
 ROOT_URLCONF = 'rdap.urls'
 SECRET_KEY = 'SECRET'
 
-CORBA_NS_HOST_PORT = 'localhost'
-CORBA_NS_CONTEXT = 'fred'
 RDAP_ROOT_URL = 'http://localhost:8000'
 DNS_MAX_SIG_LIFE = 1209600
 DISCLAIMER_FILE = ''
