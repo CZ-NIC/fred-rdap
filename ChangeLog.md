@@ -1,3 +1,11 @@
+2018-07-20 (0.13.0)
+
+ * Add Python 3 and Django 2.0 support.
+ * Use ``appsettings`` for Corba settings.
+ * Update help responses.
+ * Fix Fedora builds.
+ * Remove manage.py file.
+
 2018-04-17 (0.12.0)
 
  * Drop support for old IDL structures
