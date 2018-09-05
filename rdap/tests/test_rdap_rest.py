@@ -54,7 +54,7 @@ def get_keyset(tech_contact_handles=None):
         created=datetime(1980, 1, 3, 10, 9, 34), changed=None, last_transfer=None, statuses=[])
 
 
-@override_settings(RDAP_ROOT_URL='http://rdap.example.cz/')
+@override_settings(RDAP_ROOT_URL='http://rdap.example.cz/', RDAP_UNIX_WHOIS=None)
 class TestDomainToDict(SimpleTestCase):
     """Test `rdap.rdap_rest.domain.domain_to_dict` function."""
 
@@ -62,6 +62,7 @@ class TestDomainToDict(SimpleTestCase):
         result = domain_to_dict(get_domain())
         self.assertEqual(result['links'][0]['value'], 'http://rdap.example.cz/domain/example.cz')
         self.assertEqual(result['entities'][0]['links'][0]['value'], 'http://rdap.example.cz/entity/KRYTEN')
+        self.assertNotIn('port43', result)
 
     def test_admin_contacts(self):
         result = domain_to_dict(get_domain(admin_contact_handles=['HOLLY']))
@@ -95,8 +96,13 @@ class TestDomainToDict(SimpleTestCase):
 
         self.assertEqual(result['fred_keyset']['links'][0]['value'], 'http://rdap.example.cz/fred_keyset/gazpacho')
 
+    def test_port43(self):
+        with override_settings(RDAP_UNIX_WHOIS='whois.example.com'):
+            result = domain_to_dict(get_domain())
+        self.assertEqual(result['port43'], 'whois.example.com')
 
-@override_settings(RDAP_ROOT_URL='http://rdap.example.cz/', UNIX_WHOIS_HOST='whois.example.cz')
+
+@override_settings(RDAP_ROOT_URL='http://rdap.example.cz/', RDAP_UNIX_WHOIS=None)
 class TestDeleteCandidateDomainToDict(SimpleTestCase):
     """Test `rdap.rdap_rest.domain.delete_candidate_domain_to_dict` function."""
 
@@ -114,33 +120,49 @@ class TestDeleteCandidateDomainToDict(SimpleTestCase):
                         'type': 'application/rdap+json',
                     },
                 ],
-                'port43': 'whois.example.cz',
                 'status': ['pending delete']}
         self.assertEqual(result, data)
 
+    def test_port43(self):
+        with override_settings(RDAP_UNIX_WHOIS='whois.example.com'):
+            result = delete_candidate_domain_to_dict('example.cz')
+        self.assertEqual(result['port43'], 'whois.example.com')
 
-@override_settings(RDAP_ROOT_URL='http://rdap.example.cz/')
+
+@override_settings(RDAP_ROOT_URL='http://rdap.example.cz/', RDAP_UNIX_WHOIS=None)
 class TestContactToDict(SimpleTestCase):
     """Test `rdap.rdap_rest.domain.contact_to_dict` function."""
 
     def test_simple(self):
         result = contact_to_dict(get_contact())
         self.assertEqual(result['links'][0]['value'], 'http://rdap.example.cz/entity/KRYTEN')
+        self.assertNotIn('port43', result)
+
+    def test_port43(self):
+        with override_settings(RDAP_UNIX_WHOIS='whois.example.com'):
+            result = contact_to_dict(get_contact())
+        self.assertEqual(result['port43'], 'whois.example.com')
 
 
-@override_settings(RDAP_ROOT_URL='http://rdap.example.cz/')
+@override_settings(RDAP_ROOT_URL='http://rdap.example.cz/', RDAP_UNIX_WHOIS=None)
 class TestKeysetToDict(SimpleTestCase):
     """Test `rdap.rdap_rest.domain.keyset_to_dict` function."""
 
     def test_simple(self):
         result = keyset_to_dict(get_keyset())
         self.assertEqual(result['links'][0]['value'], 'http://rdap.example.cz/fred_keyset/gazpacho')
+        self.assertNotIn('port43', result)
 
     def test_tech_contacts(self):
         result = keyset_to_dict(get_keyset(tech_contact_handles=['KOCHANSKI']))
         tech = result['entities'][1]
         self.assertEqual(tech['roles'], ['technical'])
         self.assertEqual(tech['links'][0]['value'], 'http://rdap.example.cz/entity/KOCHANSKI')
+
+    def test_port43(self):
+        with override_settings(RDAP_UNIX_WHOIS='whois.example.com'):
+            result = keyset_to_dict(get_keyset())
+        self.assertEqual(result['port43'], 'whois.example.com')
 
 
 @override_settings(RDAP_ROOT_URL='http://rdap.example.cz/')
@@ -153,13 +175,14 @@ class TestNameserverToDict(SimpleTestCase):
         self.assertEqual(result['links'][0]['value'], 'http://rdap.example.cz/nameserver/nameserver.example.cz')
 
 
-@override_settings(RDAP_ROOT_URL='http://rdap.example.cz/')
+@override_settings(RDAP_ROOT_URL='http://rdap.example.cz/', RDAP_UNIX_WHOIS=None)
 class TestNssetToDict(SimpleTestCase):
     """Test `rdap.rdap_rest.domain.nsset_to_dict` function."""
 
     def test_simple(self):
         result = nsset_to_dict(get_nsset())
         self.assertEqual(result['links'][0]['value'], 'http://rdap.example.cz/fred_nsset/new-saturn')
+        self.assertNotIn('port43', result)
 
     def test_tech_contacts(self):
         result = nsset_to_dict(get_nsset(tech_contact_handles=['KOCHANSKI']))
@@ -172,3 +195,8 @@ class TestNssetToDict(SimpleTestCase):
         result = nsset_to_dict(get_nsset(nservers=nservers))
         self.assertEqual(result['nameservers'][0]['links'][0]['value'],
                          'http://rdap.example.cz/nameserver/nameserver.example.cz')
+
+    def test_port43(self):
+        with override_settings(RDAP_UNIX_WHOIS='whois.example.com'):
+            result = nsset_to_dict(get_nsset())
+        self.assertEqual(result['port43'], 'whois.example.com')

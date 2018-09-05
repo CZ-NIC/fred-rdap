@@ -7,6 +7,8 @@ from django.conf import settings
 from django.urls import reverse
 from six.moves.urllib.parse import urljoin
 
+from rdap.settings import RDAP_SETTINGS
+
 from .rdap_utils import ObjectClassName, nonempty, rdap_status_mapping, to_rfc3339
 
 
@@ -30,7 +32,6 @@ def keyset_to_dict(struct):
                     "roles": ["registrar"],
                 },
             ],
-            "port43": settings.UNIX_WHOIS_HOST,
             "events": [
                 {
                     "eventAction": "registration",
@@ -46,6 +47,8 @@ def keyset_to_dict(struct):
                 },
             ]
         }
+        if RDAP_SETTINGS.UNIX_WHOIS:
+            result['port43'] = RDAP_SETTINGS.UNIX_WHOIS
 
         status = rdap_status_mapping(struct.statuses)
         if status:

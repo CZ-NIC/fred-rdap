@@ -7,6 +7,8 @@ from django.conf import settings
 from django.urls import reverse
 from six.moves.urllib.parse import urljoin
 
+from rdap.settings import RDAP_SETTINGS
+
 from .rdap_utils import ObjectClassName, disclosable_nonempty, nonempty, rdap_status_mapping, to_rfc3339
 
 
@@ -38,7 +40,6 @@ def contact_to_dict(struct):
                         "roles": ["registrar"],
                     },
                 ],
-                "port43": settings.UNIX_WHOIS_HOST,
                 "remarks": [
                     {"description": ["Omitting data because contact is not linked to any registry object."]}
                 ],
@@ -95,7 +96,6 @@ def contact_to_dict(struct):
                         "type": "application/rdap+json",
                     },
                 ],
-                "port43": settings.UNIX_WHOIS_HOST,
                 "events": [
                     {
                         "eventAction": "registration",
@@ -124,6 +124,8 @@ def contact_to_dict(struct):
                     "eventAction": 'transfer',
                     "eventDate": to_rfc3339(struct.last_transfer),
                 })
+        if RDAP_SETTINGS.UNIX_WHOIS:
+            result['port43'] = RDAP_SETTINGS.UNIX_WHOIS
 
     logging.debug(result)
     return result

@@ -9,6 +9,7 @@ class RdapAppSettings(AppSettings):
 
     CORBA_NETLOC = StringSetting(default='localhost')
     CORBA_CONTEXT = StringSetting(default='fred')
+    UNIX_WHOIS = StringSetting(default=None)
 
     class Meta:
         setting_prefix = 'RDAP_'

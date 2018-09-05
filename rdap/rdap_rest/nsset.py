@@ -8,6 +8,8 @@ from django.urls import reverse
 from fred_idl.Registry.Whois import IPv4, IPv6
 from six.moves.urllib.parse import urljoin
 
+from rdap.settings import RDAP_SETTINGS
+
 from .rdap_utils import ObjectClassName, add_unicode_name, nonempty, rdap_status_mapping, to_rfc3339
 
 
@@ -31,7 +33,6 @@ def nsset_to_dict(struct):
                     "roles": ["registrar"],
                 }
             ],
-            "port43": settings.UNIX_WHOIS_HOST,
             "events": [
                 {
                     "eventAction": "registration",
@@ -48,6 +49,8 @@ def nsset_to_dict(struct):
             ],
             "nameservers": [],
         }
+        if RDAP_SETTINGS.UNIX_WHOIS:
+            result['port43'] = RDAP_SETTINGS.UNIX_WHOIS
 
         status = rdap_status_mapping(struct.statuses)
         if status:

@@ -59,7 +59,7 @@ LOGGING = {
 # Base of URLs
 RDAP_ROOT_URL = ''
 # Unix Whois server address
-UNIX_WHOIS_HOST = ''
+# RDAP_UNIX_WHOIS = None
 
 # Maximum signature lifetime (seconds) used in secureDNS
 DNS_MAX_SIG_LIFE = 1209600

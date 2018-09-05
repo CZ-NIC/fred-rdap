@@ -40,3 +40,8 @@ Default value is ``localhost``.
 
 The name of the RDAP CORBA context.
 Default value is ``fred``.
+
+### `RDAP_UNIX_WHOIS` ###
+
+The host name or IP address of the WHOIS server as defined by [Port 43 WHOIS Server](https://tools.ietf.org/html/rfc7483#section-4.7).
+Default value is ``None``, i.e. disabled.
