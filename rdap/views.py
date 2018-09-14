@@ -1,7 +1,6 @@
 """RDAP views."""
 from __future__ import unicode_literals
 
-from django.conf import settings
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, JsonResponse
 from django.utils.functional import SimpleLazyObject
 from django.views.decorators.csrf import csrf_exempt
@@ -10,7 +9,8 @@ from fred_idl import ccReg
 from pylogger.corbalogger import Logger
 
 from rdap.exceptions import InvalidHandleError, NotFoundError
-from rdap.rdap_rest.rdap_utils import InvalidIdn, get_disclaimer_text, preprocess_fqdn
+from rdap.rdap_rest.rdap_utils import InvalidIdn, preprocess_fqdn
+from rdap.settings import RDAP_SETTINGS
 from rdap.utils.corba import LOGGER as LOGGER_OBJECT
 
 RDAP_CONTENT_TYPE = 'application/rdap+json'
@@ -45,9 +45,9 @@ class ObjectView(View):
         try:
             data = self.getter(handle)
 
-            if settings.DISCLAIMER_FILE:
+            if RDAP_SETTINGS.DISCLAIMER:
                 notices = data.setdefault('notices', [])
-                notices.append({'title': 'Disclaimer', 'description': [get_disclaimer_text()]})
+                notices.append({'title': 'Disclaimer', 'description': RDAP_SETTINGS.DISCLAIMER})
 
             log_request.result = LOGGER_SUCCESS
             response = JsonResponse(data, content_type=RDAP_CONTENT_TYPE)

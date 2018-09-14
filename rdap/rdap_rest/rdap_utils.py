@@ -95,17 +95,6 @@ def rdap_status_mapping(status_list):
     return list(ret)
 
 
-def get_disclaimer_text():
-    if get_disclaimer_text.text is None:
-        with open(settings.DISCLAIMER_FILE, 'r') as file:
-            get_disclaimer_text.text = file.read()
-
-    return get_disclaimer_text.text
-
-
-get_disclaimer_text.text = None
-
-
 class ObjectClassName(object):
     DOMAIN = 'domain'
     ENTITY = 'entity'

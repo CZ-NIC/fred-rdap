@@ -63,5 +63,5 @@ RDAP_ROOT_URL = ''
 
 # Maximum signature lifetime (seconds) used in secureDNS
 DNS_MAX_SIG_LIFE = 1209600
-# File path of the disclaimer notice that is included in each response
-DISCLAIMER_FILE = ''
+# The disclaimer notice that is included in each response
+# RDAP_DISCLAIMER = None
