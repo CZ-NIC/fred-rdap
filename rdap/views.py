@@ -83,7 +83,7 @@ class HelpView(View):
     @cvar help_text: The text to be displayed as a help.
     """
 
-    help_text = 'The API reference can be found at https://fred.nic.cz/documentation/html/RDAPReference.'
+    help_text = 'See the API reference: https://fred.nic.cz/documentation/html/RDAPReference'
 
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
