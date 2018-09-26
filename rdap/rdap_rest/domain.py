@@ -8,6 +8,7 @@ from django.urls import reverse
 from fred_idl.Registry.Whois import IPv4, IPv6
 from six.moves.urllib.parse import urljoin
 
+from rdap.settings import RDAP_SETTINGS
 from rdap.utils.corba import WHOIS
 
 from .rdap_utils import ObjectClassName, add_unicode_name, nonempty, rdap_status_mapping, to_rfc3339
@@ -42,7 +43,6 @@ def domain_to_dict(struct):
                     "type": "application/rdap+json",
                 },
             ],
-            "port43": settings.UNIX_WHOIS_HOST,
             "events": [
                 {
                     "eventAction": "registration",
@@ -74,6 +74,8 @@ def domain_to_dict(struct):
                 },
             ]
         }
+        if RDAP_SETTINGS.UNIX_WHOIS:
+            result['port43'] = RDAP_SETTINGS.UNIX_WHOIS
 
         add_unicode_name(result, struct.handle)
 
@@ -229,9 +231,10 @@ def delete_candidate_domain_to_dict(handle):
                 "type": "application/rdap+json",
             },
         ],
-        "port43": settings.UNIX_WHOIS_HOST,
         'status': ["pending delete"],
     }
+    if RDAP_SETTINGS.UNIX_WHOIS:
+        result['port43'] = RDAP_SETTINGS.UNIX_WHOIS
     add_unicode_name(result, handle)
 
     logging.debug(result)

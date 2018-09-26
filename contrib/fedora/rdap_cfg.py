@@ -56,8 +56,6 @@ LOGGING = {
 # #### WHOIS URLs configuration
 # Base of URLs
 RDAP_ROOT_URL = 'http://localhost/rdap/'
-# Unix Whois server address
-UNIX_WHOIS_HOST = ''
 
 # Maximum signature lifetime (seconds) used in secureDNS
 DNS_MAX_SIG_LIFE = 1209600
