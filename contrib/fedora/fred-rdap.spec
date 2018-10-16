@@ -14,12 +14,9 @@ BuildArch: noarch
 Vendor: CZ.NIC <fred@nic.cz>
 Url: https://fred.nic.cz/
 BuildRequires: python-setuptools
-Requires: python python2dist(django) >= 1.10 python-idna fred-idl fred-pyfco uwsgi-plugin-python2 httpd
+Requires: python python2dist(django) >= 1.10 python-idna fred-idl fred-pyfco uwsgi-plugin-python2 httpd /usr/sbin/semanage
 %if 0%{?centos}
-BuildRequires: policycoreutils-python
 Requires: mod_proxy_uwsgi
-%else
-BuildRequires: policycoreutils-python-utils
 %endif
 
 
@@ -52,13 +49,17 @@ then
 
 export rdap_log_file=/var/log/fred-rdap.log
 [[ -f $rdap_log_file ]] || install -o uwsgi -g uwsgi /dev/null $rdap_log_file
-semanage fcontext -a -t httpd_log_t $rdap_log_file
-restorecon $rdap_log_file
+/usr/sbin/sestatus | grep -q "SELinux status:.*disabled" || {
+  semanage fcontext -a -t httpd_log_t $rdap_log_file
+  restorecon $rdap_log_file
+}
 
 export rdap_socket_dir=/var/run/rdap
 [[ -f $rdap_socket_dir ]] || install -o uwsgi -g uwsgi -d $rdap_socket_dir
-semanage fcontext -a -t httpd_sys_rw_content_t "$rdap_socket_dir(/.*)?"
-restorecon -R $rdap_socket_dir
+/usr/sbin/sestatus | grep -q "SELinux status:.*disabled" || {
+  semanage fcontext -a -t httpd_sys_rw_content_t "$rdap_socket_dir(/.*)?"
+  restorecon -R $rdap_socket_dir
+}
 
 # This is necessary because sometimes SIGPIPE is being blocked when the scriptlet
 # executes and reading from /dev/urandom never ends even though the process on the
@@ -85,8 +86,10 @@ exit 0
 %postun
 if [[ $1 -eq 0 ]]
 then
+/usr/sbin/sestatus | grep -q "SELinux status:.*disabled" || {
     semanage fcontext -d -t httpd_log_t /var/log/fred-rdap.log
     semanage fcontext -d -t httpd_sys_rw_content_t "/var/run/rdap(/.*)?"
+}
 fi
 exit 0
 
