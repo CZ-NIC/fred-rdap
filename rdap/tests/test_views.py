@@ -160,7 +160,7 @@ class TestFqdnObjectView(SimpleTestCase):
 
         # Check logger
         calls = [call.create_request('127.0.0.1', 'RDAP', 'NameserverLookup',
-                                     properties=[('handle', 'holly'.encode())]),
+                                     properties=[('handle', 'holly')]),
                  call.create_request().close(properties=[])]
         self.assertEqual(self.logger_mock.mock_calls, calls)
         self.assertEqual(self.logger_mock.create_request.return_value.result, 'Ok')

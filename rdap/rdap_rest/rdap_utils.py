@@ -119,13 +119,19 @@ class InvalidIdn(Exception):
 
 
 def preprocess_fqdn(fqdn):
-    """Normalize fqdn input search string for backend call."""
+    """Normalize fqdn input search string for backend call.
+
+    @rtype: str
+    """
     try:
         fqdn = idna.encode(fqdn)
         idna.decode(fqdn)
     except UnicodeError:
         raise InvalidIdn()
-    return fqdn
+    if six.PY2:
+        return fqdn
+    else:
+        return fqdn.decode()
 
 
 def add_unicode_name(dst_dict, ldh_name):
