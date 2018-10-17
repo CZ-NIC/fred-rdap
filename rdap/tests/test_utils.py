@@ -92,12 +92,12 @@ class TestStatusMappingDefinition(SimpleTestCase):
 class TestInputFqdnProcessing(SimpleTestCase):
 
     def test_ok_a_input(self):
-        self.assertEqual(rdap_utils.preprocess_fqdn('skvirukl.example'), 'skvirukl.example'.encode())
-        self.assertEqual(rdap_utils.preprocess_fqdn('skvirukl.example'), 'skvirukl.example'.encode())
+        self.assertEqual(rdap_utils.preprocess_fqdn('skvirukl.example'), 'skvirukl.example')
+        self.assertEqual(rdap_utils.preprocess_fqdn('skvirukl.example'), 'skvirukl.example')
 
     def test_ok_idn_input(self):
-        self.assertEqual(rdap_utils.preprocess_fqdn('skvírůkl.example'), 'xn--skvrkl-5va55h.example'.encode())
-        self.assertEqual(rdap_utils.preprocess_fqdn('xn--skvrkl-5va55h.example'), 'xn--skvrkl-5va55h.example'.encode())
+        self.assertEqual(rdap_utils.preprocess_fqdn('skvírůkl.example'), 'xn--skvrkl-5va55h.example')
+        self.assertEqual(rdap_utils.preprocess_fqdn('xn--skvrkl-5va55h.example'), 'xn--skvrkl-5va55h.example')
 
     def test_bad_idn_input(self):
         self.assertRaises(rdap_utils.InvalidIdn, rdap_utils.preprocess_fqdn, 'xn--skvrkl-ňúríkl.example')
