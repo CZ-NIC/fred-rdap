@@ -2,6 +2,7 @@
 
  * Add Python 3 and Django 2.0 support.
  * Use ``appsettings`` for Corba settings.
+ * Rename ``UNIX_WHOIS_HOST`` setting to ``RDAP_UNIX_WHOIS``.
  * Update help responses.
  * Fix Fedora builds.
  * Remove manage.py file.
