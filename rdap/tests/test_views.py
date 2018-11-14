@@ -4,7 +4,6 @@ Tests of RDAP views.
 from __future__ import unicode_literals
 
 import json
-import os
 
 from django.test import Client, SimpleTestCase
 from fred_idl.Registry import IsoDateTime
@@ -79,7 +78,7 @@ class TestObjectView(SimpleTestCase):
 
     def test_disclaimer(self):
         WHOIS.get_contact_by_handle.return_value = self.get_contact()
-        with self.settings(DISCLAIMER_FILE=os.path.join(os.path.dirname(__file__), 'data', 'disclaimer.txt')):
+        with self.settings(RDAP_DISCLAIMER=['Quagaars!']):
             response = self.client.get('/entity/kryten')
 
         self.assertEqual(response.status_code, 200)
@@ -87,7 +86,7 @@ class TestObjectView(SimpleTestCase):
         result = json.loads(response.content.decode())
         self.assertEqual(result['objectClassName'], 'entity')
         self.assertEqual(result['handle'], 'kryten')
-        self.assertIn({'title': 'Disclaimer', 'description': ['Quagaars!\n']}, result['notices'])
+        self.assertIn({'title': 'Disclaimer', 'description': ['Quagaars!']}, result['notices'])
 
     def test_entity_not_found(self):
         WHOIS.get_contact_by_handle.side_effect = OBJECT_NOT_FOUND

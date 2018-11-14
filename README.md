@@ -41,6 +41,12 @@ Default value is ``localhost``.
 The name of the RDAP CORBA context.
 Default value is ``fred``.
 
+### `RDAP_DISCLAIMER` ###
+
+A disclaimer text to be attached to every response.
+Valid value is a list of strings, see [RDAP specification](https://tools.ietf.org/html/rfc7483#section-4.3) for details.
+Default value is ``None``, i.e. no disclaimer.
+
 ### `RDAP_UNIX_WHOIS` ###
 
 The host name or IP address of the WHOIS server as defined by [Port 43 WHOIS Server](https://tools.ietf.org/html/rfc7483#section-4.7).
