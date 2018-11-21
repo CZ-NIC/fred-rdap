@@ -72,8 +72,11 @@ conformance:
         # Start RDAP
         - PYTHONPATH="./test_cfg/conformance:$PYTHONPATH" DJANGO_SETTINGS_MODULE='settings' django-admin runserver localhost:8000 &
         # Prepare conformance tests
-        - git clone https://github.com/APNIC-net/rdap-conformance.git
-        - (cd rdap-conformance && git checkout v0.5)
+        # - git clone https://github.com/APNIC-net/rdap-conformance.git
+        # - (cd rdap-conformance && git checkout v0.5)
+        # Use fixed version of conformance, since upstream doesn't work in docker
+        - git clone https://github.com/ziima/rdap-conformance.git
+        - (cd rdap-conformance && git checkout freeze-surefire-version)
         - (cd rdap-conformance && mvn package --quiet)
     script:
         - java -jar rdap-conformance/target/rdap-conformance-0.5.jar test_cfg/conformance/rdap_conformance.json
