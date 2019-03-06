@@ -6,7 +6,7 @@ Name: fred-rdap
 Version: %{our_version}
 Release: %{?our_release}%{!?our_release:1}%{?dist}
 Source0: %{name}-%{version}.tar.gz
-License: GNU GPL
+License: GPLv3+
 Group: Development/Libraries
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Prefix: %{_prefix}
