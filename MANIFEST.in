@@ -1,4 +1,6 @@
 include *.md
+include LICENSE
+include COPYING
 include dependency_links.txt
 include requirements.txt
 include constraints.txt
