@@ -1,3 +1,10 @@
+2019-03-20 (0.14.0)
+
+ * License GNU GPLv3+
+ * Disclaimer setting reworked
+ * Test fixes
+ * CI fixes
+
 2018-07-20 (0.13.0)
 
  * Add Python 3 and Django 2.0 support.
