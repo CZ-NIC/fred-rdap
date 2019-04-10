@@ -39,6 +39,8 @@ mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/fred/
 install contrib/fedora/rdap_cfg.py $RPM_BUILD_ROOT/%{_sysconfdir}/fred/
 
 install -d $RPM_BUILD_ROOT/var/run/rdap/
+mkdir -p $RPM_BUILD_ROOT/%{_prefix}/lib/tmpfiles.d/
+echo "d /var/run/rdap/ 755 uwsgi uwsgi" > $RPM_BUILD_ROOT/%{_prefix}/lib/tmpfiles.d/rdap.conf
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -99,3 +101,4 @@ exit 0
 %config %{_sysconfdir}/fred/rdap_cfg.py
 %config %attr(-,uwsgi,uwsgi) %{_sysconfdir}/uwsgi.d/rdap.ini
 %ghost %attr(-,uwsgi,uwsgi) /var/run/rdap/
+%{_prefix}/lib/tmpfiles.d/rdap.conf
