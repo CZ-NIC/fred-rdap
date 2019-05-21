@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2014-2018  CZ.NIC, z. s. p. o.
+# Copyright (C) 2014-2019  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -34,5 +34,4 @@ setup(name='fred-rdap',
       include_package_data=True,
       install_requires=open('requirements.txt').read().splitlines(),
       extras_require={'testing': ['mock'],
-                      'quality': ['isort', 'flake8', 'pydocstyle']},
-      dependency_links=open('dependency_links.txt').read().splitlines())
+                      'quality': ['isort', 'flake8', 'pydocstyle']})
