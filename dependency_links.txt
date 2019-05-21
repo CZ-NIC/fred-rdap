@@ -1,2 +1,0 @@
-git+ssh://git@gitlab.office.nic.cz/fred/utils/pyfco.git#egg=fred-pyfco-0
-git+ssh://git@gitlab.office.nic.cz/fred/utils/pylogger.git#egg=fred-pylogger-0
