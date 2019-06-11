@@ -72,7 +72,8 @@ conformance:
         # Prepare RDAP dependencies
         - git clone git@gitlab.office.nic.cz:fred/idl.git
         - (cd idl && omniidl -bpython -Wbmodules=fred_idl -Wbstubs=fred_idl._stubs idl/*.idl)
-        - pip install --process-dependency-links .
+        - pip install --upgrade pip
+        - /usr/local/bin/pip install .
         # Start fake RDAP backend
         - omniNames -start &
         - python test_cfg/conformance/mock_fred.py &
