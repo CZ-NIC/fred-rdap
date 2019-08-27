@@ -1,8 +1,38 @@
+stages:
+    - image
+    - analysis
+    - test
+
 variables:
     IDL_DIR: "idl"
 
 ########################################################################################################################
+# Docker
+.image: &image
+    stage: image
+    before_script:
+        - docker info
+    script:
+        # Login to GitLab container registry https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#using-the-gitlab-container-registry
+        - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
+        # Build image using Docker caching, see https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#making-docker-in-docker-builds-faster-with-docker-layer-caching
+        - docker pull "$IMAGE_TAG" || true
+        - docker build --cache-from "$IMAGE_TAG" -t "$IMAGE_TAG" "docker/$IMAGE_NAME"
+        - docker push "$IMAGE_TAG"
+    tags:
+        - dind
+
+image:ubuntu:bionic:
+    <<: *image
+    variables:
+        IMAGE_NAME: ubuntu:bionic
+        IMAGE_TAG: $CI_REGISTRY_IMAGE/$IMAGE_NAME
+
+########################################################################################################################
 # Basic declarations
+.ubuntu-bionic: &ubuntu-bionic
+    image: "$CI_REGISTRY/$CI_PROJECT_PATH/ubuntu:bionic"
+
 .requires-python: &requires-python
     tags:
         - python
@@ -12,20 +42,18 @@ variables:
 
 .install-dependencies: &install-dependencies
     before_script:
-        # Install package dependencies
-        - apt-get update && apt-get install -y omniidl-python
-        # Get pr-version and update dependency_link and parse IDL requirementss
+        # Set up SSH key for access to gitlab repositories
+        - install -m 700 -d $HOME/.ssh
+        - install -m 600 $SRC_DIR/{id_rsa,id_rsa.pub,known_hosts} $HOME/.ssh/
+        # Get pr-version and update dependency_link and parse IDL requirements
         - git clone git@gitlab.office.nic.cz:pr-utils/pr-version.git --depth 1
-        - if [ -e pr-version/devel/$CI_BUILD_REF_NAME.conf ]; then IDL_BRANCH=$(python -c "import json;obj=json.loads(open('pr-version/devel/${CI_BUILD_REF_NAME}.conf').read());print obj.get('idl',{}).get('revision', 'master')"); fi
+        - if [ -e pr-version/devel/$CI_BUILD_REF_NAME.conf ]; then IDL_BRANCH=$(python3 -c "import json;obj=json.loads(open('pr-version/devel/${CI_BUILD_REF_NAME}.conf').read());print(obj.get('idl',{}).get('revision', 'master'))"); fi
         - git clone git@gitlab.office.nic.cz:fred/idl.git
         - (cd idl && git checkout $IDL_BRANCH && omniidl -bpython -Wbmodules=fred_idl -Wbstubs=fred_idl._stubs idl/*.idl)
-        - pip install tox
-        - pip install git+https://gitlab.office.nic.cz/tomas.pazderka/tox-version-plugin.git
-        - pip install tox_DEBIAN
+    variables:
+        SRC_DIR: /usr/local/env
 
 .test: &test
-    <<: *requires-python
-    <<: *python2-xenial
     <<: *install-dependencies
     script:
         - tox
@@ -33,29 +61,33 @@ variables:
 ########################################################################################################################
 # Individual jobs
 licensing:
-    <<: *python2-xenial
-    before_script:
-        - git clone git@gitlab.office.nic.cz:internal-tools/license-check.git --single-branch --depth 1
+    <<: *ubuntu-bionic
+    <<: *install-dependencies
+    stage: analysis
     script:
+        - git clone git@gitlab.office.nic.cz:internal-tools/license-check.git --single-branch --depth 1
         - ./license-check/license-check.sh -v
 
 depcheck:
-    <<: *requires-python
-    <<: *python2-xenial
+    <<: *ubuntu-bionic
+    <<: *install-dependencies
+    stage: analysis
     only:
         - schedules
-    before_script:
-        # Install package with testing dependencies to verify versions
-        - pip install --process-dependency-links .[testing]
     script:
-        - check-constraints.py constraints.txt
+        - git clone https://gitlab.office.nic.cz/vzima/ci-tools.git --depth=1
+        # Install package with testing dependencies to verify versions
+        - pip3 install .[testing]
+        - python3 ./ci-tools/check-constraints.py constraints.txt
     allow_failure: true
 
-test:
+test:bionic:
     <<: *test
+    <<: *ubuntu-bionic
 
 test-thawed:
     <<: *test
+    <<: *ubuntu-bionic
     only:
         - schedules
     script:
