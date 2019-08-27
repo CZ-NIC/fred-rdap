@@ -34,6 +34,12 @@ image:ubuntu:bionic:
         IMAGE_NAME: ubuntu:bionic
         IMAGE_TAG: $CI_REGISTRY_IMAGE/$IMAGE_NAME
 
+image:ubuntu:conformance:
+    <<: *image
+    variables:
+        IMAGE_NAME: ubuntu:conformance
+        IMAGE_TAG: $CI_REGISTRY_IMAGE/$IMAGE_NAME
+
 ########################################################################################################################
 # Basic declarations
 .ubuntu-xenial: &ubuntu-xenial
@@ -42,12 +48,8 @@ image:ubuntu:bionic:
 .ubuntu-bionic: &ubuntu-bionic
     image: "$CI_REGISTRY/$CI_PROJECT_PATH/ubuntu:bionic"
 
-.requires-python: &requires-python
-    tags:
-        - python
-
-.python2-xenial: &python2-xenial
-    image: $CI_REGISTRY/ginger/base/ubuntu_xenial_python2:latest
+.ubuntu-conformance: &ubuntu-conformance
+    image: "$CI_REGISTRY/$CI_PROJECT_PATH/ubuntu:conformance"
 
 .install-dependencies: &install-dependencies
     before_script:
@@ -107,31 +109,19 @@ test-thawed:
         - tox -e py27-thaw,py35-thaw,py36-thaw,py37-thaw
 
 conformance:
-    <<: *requires-python
-    <<: *python2-xenial
-    only:
-        - schedules
-    before_script:
-        - apt-get update
-        - apt-get install --quiet=2 --yes maven openjdk-8-jdk omniidl-python omniorb-nameserver python-omniorb
-        # Prepare RDAP dependencies
-        - git clone git@gitlab.office.nic.cz:fred/idl.git
-        - (cd idl && omniidl -bpython -Wbmodules=fred_idl -Wbstubs=fred_idl._stubs idl/*.idl)
-        - pip install --upgrade pip
-        - /usr/local/bin/pip install .
+    <<: *install-dependencies
+    <<: *ubuntu-conformance
+    script:
+        # Install rdap
+        - pip install .
         # Start fake RDAP backend
         - omniNames -start &
-        - python test_cfg/conformance/mock_fred.py &
+        - PYTHONPATH="$IDL_DIR:$PYTHONPATH" python test_cfg/conformance/mock_fred.py &
         # Start RDAP
-        - PYTHONPATH="./test_cfg/conformance:$PYTHONPATH" DJANGO_SETTINGS_MODULE='settings' django-admin runserver localhost:8000 &
+        - PYTHONPATH="./test_cfg/conformance:$IDL_DIR:$PYTHONPATH" DJANGO_SETTINGS_MODULE='settings' django-admin runserver localhost:8000 &
         # Prepare conformance tests
-        # - git clone https://github.com/APNIC-net/rdap-conformance.git
-        # - (cd rdap-conformance && git checkout v0.5)
-        # Use fixed version of conformance, since upstream doesn't work in docker
-        - git clone https://github.com/ziima/rdap-conformance.git
-        - (cd rdap-conformance && git checkout freeze-surefire-version)
+        - git clone https://github.com/APNIC-net/rdap-conformance.git
+        - (cd rdap-conformance && git checkout v0.6)
         - (cd rdap-conformance && mvn package --quiet)
-    script:
-        - java -jar rdap-conformance/target/rdap-conformance-0.5.jar test_cfg/conformance/rdap_conformance.json
-    variables:
-        PYTHONPATH: "$IDL_DIR:$PYTHONPATH"
+        # Run the conformance test
+        - java -jar rdap-conformance/target/rdap-conformance-0.6.jar test_cfg/conformance/rdap_conformance.json
