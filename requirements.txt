@@ -1,5 +1,5 @@
 django >=1.10,<2.0;python_version=="2.7.*"
-django >=1.10,<2.0.99;python_version>="3.4"
+django >=1.10,<2.2.99;python_version>="3.4"
 django-app-settings
 idna
 fred-pylogger @ git+ssh://git@gitlab.office.nic.cz/fred/utils/pylogger.git
