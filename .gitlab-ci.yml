@@ -1,31 +1,70 @@
+stages:
+    - image
+    - analysis
+    - test
+
 variables:
     IDL_DIR: "idl"
 
 ########################################################################################################################
-# Basic declarations
-.requires-python: &requires-python
+# Docker
+.image: &image
+    stage: image
+    before_script:
+        - docker info
+    script:
+        # Login to GitLab container registry https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#using-the-gitlab-container-registry
+        - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
+        # Build image using Docker caching, see https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#making-docker-in-docker-builds-faster-with-docker-layer-caching
+        - docker pull "$IMAGE_TAG" || true
+        - docker build --cache-from "$IMAGE_TAG" -t "$IMAGE_TAG" "docker/$IMAGE_NAME"
+        - docker push "$IMAGE_TAG"
     tags:
-        - python
+        - dind
 
-.python2-xenial: &python2-xenial
-    image: $CI_REGISTRY/ginger/base/ubuntu_xenial_python2:latest
+image:ubuntu:xenial:
+    <<: *image
+    variables:
+        IMAGE_NAME: ubuntu:xenial
+        IMAGE_TAG: $CI_REGISTRY_IMAGE/$IMAGE_NAME
+
+image:ubuntu:bionic:
+    <<: *image
+    variables:
+        IMAGE_NAME: ubuntu:bionic
+        IMAGE_TAG: $CI_REGISTRY_IMAGE/$IMAGE_NAME
+
+image:ubuntu:conformance:
+    <<: *image
+    variables:
+        IMAGE_NAME: ubuntu:conformance
+        IMAGE_TAG: $CI_REGISTRY_IMAGE/$IMAGE_NAME
+
+########################################################################################################################
+# Basic declarations
+.ubuntu-xenial: &ubuntu-xenial
+    image: "$CI_REGISTRY/$CI_PROJECT_PATH/ubuntu:xenial"
+
+.ubuntu-bionic: &ubuntu-bionic
+    image: "$CI_REGISTRY/$CI_PROJECT_PATH/ubuntu:bionic"
+
+.ubuntu-conformance: &ubuntu-conformance
+    image: "$CI_REGISTRY/$CI_PROJECT_PATH/ubuntu:conformance"
 
 .install-dependencies: &install-dependencies
     before_script:
-        # Install package dependencies
-        - apt-get update && apt-get install -y omniidl-python
-        # Get pr-version and update dependency_link and parse IDL requirementss
+        # Set up SSH key for access to gitlab repositories
+        - install -m 700 -d $HOME/.ssh
+        - install -m 600 $SRC_DIR/{id_rsa,id_rsa.pub,known_hosts} $HOME/.ssh/
+        # Get pr-version and update dependency_link and parse IDL requirements
         - git clone git@gitlab.office.nic.cz:pr-utils/pr-version.git --depth 1
-        - if [ -e pr-version/devel/$CI_BUILD_REF_NAME.conf ]; then IDL_BRANCH=$(python -c "import json;obj=json.loads(open('pr-version/devel/${CI_BUILD_REF_NAME}.conf').read());print obj.get('idl',{}).get('revision', 'master')"); fi
+        - if [ -e pr-version/devel/$CI_BUILD_REF_NAME.conf ]; then IDL_BRANCH=$(python3 -c "import json;obj=json.loads(open('pr-version/devel/${CI_BUILD_REF_NAME}.conf').read());print(obj.get('idl',{}).get('revision', 'master'))"); fi
         - git clone git@gitlab.office.nic.cz:fred/idl.git
         - (cd idl && git checkout $IDL_BRANCH && omniidl -bpython -Wbmodules=fred_idl -Wbstubs=fred_idl._stubs idl/*.idl)
-        - pip install tox
-        - pip install git+https://gitlab.office.nic.cz/tomas.pazderka/tox-version-plugin.git
-        - pip install tox_DEBIAN
+    variables:
+        SRC_DIR: /usr/local/env
 
 .test: &test
-    <<: *requires-python
-    <<: *python2-xenial
     <<: *install-dependencies
     script:
         - tox
@@ -33,60 +72,56 @@ variables:
 ########################################################################################################################
 # Individual jobs
 licensing:
-    <<: *python2-xenial
-    before_script:
-        - git clone git@gitlab.office.nic.cz:internal-tools/license-check.git --single-branch --depth 1
+    <<: *ubuntu-bionic
+    <<: *install-dependencies
+    stage: analysis
     script:
+        - git clone git@gitlab.office.nic.cz:internal-tools/license-check.git --single-branch --depth 1
         - ./license-check/license-check.sh -v
 
 depcheck:
-    <<: *requires-python
-    <<: *python2-xenial
+    <<: *ubuntu-bionic
+    <<: *install-dependencies
+    stage: analysis
     only:
         - schedules
-    before_script:
-        # Install package with testing dependencies to verify versions
-        - pip install --process-dependency-links .[testing]
     script:
-        - check-constraints.py constraints.txt
+        - git clone https://gitlab.office.nic.cz/vzima/ci-tools.git --depth=1
+        # Install package with testing dependencies to verify versions
+        - pip3 install .[testing]
+        - python3 ./ci-tools/check-constraints.py constraints.txt
     allow_failure: true
 
-test:
+test:xenial:
     <<: *test
+    <<: *ubuntu-xenial
+
+test:bionic:
+    <<: *test
+    <<: *ubuntu-bionic
 
 test-thawed:
     <<: *test
+    <<: *ubuntu-bionic
     only:
         - schedules
     script:
         - tox -e py27-thaw,py35-thaw,py36-thaw,py37-thaw
 
 conformance:
-    <<: *requires-python
-    <<: *python2-xenial
-    only:
-        - schedules
-    before_script:
-        - apt-get update
-        - apt-get install --quiet=2 --yes maven openjdk-8-jdk omniidl-python omniorb-nameserver python-omniorb
-        # Prepare RDAP dependencies
-        - git clone git@gitlab.office.nic.cz:fred/idl.git
-        - (cd idl && omniidl -bpython -Wbmodules=fred_idl -Wbstubs=fred_idl._stubs idl/*.idl)
-        - pip install --upgrade pip
-        - /usr/local/bin/pip install .
+    <<: *install-dependencies
+    <<: *ubuntu-conformance
+    script:
+        # Install rdap
+        - pip install .
         # Start fake RDAP backend
         - omniNames -start &
-        - python test_cfg/conformance/mock_fred.py &
+        - PYTHONPATH="$IDL_DIR:$PYTHONPATH" python test_cfg/conformance/mock_fred.py &
         # Start RDAP
-        - PYTHONPATH="./test_cfg/conformance:$PYTHONPATH" DJANGO_SETTINGS_MODULE='settings' django-admin runserver localhost:8000 &
+        - PYTHONPATH="./test_cfg/conformance:$IDL_DIR:$PYTHONPATH" DJANGO_SETTINGS_MODULE='settings' django-admin runserver localhost:8000 &
         # Prepare conformance tests
-        # - git clone https://github.com/APNIC-net/rdap-conformance.git
-        # - (cd rdap-conformance && git checkout v0.5)
-        # Use fixed version of conformance, since upstream doesn't work in docker
-        - git clone https://github.com/ziima/rdap-conformance.git
-        - (cd rdap-conformance && git checkout freeze-surefire-version)
+        - git clone https://github.com/APNIC-net/rdap-conformance.git
+        - (cd rdap-conformance && git checkout v0.6)
         - (cd rdap-conformance && mvn package --quiet)
-    script:
-        - java -jar rdap-conformance/target/rdap-conformance-0.5.jar test_cfg/conformance/rdap_conformance.json
-    variables:
-        PYTHONPATH: "$IDL_DIR:$PYTHONPATH"
+        # Run the conformance test
+        - java -jar rdap-conformance/target/rdap-conformance-0.6.jar test_cfg/conformance/rdap_conformance.json
