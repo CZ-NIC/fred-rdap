@@ -9,7 +9,7 @@ and other domain registry objects, but provides results in a machine-readable fo
 ## Dependencies ##
 - python 2.7
 - python-omniorb
-- python-django 1.10 to 1.11
+- python-django 1.10 to 2.2
 - Other dependencies are listed in [requirements.txt](requirements.txt)
 
 ## Installation ##
