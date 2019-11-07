@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014-2018  CZ.NIC, z. s. p. o.
+# Copyright (C) 2014-2019  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -59,33 +59,31 @@ def disclosable_nonempty(disclosable):
 RDAP_STATUS_MAPPING = {
     # EPP defined
     # https://tools.ietf.org/html/rfc7483#section-10.2.2
-    #
-    # empty values will be added from draft
-    # https://tools.ietf.org/html/draft-gould-epp-rdap-status-mapping-02
-    'addPeriod': '',
-    'autoRenewPeriod': '',
-    'clientDeleteProhibited': '',
-    'clientHold': '',
-    'clientRenewProhibited': '',
-    'clientTransferProhibited': '',
-    'clientUpdateProhibited': '',
+    # https://tools.ietf.org/html/rfc8056
+    'addPeriod': 'add period',
+    'autoRenewPeriod': 'auto renew period',
+    'clientDeleteProhibited': 'client delete prohibited',
+    'clientHold': 'client hold',
+    'clientRenewProhibited': 'client renew prohibited',
+    'clientTransferProhibited': 'client transfer prohibited',
+    'clientUpdateProhibited': 'client update prohibited',
     'inactive': 'inactive',
     'linked': 'associated',
     'ok': 'active',
     'pendingCreate': 'pending create',
     'pendingDelete': 'pending delete',
     'pendingRenew': 'pending renew',
-    'pendingRestore': '',
+    'pendingRestore': 'pending restore',
     'pendingTransfer': 'pending transfer',
     'pendingUpdate': 'pending update',
-    'redemptionPeriod': '',
-    'renewPeriod': '',
-    'serverDeleteProhibited': '',
-    'serverRenewProhibited': '',
-    'serverTransferProhibited': '',
-    'serverUpdateProhibited': '',
-    'serverHold': '',
-    'transferPeriod': '',
+    'redemptionPeriod': 'redemption period',
+    'renewPeriod': 'renew period',
+    'serverDeleteProhibited': 'server delete prohibited',
+    'serverRenewProhibited': 'server renew prohibited',
+    'serverTransferProhibited': 'server transfer prohibited',
+    'serverUpdateProhibited': 'server update prohibited',
+    'serverHold': 'server hold',
+    'transferPeriod': 'transfer period',
     # FRED custom
     'validatedContact': 'validated',
     'contactPassedManualVerification': 'validated',

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2016-2018  CZ.NIC, z. s. p. o.
+# Copyright (C) 2016-2019  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -64,40 +64,16 @@ class TestStatusMappingDefinition(SimpleTestCase):
 
     def test_defined_mapping(self):
         defined = (
-            (['addPeriod'], []),
-            (['autoRenewPeriod'], []),
-            (['clientDeleteProhibited'], []),
-            (['clientHold'], []),
-            (['clientRenewProhibited'], []),
-            (['clientTransferProhibited'], []),
-            (['clientUpdateProhibited'], []),
             (['inactive'], ['inactive']),
             (['linked'], ['associated']),
             (['ok'], ['active']),
-            (['pendingCreate'], ['pending create']),
-            (['pendingDelete'], ['pending delete']),
-            (['pendingRenew'], ['pending renew']),
-            (['pendingRestore'], []),
-            (['pendingTransfer'], ['pending transfer']),
-            (['pendingUpdate'], ['pending update']),
-            (['redemptionPeriod'], []),
-            (['renewPeriod'], []),
-            (['serverDeleteProhibited'], []),
-            (['serverRenewProhibited'], []),
-            (['serverTransferProhibited'], []),
-            (['serverUpdateProhibited'], []),
-            (['serverHold'], []),
-            (['transferPeriod'], []),
-            (['validatedContact'], ['validated']),
-            (['contactPassedManualVerification'], ['validated']),
-            (['deleteCandidate'], ['pending delete']),
             (['outzone'], ['inactive']),
         )
         for in_list, out_set in defined:
             self.assertEqual(rdap_utils.rdap_status_mapping(in_list), out_set)
 
     def test_combination_4_mapped_1_nomap(self):
-        in_list = ['pendingCreate', 'pendingDelete', 'pendingRenew', 'pendingRestore', 'pendingTransfer']
+        in_list = ['pendingCreate', 'pendingDelete', 'pendingRenew', 'unknown', 'pendingTransfer']
         out_set = ['pending create', 'pending delete', 'pending renew', 'pending transfer']
         six.assertCountEqual(self, rdap_utils.rdap_status_mapping(in_list), out_set)
 
