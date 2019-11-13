@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014-2018  CZ.NIC, z. s. p. o.
+# Copyright (C) 2014-2019  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -19,7 +19,7 @@
 """RDAP application settings wrapper."""
 from __future__ import unicode_literals
 
-from appsettings import AppSettings, ListSetting, StringSetting
+from appsettings import AppSettings, IntegerSetting, ListSetting, StringSetting
 
 
 class RdapAppSettings(AppSettings):
@@ -29,6 +29,7 @@ class RdapAppSettings(AppSettings):
     CORBA_CONTEXT = StringSetting(default='fred')
     DISCLAIMER = ListSetting(default=None)
     UNIX_WHOIS = StringSetting(default=None)
+    MAX_SIG_LIFE = IntegerSetting(default=None)
 
     class Meta:
         setting_prefix = 'RDAP_'

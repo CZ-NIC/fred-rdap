@@ -81,6 +81,11 @@ Default value is ``None``, i.e. no disclaimer.
 The host name or IP address of the WHOIS server as defined by [Port 43 WHOIS Server](https://tools.ietf.org/html/rfc7483#section-4.7).
 Default value is ``None``, i.e. disabled.
 
+#### `RDAP_MAX_SIG_LIFE` ####
+
+Value of the ``maxSigLife`` member in [the domain object class](https://tools.ietf.org/html/rfc7483#section-5.3).
+Default value is ``None``, i.e. disabled.
+
 ## Development ##
 
 ### Testing ###

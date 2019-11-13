@@ -37,5 +37,3 @@ MIDDLEWARE = ['settings.CorsMiddleware',
               'django.middleware.common.CommonMiddleware']
 ROOT_URLCONF = 'rdap.urls'
 SECRET_KEY = 'SECRET'
-
-DNS_MAX_SIG_LIFE = 1209600
