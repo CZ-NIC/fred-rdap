@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014-2018  CZ.NIC, z. s. p. o.
+# Copyright (C) 2014-2019  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -21,23 +21,21 @@ from __future__ import unicode_literals
 
 import logging
 
-from django.conf import settings
 from django.urls import reverse
-from six.moves.urllib.parse import urljoin
 
 from rdap.settings import RDAP_SETTINGS
 
 from .rdap_utils import ObjectClassName, disclosable_nonempty, nonempty, rdap_status_mapping, to_rfc3339
 
 
-def contact_to_dict(struct):
+def contact_to_dict(request, struct):
     """Transform CORBA contact struct to python dictionary."""
     logging.debug(struct)
 
     if struct is None:
         result = None
     else:
-        self_link = urljoin(settings.RDAP_ROOT_URL, reverse('entity-detail', kwargs={"handle": struct.handle}))
+        self_link = request.build_absolute_uri(reverse('entity-detail', kwargs={"handle": struct.handle}))
         if "linked" not in struct.statuses:
             result = {
                 "rdapConformance": ["rdap_level_0"],

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014-2018  CZ.NIC, z. s. p. o.
+# Copyright (C) 2014-2019  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -24,7 +24,6 @@ import logging
 from django.conf import settings
 from django.urls import reverse
 from fred_idl.Registry.Whois import IPv4, IPv6
-from six.moves.urllib.parse import urljoin
 
 from rdap.settings import RDAP_SETTINGS
 from rdap.utils.corba import WHOIS
@@ -32,7 +31,7 @@ from rdap.utils.corba import WHOIS
 from .rdap_utils import ObjectClassName, add_unicode_name, nonempty, rdap_status_mapping, to_rfc3339
 
 
-def domain_to_dict(struct):
+def domain_to_dict(request, struct):
     """Transform CORBA domain struct to python dictionary."""
     logging.debug(struct)
 
@@ -44,9 +43,9 @@ def domain_to_dict(struct):
         else:
             expiration_datetime = struct.expire_time_estimate
 
-        self_link = urljoin(settings.RDAP_ROOT_URL, reverse('domain-detail', kwargs={"handle": struct.handle}))
-        registrant_link = urljoin(settings.RDAP_ROOT_URL,
-                                  reverse('entity-detail', kwargs={"handle": struct.registrant_handle}))
+        self_link = request.build_absolute_uri(reverse('domain-detail', kwargs={"handle": struct.handle}))
+        registrant_link = request.build_absolute_uri(
+            reverse('entity-detail', kwargs={"handle": struct.registrant_handle}))
 
         result = {
             "rdapConformance": ["rdap_level_0", "fred_version_0"],
@@ -98,7 +97,7 @@ def domain_to_dict(struct):
         add_unicode_name(result, struct.handle)
 
         for admin_contact in struct.admin_contact_handles:
-            admin_link = urljoin(settings.RDAP_ROOT_URL, reverse('entity-detail', kwargs={"handle": admin_contact}))
+            admin_link = request.build_absolute_uri(reverse('entity-detail', kwargs={"handle": admin_contact}))
             result['entities'].append(
                 {
                     "objectClassName": ObjectClassName.ENTITY,
@@ -141,7 +140,7 @@ def domain_to_dict(struct):
         if nonempty(struct.nsset_handle):
             nsset = WHOIS.get_nsset_by_handle(struct.nsset_handle)
             if nsset is not None:
-                nsset_link = urljoin(settings.RDAP_ROOT_URL, reverse('nsset-detail', kwargs={"handle": nsset.handle}))
+                nsset_link = request.build_absolute_uri(reverse('nsset-detail', kwargs={"handle": nsset.handle}))
                 result["nameservers"] = []
                 result['fred_nsset'] = {
                     "objectClassName": ObjectClassName.NSSET,
@@ -157,7 +156,7 @@ def domain_to_dict(struct):
                     "nameservers": [],
                 }
                 for ns in nsset.nservers:
-                    ns_link = urljoin(settings.RDAP_ROOT_URL, reverse('nameserver-detail', kwargs={"handle": ns.fqdn}))
+                    ns_link = request.build_absolute_uri(reverse('nameserver-detail', kwargs={"handle": ns.fqdn}))
                     ns_obj = {
                         "objectClassName": ObjectClassName.NAMESERVER,
                         "handle": ns.fqdn,
@@ -199,8 +198,7 @@ def domain_to_dict(struct):
                     "maxSigLife": settings.DNS_MAX_SIG_LIFE,
                     "keyData": [],
                 }
-                keyset_link = urljoin(settings.RDAP_ROOT_URL,
-                                      reverse('keyset-detail', kwargs={"handle": keyset.handle}))
+                keyset_link = request.build_absolute_uri(reverse('keyset-detail', kwargs={"handle": keyset.handle}))
                 result['fred_keyset'] = {
                     "objectClassName": ObjectClassName.KEYSET,
                     "handle": keyset.handle,
@@ -232,9 +230,9 @@ def domain_to_dict(struct):
     return result
 
 
-def delete_candidate_domain_to_dict(handle):
+def delete_candidate_domain_to_dict(request, handle):
     """Return python dictionary with RDAP data for domain with `deleteCandidate` status."""
-    self_link = urljoin(settings.RDAP_ROOT_URL, reverse('domain-detail', kwargs={"handle": handle}))
+    self_link = request.build_absolute_uri(reverse('domain-detail', kwargs={"handle": handle}))
 
     result = {
         "objectClassName": ObjectClassName.DOMAIN,

@@ -69,10 +69,6 @@ LOGGING = {
 # Naming service context
 # RDAP_CORBA_CONTEXT = 'fred'
 
-# #### WHOIS URLs configuration
-# Base of URLs
-RDAP_ROOT_URL = 'http://localhost/rdap/'
-
 # Maximum signature lifetime (seconds) used in secureDNS
 DNS_MAX_SIG_LIFE = 1209600
 # The disclaimer notice that is included in each response

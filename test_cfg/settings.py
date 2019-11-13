@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2016-2018  CZ.NIC, z. s. p. o.
+# Copyright (C) 2016-2019  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -20,5 +20,4 @@ INSTALLED_APPS = ('rdap.apps.RdapAppConfig', )
 ROOT_URLCONF = 'rdap.urls'
 SECRET_KEY = 'SECRET'
 
-RDAP_ROOT_URL = ''
 DNS_MAX_SIG_LIFE = 1209600

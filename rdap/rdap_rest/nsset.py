@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014-2018  CZ.NIC, z. s. p. o.
+# Copyright (C) 2014-2019  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -21,24 +21,22 @@ from __future__ import unicode_literals
 
 import logging
 
-from django.conf import settings
 from django.urls import reverse
 from fred_idl.Registry.Whois import IPv4, IPv6
-from six.moves.urllib.parse import urljoin
 
 from rdap.settings import RDAP_SETTINGS
 
 from .rdap_utils import ObjectClassName, add_unicode_name, nonempty, rdap_status_mapping, to_rfc3339
 
 
-def nsset_to_dict(struct):
+def nsset_to_dict(request, struct):
     """Transform CORBA nsset struct to python dictionary."""
     logging.debug(struct)
 
     if struct is None:
         result = None
     else:
-        self_link = urljoin(settings.RDAP_ROOT_URL, reverse('nsset-detail', kwargs={"handle": struct.handle}))
+        self_link = request.build_absolute_uri(reverse('nsset-detail', kwargs={"handle": struct.handle}))
 
         result = {
             "rdapConformance": ["rdap_level_0", "fred_version_0"],
@@ -75,7 +73,7 @@ def nsset_to_dict(struct):
             result["status"] = status
 
         for tech_c in struct.tech_contact_handles:
-            tech_link = urljoin(settings.RDAP_ROOT_URL, reverse('entity-detail', kwargs={"handle": tech_c}))
+            tech_link = request.build_absolute_uri(reverse('entity-detail', kwargs={"handle": tech_c}))
             result['entities'].append({
                 "objectClassName": ObjectClassName.ENTITY,
                 "handle": tech_c,
@@ -91,7 +89,7 @@ def nsset_to_dict(struct):
             })
 
         for ns in struct.nservers:
-            ns_link = urljoin(settings.RDAP_ROOT_URL, reverse('nameserver-detail', kwargs={"handle": ns.fqdn}))
+            ns_link = request.build_absolute_uri(reverse('nameserver-detail', kwargs={"handle": ns.fqdn}))
             ns_json = {
                 "objectClassName": ObjectClassName.NAMESERVER,
                 "handle": ns.fqdn,
