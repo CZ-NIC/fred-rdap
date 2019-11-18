@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014-2018  CZ.NIC, z. s. p. o.
+# Copyright (C) 2014-2019  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -21,21 +21,19 @@ from __future__ import unicode_literals
 
 import logging
 
-from django.conf import settings
 from django.urls import reverse
-from six.moves.urllib.parse import urljoin
 
 from .rdap_utils import ObjectClassName, add_unicode_name
 
 
-def nameserver_to_dict(struct):
+def nameserver_to_dict(request, struct):
     """Transform CORBA nameserver struct to python dictionary."""
     logging.debug(struct)
 
     if struct is None:
         result = None
     else:
-        self_link = urljoin(settings.RDAP_ROOT_URL, reverse('nameserver-detail', kwargs={"handle": struct.fqdn}))
+        self_link = request.build_absolute_uri(reverse('nameserver-detail', kwargs={"handle": struct.fqdn}))
 
         result = {
             "rdapConformance": ["rdap_level_0"],

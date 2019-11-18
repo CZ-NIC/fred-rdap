@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014-2018  CZ.NIC, z. s. p. o.
+# Copyright (C) 2014-2019  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -34,20 +34,20 @@ from .nameserver import nameserver_to_dict
 from .nsset import nsset_to_dict
 
 
-def get_contact_by_handle(handle):
+def get_contact_by_handle(request, handle):
     logging.debug('get_contact_by_handle: %s', handle)
     try:
-        return contact_to_dict(WHOIS.get_contact_by_handle(handle))
+        return contact_to_dict(request, WHOIS.get_contact_by_handle(handle))
     except OBJECT_NOT_FOUND:
         raise NotFoundError()
     except INVALID_HANDLE:
         raise InvalidHandleError()
 
 
-def get_domain_by_handle(handle):
+def get_domain_by_handle(request, handle):
     logging.debug('get_domain_by_handle: %s', handle)
     try:
-        return domain_to_dict(WHOIS.get_domain_by_handle(handle))
+        return domain_to_dict(request, WHOIS.get_domain_by_handle(handle))
     except OBJECT_DELETE_CANDIDATE:
         return delete_candidate_domain_to_dict(handle)
     except (OBJECT_NOT_FOUND, TOO_MANY_LABELS, UNMANAGED_ZONE):
@@ -56,30 +56,30 @@ def get_domain_by_handle(handle):
         raise InvalidHandleError()
 
 
-def get_nameserver_by_handle(handle):
+def get_nameserver_by_handle(request, handle):
     logging.debug('get_nameserver_by_handle: %s', handle)
     try:
-        return nameserver_to_dict(WHOIS.get_nameserver_by_fqdn(handle))
+        return nameserver_to_dict(request, WHOIS.get_nameserver_by_fqdn(handle))
     except OBJECT_NOT_FOUND:
         raise NotFoundError()
     except INVALID_HANDLE:
         raise InvalidHandleError()
 
 
-def get_nsset_by_handle(handle):
+def get_nsset_by_handle(request, handle):
     logging.debug('get_nsset_by_handle: %s', handle)
     try:
-        return nsset_to_dict(WHOIS.get_nsset_by_handle(handle))
+        return nsset_to_dict(request, WHOIS.get_nsset_by_handle(handle))
     except OBJECT_NOT_FOUND:
         raise NotFoundError()
     except INVALID_HANDLE:
         raise InvalidHandleError()
 
 
-def get_keyset_by_handle(handle):
+def get_keyset_by_handle(request, handle):
     logging.debug('get_keyset_by_handle: %s', handle)
     try:
-        return keyset_to_dict(WHOIS.get_keyset_by_handle(handle))
+        return keyset_to_dict(request, WHOIS.get_keyset_by_handle(handle))
     except OBJECT_NOT_FOUND:
         raise NotFoundError()
     except INVALID_HANDLE:

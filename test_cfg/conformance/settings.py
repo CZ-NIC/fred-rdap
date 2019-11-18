@@ -38,5 +38,4 @@ MIDDLEWARE = ['settings.CorsMiddleware',
 ROOT_URLCONF = 'rdap.urls'
 SECRET_KEY = 'SECRET'
 
-RDAP_ROOT_URL = 'http://localhost:8000'
 DNS_MAX_SIG_LIFE = 1209600

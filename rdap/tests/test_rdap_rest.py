@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2017-2018  CZ.NIC, z. s. p. o.
+# Copyright (C) 2017-2019  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 
 from datetime import date, datetime
 
-from django.test import SimpleTestCase, override_settings
+from django.test import RequestFactory, SimpleTestCase, override_settings
 from fred_idl.Registry.Whois import Contact, ContactIdentification, DisclosableContactIdentification, \
     DisclosablePlaceAddress, DisclosableString, Domain, KeySet, NameServer, NSSet, PlaceAddress
 from mock import patch, sentinel
@@ -72,69 +72,75 @@ def get_keyset(tech_contact_handles=None):
         created=datetime(1980, 1, 3, 10, 9, 34), changed=None, last_transfer=None, statuses=[])
 
 
-@override_settings(RDAP_ROOT_URL='http://rdap.example.cz/', RDAP_UNIX_WHOIS=None)
+@override_settings(ALLOWED_HOSTS=['rdap.example'], RDAP_UNIX_WHOIS=None)
 class TestDomainToDict(SimpleTestCase):
     """Test `rdap.rdap_rest.domain.domain_to_dict` function."""
 
+    def setUp(self):
+        self.request = RequestFactory(HTTP_HOST='rdap.example').get('/dummy/')
+
     def test_simple(self):
-        result = domain_to_dict(get_domain())
-        self.assertEqual(result['links'][0]['value'], 'http://rdap.example.cz/domain/example.cz')
-        self.assertEqual(result['entities'][0]['links'][0]['value'], 'http://rdap.example.cz/entity/KRYTEN')
+        result = domain_to_dict(self.request, get_domain())
+        self.assertEqual(result['links'][0]['value'], 'http://rdap.example/domain/example.cz')
+        self.assertEqual(result['entities'][0]['links'][0]['value'], 'http://rdap.example/entity/KRYTEN')
         self.assertNotIn('port43', result)
 
     def test_admin_contacts(self):
-        result = domain_to_dict(get_domain(admin_contact_handles=['HOLLY']))
+        result = domain_to_dict(self.request, get_domain(admin_contact_handles=['HOLLY']))
         admin = result['entities'][2]
         self.assertEqual(admin['roles'], ['administrative'])
-        self.assertEqual(admin['links'][0]['value'], 'http://rdap.example.cz/entity/HOLLY')
+        self.assertEqual(admin['links'][0]['value'], 'http://rdap.example/entity/HOLLY')
 
     def test_nsset(self):
         with patch.object(WHOIS, 'client', spec=('get_nsset_by_handle', )) as whois_mock:
             whois_mock.get_nsset_by_handle.return_value = get_nsset()
 
-            result = domain_to_dict(get_domain(nsset_handle='new-saturn'))
+            result = domain_to_dict(self.request, get_domain(nsset_handle='new-saturn'))
 
-        self.assertEqual(result['fred_nsset']['links'][0]['value'], 'http://rdap.example.cz/fred_nsset/new-saturn')
+        self.assertEqual(result['fred_nsset']['links'][0]['value'], 'http://rdap.example/fred_nsset/new-saturn')
 
     def test_nameservers(self):
         nservers = [NameServer(fqdn='nameserver.example.cz', ip_addresses=[])]
         with patch.object(WHOIS, 'client', spec=('get_nsset_by_handle', )) as whois_mock:
             whois_mock.get_nsset_by_handle.return_value = get_nsset(nservers=nservers)
 
-            result = domain_to_dict(get_domain(nsset_handle='new-saturn'))
+            result = domain_to_dict(self.request, get_domain(nsset_handle='new-saturn'))
 
         self.assertEqual(result['nameservers'][0]['links'][0]['value'],
-                         'http://rdap.example.cz/nameserver/nameserver.example.cz')
+                         'http://rdap.example/nameserver/nameserver.example.cz')
 
     def test_keyset(self):
         with patch.object(WHOIS, 'client', spec=('get_keyset_by_handle', )) as whois_mock:
             whois_mock.get_keyset_by_handle.return_value = get_keyset()
 
-            result = domain_to_dict(get_domain(keyset_handle='gazpacho'))
+            result = domain_to_dict(self.request, get_domain(keyset_handle='gazpacho'))
 
-        self.assertEqual(result['fred_keyset']['links'][0]['value'], 'http://rdap.example.cz/fred_keyset/gazpacho')
+        self.assertEqual(result['fred_keyset']['links'][0]['value'], 'http://rdap.example/fred_keyset/gazpacho')
 
     def test_port43(self):
         with override_settings(RDAP_UNIX_WHOIS='whois.example.com'):
-            result = domain_to_dict(get_domain())
+            result = domain_to_dict(self.request, get_domain())
         self.assertEqual(result['port43'], 'whois.example.com')
 
 
-@override_settings(RDAP_ROOT_URL='http://rdap.example.cz/', RDAP_UNIX_WHOIS=None)
+@override_settings(ALLOWED_HOSTS=['rdap.example'], RDAP_UNIX_WHOIS=None)
 class TestDeleteCandidateDomainToDict(SimpleTestCase):
     """Test `rdap.rdap_rest.domain.delete_candidate_domain_to_dict` function."""
 
+    def setUp(self):
+        self.request = RequestFactory(HTTP_HOST='rdap.example').get('/dummy/')
+
     def test_simple(self):
-        result = delete_candidate_domain_to_dict('example.cz')
+        result = delete_candidate_domain_to_dict(self.request, 'example.cz')
         data = {'objectClassName': 'domain',
                 'rdapConformance': ['rdap_level_0', 'fred_version_0'],
                 'handle': 'example.cz',
                 'ldhName': 'example.cz',
                 'links': [
                     {
-                        'value': 'http://rdap.example.cz/domain/example.cz',
+                        'value': 'http://rdap.example/domain/example.cz',
                         'rel': 'self',
-                        'href': 'http://rdap.example.cz/domain/example.cz',
+                        'href': 'http://rdap.example/domain/example.cz',
                         'type': 'application/rdap+json',
                     },
                 ],
@@ -143,78 +149,90 @@ class TestDeleteCandidateDomainToDict(SimpleTestCase):
 
     def test_port43(self):
         with override_settings(RDAP_UNIX_WHOIS='whois.example.com'):
-            result = delete_candidate_domain_to_dict('example.cz')
+            result = delete_candidate_domain_to_dict(self.request, 'example.cz')
         self.assertEqual(result['port43'], 'whois.example.com')
 
 
-@override_settings(RDAP_ROOT_URL='http://rdap.example.cz/', RDAP_UNIX_WHOIS=None)
+@override_settings(ALLOWED_HOSTS=['rdap.example'], RDAP_UNIX_WHOIS=None)
 class TestContactToDict(SimpleTestCase):
     """Test `rdap.rdap_rest.domain.contact_to_dict` function."""
 
+    def setUp(self):
+        self.request = RequestFactory(HTTP_HOST='rdap.example').get('/dummy/')
+
     def test_simple(self):
-        result = contact_to_dict(get_contact())
-        self.assertEqual(result['links'][0]['value'], 'http://rdap.example.cz/entity/KRYTEN')
+        result = contact_to_dict(self.request, get_contact())
+        self.assertEqual(result['links'][0]['value'], 'http://rdap.example/entity/KRYTEN')
         self.assertNotIn('port43', result)
 
     def test_port43(self):
         with override_settings(RDAP_UNIX_WHOIS='whois.example.com'):
-            result = contact_to_dict(get_contact())
+            result = contact_to_dict(self.request, get_contact())
         self.assertEqual(result['port43'], 'whois.example.com')
 
 
-@override_settings(RDAP_ROOT_URL='http://rdap.example.cz/', RDAP_UNIX_WHOIS=None)
+@override_settings(ALLOWED_HOSTS=['rdap.example'], RDAP_UNIX_WHOIS=None)
 class TestKeysetToDict(SimpleTestCase):
     """Test `rdap.rdap_rest.domain.keyset_to_dict` function."""
 
+    def setUp(self):
+        self.request = RequestFactory(HTTP_HOST='rdap.example').get('/dummy/')
+
     def test_simple(self):
-        result = keyset_to_dict(get_keyset())
-        self.assertEqual(result['links'][0]['value'], 'http://rdap.example.cz/fred_keyset/gazpacho')
+        result = keyset_to_dict(self.request, get_keyset())
+        self.assertEqual(result['links'][0]['value'], 'http://rdap.example/fred_keyset/gazpacho')
         self.assertNotIn('port43', result)
 
     def test_tech_contacts(self):
-        result = keyset_to_dict(get_keyset(tech_contact_handles=['KOCHANSKI']))
+        result = keyset_to_dict(self.request, get_keyset(tech_contact_handles=['KOCHANSKI']))
         tech = result['entities'][1]
         self.assertEqual(tech['roles'], ['technical'])
-        self.assertEqual(tech['links'][0]['value'], 'http://rdap.example.cz/entity/KOCHANSKI')
+        self.assertEqual(tech['links'][0]['value'], 'http://rdap.example/entity/KOCHANSKI')
 
     def test_port43(self):
         with override_settings(RDAP_UNIX_WHOIS='whois.example.com'):
-            result = keyset_to_dict(get_keyset())
+            result = keyset_to_dict(self.request, get_keyset())
         self.assertEqual(result['port43'], 'whois.example.com')
 
 
-@override_settings(RDAP_ROOT_URL='http://rdap.example.cz/')
+@override_settings(ALLOWED_HOSTS=['rdap.example'])
 class TestNameserverToDict(SimpleTestCase):
     """Test `rdap.rdap_rest.domain.nameserver_to_dict` function."""
 
+    def setUp(self):
+        self.request = RequestFactory(HTTP_HOST='rdap.example').get('/dummy/')
+
     def test_simple(self):
         nameserver = NameServer(fqdn='nameserver.example.cz', ip_addresses=[])
-        result = nameserver_to_dict(nameserver)
-        self.assertEqual(result['links'][0]['value'], 'http://rdap.example.cz/nameserver/nameserver.example.cz')
+        result = nameserver_to_dict(self.request, nameserver)
+        self.assertEqual(result['links'][0]['value'], 'http://rdap.example/nameserver/nameserver.example.cz')
 
 
-@override_settings(RDAP_ROOT_URL='http://rdap.example.cz/', RDAP_UNIX_WHOIS=None)
+@override_settings(ALLOWED_HOSTS=['rdap.example'], RDAP_UNIX_WHOIS=None)
 class TestNssetToDict(SimpleTestCase):
     """Test `rdap.rdap_rest.domain.nsset_to_dict` function."""
 
+    def setUp(self):
+        self.request = RequestFactory(HTTP_HOST='rdap.example').get('/dummy/')
+
     def test_simple(self):
-        result = nsset_to_dict(get_nsset())
-        self.assertEqual(result['links'][0]['value'], 'http://rdap.example.cz/fred_nsset/new-saturn')
+        result = nsset_to_dict(self.request, get_nsset())
+        self.assertEqual(result['links'][0]['value'], 'http://rdap.example/fred_nsset/new-saturn')
         self.assertNotIn('port43', result)
 
     def test_tech_contacts(self):
-        result = nsset_to_dict(get_nsset(tech_contact_handles=['KOCHANSKI']))
+        result = nsset_to_dict(self.request, get_nsset(tech_contact_handles=['KOCHANSKI']))
         tech = result['entities'][1]
         self.assertEqual(tech['roles'], ['technical'])
-        self.assertEqual(tech['links'][0]['value'], 'http://rdap.example.cz/entity/KOCHANSKI')
+        self.assertEqual(tech['links'][0]['value'], 'http://rdap.example/entity/KOCHANSKI')
 
     def test_nameservers(self):
         nservers = [NameServer(fqdn='nameserver.example.cz', ip_addresses=[])]
-        result = nsset_to_dict(get_nsset(nservers=nservers))
+        result = nsset_to_dict(self.request, get_nsset(nservers=nservers))
         self.assertEqual(result['nameservers'][0]['links'][0]['value'],
-                         'http://rdap.example.cz/nameserver/nameserver.example.cz')
+                         'http://rdap.example/nameserver/nameserver.example.cz')
 
     def test_port43(self):
         with override_settings(RDAP_UNIX_WHOIS='whois.example.com'):
-            result = nsset_to_dict(get_nsset())
+            result = nsset_to_dict(self.request, get_nsset())
         self.assertEqual(result['port43'], 'whois.example.com')

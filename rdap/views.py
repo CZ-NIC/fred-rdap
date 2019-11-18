@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2016-2018  CZ.NIC, z. s. p. o.
+# Copyright (C) 2016-2019  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -61,7 +61,7 @@ class ObjectView(View):
                                             properties=[('handle', handle)])
         out_properties = []
         try:
-            data = self.getter(handle)
+            data = self.getter(request, handle)
 
             if RDAP_SETTINGS.DISCLAIMER:
                 notices = data.setdefault('notices', [])

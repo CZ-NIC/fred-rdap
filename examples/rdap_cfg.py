@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2017-2018  CZ.NIC, z. s. p. o.
+# Copyright (C) 2017-2019  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -74,8 +74,6 @@ LOGGING = {
 # RDAP_CORBA_CONTEXT = 'fred'
 
 # #### WHOIS URLs configuration
-# Base of URLs
-RDAP_ROOT_URL = ''
 # Unix Whois server address
 # RDAP_UNIX_WHOIS = None
 
