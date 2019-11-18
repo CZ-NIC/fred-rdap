@@ -122,6 +122,20 @@ class TestDomainToDict(SimpleTestCase):
             result = domain_to_dict(self.request, get_domain())
         self.assertEqual(result['port43'], 'whois.example.com')
 
+    def test_max_sig_life_absent(self):
+        with patch.object(WHOIS, 'client', spec=('get_keyset_by_handle', )) as whois_mock:
+            whois_mock.get_keyset_by_handle.return_value = get_keyset()
+            with self.settings(RDAP_MAX_SIG_LIFE=None):
+                result = domain_to_dict(self.request, get_domain(keyset_handle='gazpacho'))
+        self.assertNotIn('maxSigLife', result['secureDNS'])
+
+    def test_max_sig_life_present(self):
+        with patch.object(WHOIS, 'client', spec=('get_keyset_by_handle', )) as whois_mock:
+            whois_mock.get_keyset_by_handle.return_value = get_keyset()
+            with self.settings(RDAP_MAX_SIG_LIFE=sentinel.max_sig_life):
+                result = domain_to_dict(self.request, get_domain(keyset_handle='gazpacho'))
+        self.assertEqual(result['secureDNS']['maxSigLife'], sentinel.max_sig_life)
+
 
 @override_settings(ALLOWED_HOSTS=['rdap.example'], RDAP_UNIX_WHOIS=None)
 class TestDeleteCandidateDomainToDict(SimpleTestCase):

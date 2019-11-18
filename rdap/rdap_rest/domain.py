@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 
 import logging
 
-from django.conf import settings
 from django.urls import reverse
 from fred_idl.Registry.Whois import IPv4, IPv6
 
@@ -195,9 +194,10 @@ def domain_to_dict(request, struct):
                 result["secureDNS"] = {
                     "zoneSigned": True,
                     "delegationSigned": True,
-                    "maxSigLife": settings.DNS_MAX_SIG_LIFE,
                     "keyData": [],
                 }
+                if RDAP_SETTINGS.MAX_SIG_LIFE:
+                    result['secureDNS']['maxSigLife'] = RDAP_SETTINGS.MAX_SIG_LIFE
                 keyset_link = request.build_absolute_uri(reverse('keyset-detail', kwargs={"handle": keyset.handle}))
                 result['fred_keyset'] = {
                     "objectClassName": ObjectClassName.KEYSET,
