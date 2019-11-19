@@ -33,5 +33,5 @@ setup(name='fred-rdap',
       packages=find_packages(),
       include_package_data=True,
       install_requires=open('requirements.txt').read().splitlines(),
-      extras_require={'testing': ['mock'],
+      extras_require={'test': ['mock'],
                       'quality': ['isort', 'flake8', 'pydocstyle']})
