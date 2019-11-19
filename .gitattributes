@@ -1,1 +1,2 @@
 /Makefile whitespace=space-before-tab,indent-with-non-tab,tabwidth=4
+/.bumpversion.cfg whitespace=space-before-tab,tabwidth=4,-trailing-space
