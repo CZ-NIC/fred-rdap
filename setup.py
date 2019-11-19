@@ -23,7 +23,7 @@ from setuptools import find_packages, setup
 
 setup(name='fred-rdap',
       description='NIC.CZ RDAP',
-      version='0.13.0',
+      version='0.16.0rc1',
       author='Jan Korous, CZ.NIC',
       author_email='jan.korous@nic.cz',
       url='http://www.nic.cz/',

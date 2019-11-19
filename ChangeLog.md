@@ -1,3 +1,18 @@
+2019-11-19 (0.16.0)
+
+ * Add mapping for EPP statuses (RFC 8056).
+ * Refacotr code and drop ``RDAP_ROOT_URL`` setting.
+ * Rename setting ``DNS_MAX_SIG_LIFE`` to ``RDAP_MAX_SIG_LIFE`` and allow it to be ``None``.
+ * Update README.
+ * Update CI and tests configuration.
+ * Use bumpversion to bump version.
+
+2019-10-23 (0.15.0)
+
+ * Add Django 2.X support.
+ * Use PEP 508 dependencies.
+ * Update CI and setup configuration.
+
 2019-03-20 (0.14.0)
 
  * License GNU GPLv3+
