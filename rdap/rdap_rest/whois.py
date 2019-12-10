@@ -49,7 +49,7 @@ def get_domain_by_handle(request, handle):
     try:
         return domain_to_dict(request, WHOIS.get_domain_by_handle(handle))
     except OBJECT_DELETE_CANDIDATE:
-        return delete_candidate_domain_to_dict(handle)
+        return delete_candidate_domain_to_dict(request, handle)
     except (OBJECT_NOT_FOUND, TOO_MANY_LABELS, UNMANAGED_ZONE):
         raise NotFoundError()
     except INVALID_LABEL:
