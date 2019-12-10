@@ -23,7 +23,6 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFou
 from django.utils.functional import SimpleLazyObject
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
-from fred_idl import ccReg
 from pylogger.corbalogger import Logger
 
 from rdap.exceptions import InvalidHandleError, NotFoundError
@@ -34,7 +33,7 @@ from rdap.utils.corba import LOGGER as LOGGER_OBJECT
 RDAP_CONTENT_TYPE = 'application/rdap+json'
 RDAP_CONFORMANCE = ['rdap_level_0', 'fred_version_0']
 
-LOGGER = SimpleLazyObject(lambda: Logger(LOGGER_OBJECT, ccReg))
+LOGGER = SimpleLazyObject(lambda: Logger(LOGGER_OBJECT))
 LOGGER_SERVICE = 'RDAP'
 LOGGER_SUCCESS = 'Ok'
 LOGGER_NOT_FOUND = 'NotFound'
