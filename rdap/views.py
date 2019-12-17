@@ -39,8 +39,7 @@ LOGGER_BAD_REQUEST = 'BadRequest'
 
 
 class ObjectView(View):
-    """
-    View for RDAP protocol objects.
+    """View for RDAP protocol objects.
 
     @cvar getter: Function which returns object data or raises exception.
     @cvar request_type: Request type for logger
@@ -114,8 +113,7 @@ class HelpView(View):
 
 
 class UnsupportedView(View):
-    """
-    View for unsupported responses.
+    """View for unsupported responses.
 
     @cvar status: HTTP response code
     """
