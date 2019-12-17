@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (C) 2018  CZ.NIC, z. s. p. o.
+# Copyright (C) 2018-2019  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -120,20 +120,20 @@ def run_services():
     rootContext = obj._narrow(CosNaming.NamingContext)
 
     if rootContext is None:
-        print "Failed to narrow the root naming context"
+        print("Failed to narrow the root naming context")
         sys.exit(1)
 
     # Bind a context named "test.my_context" to the root context
     name = [CosNaming.NameComponent("fred", "context")]
     try:
         testContext = rootContext.bind_new_context(name)
-        print "New test context bound"
+        print("New test context bound")
     except CosNaming.NamingContext.AlreadyBound:
-        print "Test context already exists"
+        print("Test context already exists")
         obj = rootContext.resolve(name)
         testContext = obj._narrow(CosNaming.NamingContext)
         if testContext is None:
-            print "fred.context exists but is not a NamingContext"
+            print("fred.context exists but is not a NamingContext")
             sys.exit(1)
 
     bind_interface(testContext, FakeWhois, "Whois2")

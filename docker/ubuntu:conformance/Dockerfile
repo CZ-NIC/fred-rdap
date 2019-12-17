@@ -17,16 +17,16 @@ RUN apt-get --yes update \
     omniidl-python \
     omniorb-nameserver \
     openjdk-8-jdk \
-    python \
-    python-omniorb \
-    python-setuptools \
+    python3 \
+    python3-omniorb \
+    python3-setuptools \
     ssh \
  && rm -rf /var/lib/apt/lists/*
 # Install newest pip
 RUN apt-get --yes update \
  && apt-get install --yes --no-install-recommends \
-    python-pip \
+    python3-pip \
  && rm -rf /var/lib/apt/lists/* \
- && pip install --upgrade \
+ && pip3 install --upgrade \
     pip \
- && apt-get purge --yes python-pip
+ && apt-get purge --yes python3-pip
