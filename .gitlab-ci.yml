@@ -110,7 +110,7 @@ test-thawed:
     only:
         - schedules
     script:
-        - tox -e py27-thaw,py35-thaw,py36-thaw,py37-thaw
+        - tox -e py35-thaw,py36-thaw,py37-thaw
 
 conformance:
     <<: *install-dependencies

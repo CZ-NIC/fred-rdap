@@ -30,7 +30,7 @@ Documentation for the whole FRED project is available on-line, visit https://fre
 - [License](#license)
 
 ## Dependencies ##
-- python 2.7
+- python >=3.5
 - python-omniorb
 - python-django 1.10 to 2.2
 - Other dependencies are listed in [requirements.txt](requirements.txt)
