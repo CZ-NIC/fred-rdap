@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 
 from datetime import datetime
 
-import six
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils import timezone
@@ -75,12 +74,12 @@ class TestStatusMappingDefinition(SimpleTestCase):
     def test_combination_4_mapped_1_nomap(self):
         in_list = ['pendingCreate', 'pendingDelete', 'pendingRenew', 'unknown', 'pendingTransfer']
         out_set = ['pending create', 'pending delete', 'pending renew', 'pending transfer']
-        six.assertCountEqual(self, rdap_utils.rdap_status_mapping(in_list), out_set)
+        self.assertCountEqual(rdap_utils.rdap_status_mapping(in_list), out_set)
 
     def test_combination_same_mapped_value_just_once(self):
         in_list = ['validatedContact', 'contactPassedManualVerification', 'deleteCandidate']
         out_set = ['validated', 'pending delete']
-        six.assertCountEqual(self, rdap_utils.rdap_status_mapping(in_list), out_set)
+        self.assertCountEqual(rdap_utils.rdap_status_mapping(in_list), out_set)
 
 
 class TestInputFqdnProcessing(SimpleTestCase):

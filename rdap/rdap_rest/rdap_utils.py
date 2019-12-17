@@ -20,7 +20,6 @@
 from __future__ import unicode_literals
 
 import idna
-import six
 from django.conf import settings
 from django.utils import timezone
 
@@ -37,11 +36,7 @@ def to_rfc3339(dt):
     else:
         aux = timezone.make_aware(aux, timezone.get_default_timezone())
 
-    if six.PY2:
-        format_string = b'T'
-    else:
-        format_string = 'T'
-    return aux.isoformat(format_string)
+    return aux.isoformat('T')
 
 
 def nonempty(input):
@@ -133,17 +128,11 @@ def preprocess_fqdn(fqdn):
         idna.decode(fqdn)
     except UnicodeError:
         raise InvalidIdn()
-    if six.PY2:
-        return fqdn
-    else:
-        return fqdn.decode()
+    return fqdn.decode()
 
 
 def add_unicode_name(dst_dict, ldh_name):
     """Add optional unicodeName key to dictionary if contains non-ascii characters."""
-    if six.PY3:
-        unicode_name = ldh_name.encode("idna").decode("idna")
-    else:
-        unicode_name = ldh_name.decode("idna")
+    unicode_name = ldh_name.encode("idna").decode("idna")
     if unicode_name != ldh_name:
         dst_dict["unicodeName"] = unicode_name

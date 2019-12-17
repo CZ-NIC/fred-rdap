@@ -4,4 +4,3 @@ idna
 pytz
 fred-pylogger @ git+ssh://git@gitlab.office.nic.cz/fred/utils/pylogger.git
 fred-pyfco @ git+ssh://git@gitlab.office.nic.cz/fred/utils/pyfco.git
-six
