@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2016-2019  CZ.NIC, z. s. p. o.
+# Copyright (C) 2016-2020  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -17,8 +17,6 @@
 # along with FRED.  If not, see <https://www.gnu.org/licenses/>.
 
 """RDAP views."""
-from __future__ import unicode_literals
-
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, JsonResponse
 from django.utils.functional import SimpleLazyObject
 from django.views.decorators.csrf import csrf_exempt

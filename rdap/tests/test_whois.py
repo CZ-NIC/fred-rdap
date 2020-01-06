@@ -15,9 +15,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with FRED.  If not, see <https://www.gnu.org/licenses/>.
-
-from __future__ import unicode_literals
-
 from unittest.mock import call, patch
 
 from django.test import RequestFactory, SimpleTestCase

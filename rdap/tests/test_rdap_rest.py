@@ -17,8 +17,6 @@
 # along with FRED.  If not, see <https://www.gnu.org/licenses/>.
 
 """Tests for `rdap.rdap_rest` package."""
-from __future__ import unicode_literals
-
 from datetime import date, datetime
 from unittest.mock import patch, sentinel
 

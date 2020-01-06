@@ -19,8 +19,6 @@
 """
 Tests of RDAP views.
 """
-from __future__ import unicode_literals
-
 import json
 from unittest.mock import call, patch
 

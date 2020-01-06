@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014-2019  CZ.NIC, z. s. p. o.
+# Copyright (C) 2014-2020  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -15,9 +15,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with FRED.  If not, see <https://www.gnu.org/licenses/>.
-
-from __future__ import unicode_literals
-
 from django.conf.urls import url
 
 from rdap.rdap_rest.whois import get_contact_by_handle, get_domain_by_handle, get_keyset_by_handle, \

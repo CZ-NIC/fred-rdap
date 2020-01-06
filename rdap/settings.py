@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014-2019  CZ.NIC, z. s. p. o.
+# Copyright (C) 2014-2020  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -17,8 +17,6 @@
 # along with FRED.  If not, see <https://www.gnu.org/licenses/>.
 
 """RDAP application settings wrapper."""
-from __future__ import unicode_literals
-
 from appsettings import AppSettings, IntegerSetting, ListSetting, StringSetting
 
 
