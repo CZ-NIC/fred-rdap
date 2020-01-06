@@ -10,3 +10,4 @@ RELEASE-VERSION
 install.log
 /.coverage*
 /.tox
+/.mypy_cache
