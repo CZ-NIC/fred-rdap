@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2016-2019  CZ.NIC, z. s. p. o.
+# Copyright (C) 2016-2020  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -20,11 +20,11 @@
 from __future__ import unicode_literals
 
 from datetime import datetime
+from unittest.mock import Mock
 
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils import timezone
-from mock import Mock
 
 from rdap.rdap_rest import rdap_utils
 

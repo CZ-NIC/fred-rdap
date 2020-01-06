@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2019  CZ.NIC, z. s. p. o.
+# Copyright (C) 2019-2020  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -18,9 +18,10 @@
 
 from __future__ import unicode_literals
 
+from unittest.mock import call, patch
+
 from django.test import RequestFactory, SimpleTestCase
 from fred_idl.Registry.Whois import OBJECT_DELETE_CANDIDATE
-from mock import call, patch
 
 from rdap.rdap_rest.whois import get_domain_by_handle
 from rdap.utils.corba import WHOIS
