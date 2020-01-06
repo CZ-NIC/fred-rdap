@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014-2019  CZ.NIC, z. s. p. o.
+# Copyright (C) 2014-2020  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -17,8 +17,6 @@
 # along with FRED.  If not, see <https://www.gnu.org/licenses/>.
 
 """Wrapper module to whois idl interface."""
-from __future__ import unicode_literals
-
 import logging
 
 from fred_idl.Registry.Whois import INVALID_HANDLE, INVALID_LABEL, OBJECT_DELETE_CANDIDATE, OBJECT_NOT_FOUND, \

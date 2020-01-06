@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2017-2019  CZ.NIC, z. s. p. o.
+# Copyright (C) 2017-2020  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -17,14 +17,12 @@
 # along with FRED.  If not, see <https://www.gnu.org/licenses/>.
 
 """Tests for `rdap.rdap_rest` package."""
-from __future__ import unicode_literals
-
 from datetime import date, datetime
+from unittest.mock import patch, sentinel
 
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from fred_idl.Registry.Whois import Contact, ContactIdentification, DisclosableContactIdentification, \
     DisclosablePlaceAddress, DisclosableString, Domain, KeySet, NameServer, NSSet, PlaceAddress
-from mock import patch, sentinel
 
 from rdap.rdap_rest.domain import delete_candidate_domain_to_dict, domain_to_dict
 from rdap.rdap_rest.entity import contact_to_dict

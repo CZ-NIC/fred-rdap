@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2016-2018  CZ.NIC, z. s. p. o.
+# Copyright (C) 2016-2020  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -19,15 +19,13 @@
 """
 Tests of RDAP views.
 """
-from __future__ import unicode_literals
-
 import json
+from unittest.mock import call, patch
 
 from django.test import Client, SimpleTestCase
 from fred_idl.Registry import IsoDateTime
 from fred_idl.Registry.Whois import INVALID_HANDLE, OBJECT_NOT_FOUND, Contact, ContactIdentification, \
     DisclosableContactIdentification, DisclosablePlaceAddress, DisclosableString, NameServer, PlaceAddress
-from mock import call, patch
 from omniORB.CORBA import TRANSIENT
 
 from rdap.utils.corba import WHOIS

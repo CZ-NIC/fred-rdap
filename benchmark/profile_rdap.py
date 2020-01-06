@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 """Perform a RDAP benchmark on a domain URL."""
-from __future__ import unicode_literals
-
 import cProfile
 import itertools
 import string

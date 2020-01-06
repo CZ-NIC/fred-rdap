@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
 #
-# Copyright (C) 2016-2019  CZ.NIC, z. s. p. o.
+# Copyright (C) 2016-2020  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -16,16 +15,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with FRED.  If not, see <https://www.gnu.org/licenses/>.
-
-from __future__ import unicode_literals
-
 from datetime import datetime
+from unittest.mock import Mock
 
-import six
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils import timezone
-from mock import Mock
 
 from rdap.rdap_rest import rdap_utils
 
@@ -75,12 +70,12 @@ class TestStatusMappingDefinition(SimpleTestCase):
     def test_combination_4_mapped_1_nomap(self):
         in_list = ['pendingCreate', 'pendingDelete', 'pendingRenew', 'unknown', 'pendingTransfer']
         out_set = ['pending create', 'pending delete', 'pending renew', 'pending transfer']
-        six.assertCountEqual(self, rdap_utils.rdap_status_mapping(in_list), out_set)
+        self.assertCountEqual(rdap_utils.rdap_status_mapping(in_list), out_set)
 
     def test_combination_same_mapped_value_just_once(self):
         in_list = ['validatedContact', 'contactPassedManualVerification', 'deleteCandidate']
         out_set = ['validated', 'pending delete']
-        six.assertCountEqual(self, rdap_utils.rdap_status_mapping(in_list), out_set)
+        self.assertCountEqual(rdap_utils.rdap_status_mapping(in_list), out_set)
 
 
 class TestInputFqdnProcessing(SimpleTestCase):

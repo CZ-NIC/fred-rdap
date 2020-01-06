@@ -110,17 +110,17 @@ test-thawed:
     only:
         - schedules
     script:
-        - tox -e py27-thaw,py35-thaw,py36-thaw,py37-thaw
+        - tox -e py35-thaw,py36-thaw,py37-thaw
 
 conformance:
     <<: *install-dependencies
     <<: *ubuntu-conformance
     script:
         # Install rdap
-        - pip install .
+        - pip3 install .
         # Start fake RDAP backend
         - omniNames -start &
-        - PYTHONPATH="$IDL_DIR:$PYTHONPATH" python test_cfg/conformance/mock_fred.py &
+        - PYTHONPATH="$IDL_DIR:$PYTHONPATH" python3 test_cfg/conformance/mock_fred.py &
         # Start RDAP
         - PYTHONPATH="./test_cfg/conformance:$IDL_DIR:$PYTHONPATH" DJANGO_SETTINGS_MODULE='settings' django-admin runserver localhost:8000 &
         # Prepare conformance tests
