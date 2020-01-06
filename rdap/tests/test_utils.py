@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2016-2020  CZ.NIC, z. s. p. o.
 #
