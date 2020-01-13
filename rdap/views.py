@@ -17,6 +17,8 @@
 # along with FRED.  If not, see <https://www.gnu.org/licenses/>.
 
 """RDAP views."""
+from typing import Callable
+
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, JsonResponse
 from django.utils.functional import SimpleLazyObject
 from django.views.decorators.csrf import csrf_exempt
@@ -45,7 +47,7 @@ class ObjectView(View):
     @cvar request_type: Request type for logger
     """
 
-    getter = None
+    getter = None  # type: Callable
     request_type = None
 
     @csrf_exempt

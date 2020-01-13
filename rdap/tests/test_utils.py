@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with FRED.  If not, see <https://www.gnu.org/licenses/>.
 from datetime import datetime
+from typing import Dict
 from unittest.mock import Mock
 
 from django.test import SimpleTestCase
@@ -122,7 +123,7 @@ class TestRfc3339TimestampFormat(SimpleTestCase):
 class TestAddUnicodeName(SimpleTestCase):
 
     def test_no_add(self):
-        dst_dict = {}
+        dst_dict = {}  # type: Dict[str, str]
         rdap_utils.add_unicode_name(dst_dict, '42.cz')
         self.assertEqual(dst_dict, {})
 
@@ -131,7 +132,7 @@ class TestAddUnicodeName(SimpleTestCase):
         self.assertEqual(dst_dict, {'k': 'v'})
 
     def test_add(self):
-        dst_dict = {}
+        dst_dict = {}  # type: Dict[str, str]
         rdap_utils.add_unicode_name(dst_dict, 'xn--skvrkl-5va55h.example')
         self.assertEqual(dst_dict, {'unicodeName': 'skvírůkl.example'})
 
