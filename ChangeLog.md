@@ -1,3 +1,7 @@
+Unreleased
+
+ * Add Django 3.0 support.
+
 2019-11-19 (0.16.0)
 
  * Add mapping for EPP statuses (RFC 8056).
