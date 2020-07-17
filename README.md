@@ -32,12 +32,12 @@ Documentation for the whole FRED project is available on-line, visit https://fre
 ## Dependencies ##
 - python >=3.5
 - python-omniorb
-- python-django 1.10 to 2.2
+- python-django 1.10 to 3.0
 - Other dependencies are listed in [requirements.txt](requirements.txt)
 
 ## Installation ##
 This application is a standard Django application and is deployed the same way as other application.
-Detailed information about deploynment of Django applications can be found at https://docs.djangoproject.com/en/2.2/howto/deployment/.
+Detailed information about deploynment of Django applications can be found at https://docs.djangoproject.com/en/dev/howto/deployment/.
 
 1. Add `rdap.apps.RdapAppConfig` to your `INSTALLED_APPS`.
 2. Link `rdap` URLs into your `urls.py`
