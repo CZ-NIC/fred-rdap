@@ -29,7 +29,7 @@ from rdap.settings import RDAP_SETTINGS
 _CORBA = CorbaNameServiceClient(host_port=RDAP_SETTINGS.CORBA_NETLOC,
                                 context_name=RDAP_SETTINGS.CORBA_CONTEXT)
 _WHOIS = SimpleLazyObject(lambda: _CORBA.get_object('Whois2', Whois.WhoisIntf))
-_LOGGER = SimpleLazyObject(lambda: _CORBA.get_object('Logger', Logger))
+_LOGGER = SimpleLazyObject(lambda: _CORBA.get_object(RDAP_SETTINGS.LOGGER_CORBA_OBJECT, Logger))
 
 
 class RdapCorbaRecoder(CorbaRecoder):

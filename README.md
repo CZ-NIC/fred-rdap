@@ -70,6 +70,11 @@ Default value is ``localhost``.
 The name of the RDAP CORBA context.
 Default value is ``fred``.
 
+#### `RDAP_LOGGER_CORBA_OBJECT` ####
+
+The name of the CORBA object for logger.
+Default value is ``Logger``.
+
 #### `RDAP_DISCLAIMER` ####
 
 A disclaimer text to be attached to every response.
