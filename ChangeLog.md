@@ -1,6 +1,15 @@
 Unreleased
 
+2020-10-01 (1.0.0)
+
+ * Drop Python 2.7 support.
+ * Add Python 3.8 support.
  * Add Django 3.0 support.
+ * Add ``RDAP_LOGGER_CORBA_OBJECT`` setting.
+ * Add simple benchmark.
+ * Fix deprecations from pylogger.
+ * Update style checks, add mypy.
+ * Fix rc style in bumpversion.
 
 2019-11-19 (0.16.0)
 
