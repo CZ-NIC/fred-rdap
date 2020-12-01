@@ -16,6 +16,7 @@ Unreleased
 * Fix deprecations from pylogger.
 * Update style checks, add mypy.
 * Fix rc style in bumpversion.
+* Reformat and rename README and CHANGELOG to ReST.
 
 0.16.0 (2019-11-19)
 -------------------
