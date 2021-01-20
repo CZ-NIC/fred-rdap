@@ -1,0 +1,12 @@
+# Ignore everything
+*
+# Upload these
+!rdap
+!*.md
+!MANIFEST.in
+!setup.*
+!requirements.txt
+!docker/uwsgi
+# But ignore these
+**/__pycache__
+docker/uwsgi/Dockerfile
