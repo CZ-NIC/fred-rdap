@@ -1,6 +1,8 @@
 django >=1.10,<3.0.99
 django-app-settings
 idna
+omniORB ~=4.2.2
 pytz
-fred-pylogger @ git+ssh://git@gitlab.office.nic.cz/fred/utils/pylogger.git
-fred-pyfco @ git+ssh://git@gitlab.office.nic.cz/fred/utils/pyfco.git
+fred-idl ~=2.36.0
+fred-pyfco ~=1.15
+fred-pylogger >=1.16,<3.0
