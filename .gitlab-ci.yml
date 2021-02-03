@@ -50,6 +50,11 @@ image:py38:
     variables:
         PYTHON_VERSION: "3.8"
 
+image:py39:
+    extends: .image
+    variables:
+        PYTHON_VERSION: "3.9"
+
 image:conformance:
     extends: .image
     script:
@@ -74,6 +79,9 @@ image:conformance:
 .py38: &py38
     image: "$CI_REGISTRY_IMAGE/tox:3.8"
 
+.py39: &py39
+    image: "$CI_REGISTRY_IMAGE/tox:3.9"
+
 .test: &test
     script:
         # First, build all virtualenvs in parallel without actually executing any tests.
@@ -84,7 +92,7 @@ image:conformance:
     only:
         - schedules
     script:
-        - tox -e py35-thaw,py36-thaw,py37-thaw,py38-thaw
+        - tox -e py35-thaw,py36-thaw,py37-thaw,py38-thaw,py39-thaw
 
 ########################################################################################################################
 # Individual jobs
@@ -94,7 +102,7 @@ licensing:
         - ./license-check/license-check.sh -v
 
 piprot:
-    <<: *py38
+    <<: *py39
     only:
         - schedules
     script:
@@ -118,6 +126,10 @@ test:py38:
     <<: *test
     <<: *py38
 
+test:py39:
+    <<: *test
+    <<: *py39
+
 test:py35-thaw:
     <<: *test-thaw
     <<: *py35
@@ -133,6 +145,10 @@ test:py37-thaw:
 test:py38-thaw:
     <<: *test-thaw
     <<: *py38
+
+test:py39-thaw:
+    <<: *test-thaw
+    <<: *py39
 
 conformance:
     image: "$CI_REGISTRY_IMAGE/conformance:latest"
