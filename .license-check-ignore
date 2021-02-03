@@ -1,1 +1,3 @@
 benchmark/*
+# Check on test settings is wicked.
+rdap/tests/settings.py
