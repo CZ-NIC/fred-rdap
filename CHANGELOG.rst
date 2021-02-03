@@ -9,14 +9,16 @@ Unreleased
 ------------------
 
 * Drop Python 2.7 support.
-* Add Python 3.8 support.
-* Add Django 3.0 support.
+* Add Python 3.8 and 3.9 support.
+* Add Django 3.0 and 3.1 support.
 * Add ``RDAP_LOGGER_CORBA_OBJECT`` setting.
 * Add simple benchmark.
 * Fix deprecations from pylogger.
 * Update style checks, add mypy.
+* Update CI setup.
 * Fix rc style in bumpversion.
 * Reformat and rename README and CHANGELOG to ReST.
+* Fix tests for python 3.8.
 
 0.16.0 (2019-11-19)
 -------------------
