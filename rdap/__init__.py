@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014-2020  CZ.NIC, z. s. p. o.
+# Copyright (C) 2014-2021  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -15,4 +15,4 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with FRED.  If not, see <https://www.gnu.org/licenses/>.
-__version__ = '0.16.0'
+__version__ = '1.0.1'

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2016-2020  CZ.NIC, z. s. p. o.
+# Copyright (C) 2016-2021  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -20,13 +20,14 @@
 Tests of RDAP views.
 """
 import json
-from unittest.mock import call, patch
+from unittest.mock import Mock, call, patch
 
 from django.test import Client, SimpleTestCase
 from fred_idl.Registry import IsoDateTime
 from fred_idl.Registry.Whois import INVALID_HANDLE, OBJECT_NOT_FOUND, Contact, ContactIdentification, \
     DisclosableContactIdentification, DisclosablePlaceAddress, DisclosableString, NameServer, PlaceAddress
 from omniORB.CORBA import TRANSIENT
+from pylogger.corbalogger import Logger
 
 from rdap.utils.corba import WHOIS
 
@@ -51,9 +52,10 @@ class TestObjectView(SimpleTestCase):
         self.addCleanup(patcher.stop)
         patcher.start()
 
-        log_patcher = patch('rdap.views.LOGGER')
+        self.logger_mock = Mock(Logger, autospec=True)
+        log_patcher = patch('rdap.views.LOGGER', new=self.logger_mock)
         self.addCleanup(log_patcher.stop)
-        self.logger_mock = log_patcher.start()
+        log_patcher.start()
 
     def get_contact(self):
         address = PlaceAddress('', '', '', '', '', '', '')
@@ -159,9 +161,10 @@ class TestFqdnObjectView(SimpleTestCase):
         self.addCleanup(patcher.stop)
         patcher.start()
 
-        log_patcher = patch('rdap.views.LOGGER')
+        self.logger_mock = Mock(Logger, autospec=True)
+        log_patcher = patch('rdap.views.LOGGER', new=self.logger_mock)
         self.addCleanup(log_patcher.stop)
-        self.logger_mock = log_patcher.start()
+        log_patcher.start()
 
     def test_nameserver(self):
         WHOIS.get_nameserver_by_fqdn.return_value = NameServer('holly', [])
