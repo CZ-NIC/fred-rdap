@@ -5,6 +5,9 @@ Changelog
 Unreleased
 ----------
 
+1.0.1 (2021-02-17)
+------------------
+
 * Fix bug in dependencies limiting Django to 3.0.
 
 1.0.0 (2020-10-01)
