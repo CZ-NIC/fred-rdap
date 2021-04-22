@@ -32,6 +32,7 @@ Table of Contents
 * `Dependencies <#dependencies>`_
 * `Installation <#installation>`_
 * `Configuration <#configuration>`_
+* `Docker <#docker>`_
 * `Development <#development>`_
 * `Testing <#testing>`_
 * `Maintainers <#maintainers>`_
@@ -115,6 +116,19 @@ Default value is ``None``\ , i.e. disabled.
 
 Value of the ``maxSigLife`` member in `the domain object class <https://tools.ietf.org/html/rfc7483#section-5.3>`_.
 Default value is ``None``\ , i.e. disabled.
+
+Docker
+======
+
+RDAP can be deployed using docker.
+
+To build image use::
+
+    docker build --tag rdap --file docker/uwsgi/Dockerfile .
+
+The image provides a uWSGI service at port 16000 and a volume with static files.
+Running the image requires setting a ``SECRET_KEY`` and ``ALLOWED_HOSTS`` environment variables.
+RDAP settings can be provided as environment variables as well.
 
 Development
 ===========
