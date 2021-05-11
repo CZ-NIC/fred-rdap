@@ -5,6 +5,10 @@ Changelog
 Unreleased
 ----------
 
+* Drop Python 3.5 support.
+* Drop Django 1.10 support.
+* Add Django 3.2 support.
+
 1.0.1 (2021-02-17)
 ------------------
 
