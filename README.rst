@@ -41,9 +41,9 @@ Table of Contents
 Dependencies
 ============
 
-* python >=3.5
+* python >=3.6
 * python-omniorb
-* python-django 1.10 to 2.2
+* python-django 1.11 to 3.2
 * Other dependencies are listed in `requirements.txt <requirements.txt>`_
 
 Installation

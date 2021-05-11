@@ -31,5 +31,6 @@ setup(name='fred-rdap',
       long_description='CZ.NIC RDAP server',
       packages=find_packages(),
       include_package_data=True,
+      python_requires='~=3.6',
       install_requires=open('requirements.txt').read().splitlines(),
       extras_require={'quality': ['isort', 'flake8', 'pydocstyle', 'mypy']})
