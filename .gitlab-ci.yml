@@ -135,18 +135,15 @@ test:py39-thaw:
     <<: *py39
 
 conformance:
-    image: "$CI_REGISTRY_IMAGE/conformance:latest"
+    services:
+        - name: "$CI_REGISTRY_IMAGE/conformance:latest"
+          alias: rdap
+    image:
+        name: "apnic/rdap-conformance:latest"
+        entrypoint: [""]
     script:
-        # Install rdap
-        - pip install --index-url ${PIP_INDEX_URL-https://pypi.nic.cz/cznic/public} .
-        # Start fake RDAP backend
-        - omniNames -start &
-        - python3 test_cfg/conformance/mock_fred.py &
-        # Start RDAP
-        - PYTHONPATH="./test_cfg/conformance:$PYTHONPATH" DJANGO_SETTINGS_MODULE='settings' django-admin runserver localhost:8000 &
-        # Prepare conformance tests
-        - git clone https://github.com/APNIC-net/rdap-conformance.git
-        - (cd rdap-conformance && git checkout v0.6)
-        - (cd rdap-conformance && mvn package --quiet)
-        # Run the conformance test
-        - java -jar rdap-conformance/target/rdap-conformance-0.6.jar test_cfg/conformance/rdap_conformance.json
+        # Check server is running. Retry several times until the server replies.
+        - curl --retry 10 http://rdap:8000/help
+        # Run the conformance test.
+        - cd /app
+        - /app/entrypoint.sh $CI_PROJECT_DIR/docker/conformance/rdap_conformance.json

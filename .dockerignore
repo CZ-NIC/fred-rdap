@@ -6,7 +6,7 @@
 !MANIFEST.in
 !setup.*
 !requirements.txt
-!docker/uwsgi
+!docker/
 # But ignore these
 **/__pycache__
-docker/uwsgi/Dockerfile
+docker/*/Dockerfile
