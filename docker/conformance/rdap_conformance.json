@@ -1,5 +1,5 @@
 {
-    "baseUrl": "http://localhost:8000",
+    "baseUrl": "http://rdap:8000",
     "objectClasses": {
         "ip": {
             "supported": false

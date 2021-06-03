@@ -1,5 +1,5 @@
 benchmark/*
 # Ignore docker configuration
-docker/uwsgi/*
+docker/*/*
 # Check on test settings is wicked.
 rdap/tests/settings.py
