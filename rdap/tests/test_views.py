@@ -24,8 +24,9 @@ from unittest.mock import Mock, call, patch
 
 from django.test import Client, SimpleTestCase
 from fred_idl.Registry import IsoDateTime
-from fred_idl.Registry.Whois import INVALID_HANDLE, OBJECT_NOT_FOUND, Contact, ContactIdentification, \
-    DisclosableContactIdentification, DisclosablePlaceAddress, DisclosableString, NameServer, PlaceAddress
+from fred_idl.Registry.Whois import (INVALID_HANDLE, OBJECT_NOT_FOUND, Contact, ContactIdentification,
+                                     DisclosableContactIdentification, DisclosablePlaceAddress, DisclosableString,
+                                     NameServer, PlaceAddress)
 from omniORB.CORBA import TRANSIENT
 from pylogger.corbalogger import Logger
 
