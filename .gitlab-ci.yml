@@ -6,6 +6,7 @@ stages:
     - test
 
 variables:
+    DOCKER_REGISTRY: "archive.nic.cz:5000"
     # Set up pip cache shared between all jobs of the project.
     PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
     TOX_PARALLEL_NO_SPINNER: 1
@@ -75,12 +76,16 @@ image:conformance:
     image: "$CI_REGISTRY_IMAGE/tox:3.9"
 
 .test: &test
-    script:
-        # First, build all virtualenvs in parallel without actually executing any tests.
+    stage: test
+    before_script:
+        - echo "Active index - $PIP_INDEX_URL"
+        # First, build all virtualenvs without actually executing any tests.
         - tox --parallel all --notest
+    script:
         - tox
 
 .test-thaw: &test-thaw
+    <<: *test
     only:
         - schedules
     script:
@@ -89,9 +94,11 @@ image:conformance:
 ########################################################################################################################
 # Individual jobs
 licensing:
+    image: "$DOCKER_REGISTRY/utils/license-check:latest"
+    tags:
+        - common
     script:
-        - git clone git@gitlab.office.nic.cz:internal-tools/license-check.git --single-branch --depth 1
-        - ./license-check/license-check.sh -v
+        - license-check -v
 
 piprot:
     <<: *py39
@@ -105,34 +112,42 @@ piprot:
 test:py36:
     <<: *test
     <<: *py36
+    needs: ["image:py36"]
 
 test:py37:
     <<: *test
     <<: *py37
+    needs: ["image:py37"]
 
 test:py38:
     <<: *test
     <<: *py38
+    needs: ["image:py38"]
 
 test:py39:
     <<: *test
     <<: *py39
+    needs: ["image:py39"]
 
 test:py36-thaw:
     <<: *test-thaw
     <<: *py36
+    needs: ["image:py36"]
 
 test:py37-thaw:
     <<: *test-thaw
     <<: *py37
+    needs: ["image:py37"]
 
 test:py38-thaw:
     <<: *test-thaw
     <<: *py38
+    needs: ["image:py38"]
 
 test:py39-thaw:
     <<: *test-thaw
     <<: *py39
+    needs: ["image:py39"]
 
 conformance:
     services:
