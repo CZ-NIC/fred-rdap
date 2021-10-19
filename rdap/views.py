@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2016-2020  CZ.NIC, z. s. p. o.
+# Copyright (C) 2016-2021  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -15,29 +15,26 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with FRED.  If not, see <https://www.gnu.org/licenses/>.
-
+#
 """RDAP views."""
-from typing import Callable
+from typing import Callable, cast
 
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, JsonResponse
-from django.utils.functional import SimpleLazyObject
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
-from pylogger.corbalogger import Logger
+from grill import Logger, get_logger_client
 
 from rdap.exceptions import InvalidHandleError, NotFoundError
 from rdap.rdap_rest.rdap_utils import InvalidIdn, preprocess_fqdn
 from rdap.settings import RDAP_SETTINGS
-from rdap.utils.corba import LOGGER as LOGGER_OBJECT
+
+from .constants import LOGGER_SERVICE, LogResult
 
 RDAP_CONTENT_TYPE = 'application/rdap+json'
 RDAP_CONFORMANCE = ['rdap_level_0', 'fred_version_0']
 
-LOGGER = SimpleLazyObject(lambda: Logger(LOGGER_OBJECT))
-LOGGER_SERVICE = 'RDAP'
-LOGGER_SUCCESS = 'Ok'
-LOGGER_NOT_FOUND = 'NotFound'
-LOGGER_BAD_REQUEST = 'BadRequest'
+_LOGGER_CLIENT = get_logger_client(RDAP_SETTINGS.LOGGER, **RDAP_SETTINGS.LOGGER_OPTIONS)
+LOGGER = Logger(_LOGGER_CLIENT, LOGGER_SERVICE, LogResult.INTERNAL_SERVER_ERROR)
 
 
 class ObjectView(View):
@@ -55,30 +52,27 @@ class ObjectView(View):
         return super(ObjectView, self).dispatch(request, *args, **kwargs)
 
     def get(self, request, handle, *args, **kwargs):
-        log_request = LOGGER.create_request(request.META.get('REMOTE_ADDR', ''), LOGGER_SERVICE, self.request_type,
-                                            properties=[('handle', handle)])
-        out_properties = []
-        try:
-            data = self.getter(request, handle)
+        with LOGGER.create(cast(str, self.request_type), source_ip=request.META.get('REMOTE_ADDR', ''),
+                           properties={'handle': handle}) as log_entry:
+            try:
+                data = self.getter(request, handle)
 
-            if RDAP_SETTINGS.DISCLAIMER:
-                notices = data.setdefault('notices', [])
-                notices.append({'title': 'Disclaimer', 'description': RDAP_SETTINGS.DISCLAIMER})
+                if RDAP_SETTINGS.DISCLAIMER:
+                    notices = data.setdefault('notices', [])
+                    notices.append({'title': 'Disclaimer', 'description': RDAP_SETTINGS.DISCLAIMER})
 
-            log_request.result = LOGGER_SUCCESS
-            response = JsonResponse(data, content_type=RDAP_CONTENT_TYPE)
-            return response
-        except NotFoundError:
-            log_request.result = LOGGER_NOT_FOUND
-            return HttpResponseNotFound(content_type=RDAP_CONTENT_TYPE)
-        except InvalidHandleError:
-            log_request.result = LOGGER_BAD_REQUEST
-            return HttpResponseBadRequest(content_type=RDAP_CONTENT_TYPE)
-        except Exception as error:
-            out_properties.append(('error', type(error).__name__))
-            raise error
-        finally:
-            log_request.close(properties=out_properties)
+                log_entry.result = LogResult.SUCCESS
+                return JsonResponse(data, content_type=RDAP_CONTENT_TYPE)
+
+            except NotFoundError:
+                log_entry.result = LogResult.NOT_FOUND
+                return HttpResponseNotFound(content_type=RDAP_CONTENT_TYPE)
+            except InvalidHandleError:
+                log_entry.result = LogResult.BAD_REQUEST
+                return HttpResponseBadRequest(content_type=RDAP_CONTENT_TYPE)
+            except Exception as error:
+                log_entry.properties = {'error': type(error).__name__}
+                raise error
 
 
 # TODO: IDN should be handled by backend. Once its implemented in FRED this view can be removed.

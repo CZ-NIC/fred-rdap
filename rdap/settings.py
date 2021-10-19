@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014-2020  CZ.NIC, z. s. p. o.
+# Copyright (C) 2014-2021  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -17,7 +17,19 @@
 # along with FRED.  If not, see <https://www.gnu.org/licenses/>.
 
 """RDAP application settings wrapper."""
-from appsettings import AppSettings, IntegerSetting, ListSetting, StringSetting
+from appsettings import AppSettings, DictSetting, IntegerSetting, ListSetting, StringSetting
+from frgal import make_credentials
+
+
+class LoggerOptionsSetting(DictSetting):
+    """Custom dict setting for logger options."""
+
+    def transform(self, value):
+        """Transform the credentials."""
+        value = super().transform(value)
+        if 'credentials' in value:
+            value['credentials'] = make_credentials(**value['credentials'])
+        return value
 
 
 class RdapAppSettings(AppSettings):
@@ -25,7 +37,8 @@ class RdapAppSettings(AppSettings):
 
     CORBA_NETLOC = StringSetting(default='localhost')
     CORBA_CONTEXT = StringSetting(default='fred')
-    LOGGER_CORBA_OBJECT = StringSetting(default='Logger')
+    LOGGER = StringSetting(default='grill.DummyLoggerClient')
+    LOGGER_OPTIONS = LoggerOptionsSetting(default={})
     DISCLAIMER = ListSetting(default=None)
     UNIX_WHOIS = StringSetting(default=None)
     MAX_SIG_LIFE = IntegerSetting(default=None)

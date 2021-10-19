@@ -92,11 +92,18 @@ Default value is ``localhost``.
 The name of the RDAP CORBA context.
 Default value is ``fred``.
 
-``RDAP_LOGGER_CORBA_OBJECT``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``RDAP_LOGGER``
+~~~~~~~~~~~~~~~
 
-The name of the CORBA object for logger.
-Default value is ``Logger``.
+A dotted path to the logger client.
+Default value is ``grill.DummyLoggerClient``.
+
+``RDAP_LOGGER_OPTIONS``
+~~~~~~~~~~~~~~~~~~~~~~~
+
+A mapping with options for the ``RDAP_LOGGER``.
+If the key ``credentials`` is present, it will be passed to the ``make_credentials`` utility as a mapping.
+Default value is ``{}``.
 
 ``RDAP_DISCLAIMER``
 -------------------

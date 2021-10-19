@@ -20,16 +20,17 @@
 Tests of RDAP views.
 """
 import json
-from unittest.mock import Mock, call, patch
+from unittest.mock import patch
 
 from django.test import Client, SimpleTestCase
 from fred_idl.Registry import IsoDateTime
 from fred_idl.Registry.Whois import (INVALID_HANDLE, OBJECT_NOT_FOUND, Contact, ContactIdentification,
                                      DisclosableContactIdentification, DisclosablePlaceAddress, DisclosableString,
                                      NameServer, PlaceAddress)
+from grill.utils import TestLogEntry, TestLoggerClient
 from omniORB.CORBA import TRANSIENT
-from pylogger.corbalogger import Logger
 
+from rdap.constants import LOGGER_SERVICE, LogEntryType, LogResult
 from rdap.utils.corba import WHOIS
 
 
@@ -53,8 +54,8 @@ class TestObjectView(SimpleTestCase):
         self.addCleanup(patcher.stop)
         patcher.start()
 
-        self.logger_mock = Mock(Logger, autospec=True)
-        log_patcher = patch('rdap.views.LOGGER', new=self.logger_mock)
+        self.test_logger = TestLoggerClient()
+        log_patcher = patch('rdap.views.LOGGER.client', new=self.test_logger)
         self.addCleanup(log_patcher.stop)
         log_patcher.start()
 
@@ -90,10 +91,9 @@ class TestObjectView(SimpleTestCase):
         self.assertEqual(result['handle'], 'kryten')
 
         # Check logger
-        calls = [call.create_request('127.0.0.1', 'RDAP', 'EntityLookup', properties=[('handle', 'kryten')]),
-                 call.create_request().close(properties=[])]
-        self.assertEqual(self.logger_mock.mock_calls, calls)
-        self.assertEqual(self.logger_mock.create_request.return_value.result, 'Ok')
+        log_entry = TestLogEntry(LOGGER_SERVICE, LogEntryType.ENTITY_LOOKUP, LogResult.SUCCESS, source_ip='127.0.0.1',
+                                 input_properties={'handle': 'kryten'})
+        self.assertEqual(self.test_logger.mock.mock_calls, log_entry.get_calls())
 
     def test_disclaimer(self):
         WHOIS.get_contact_by_handle.return_value = self.get_contact()
@@ -116,10 +116,9 @@ class TestObjectView(SimpleTestCase):
         self.assertEqual(response.content, b'')
 
         # Check logger
-        calls = [call.create_request('127.0.0.1', 'RDAP', 'EntityLookup', properties=[('handle', 'kryten')]),
-                 call.create_request().close(properties=[])]
-        self.assertEqual(self.logger_mock.mock_calls, calls)
-        self.assertEqual(self.logger_mock.create_request.return_value.result, 'NotFound')
+        log_entry = TestLogEntry(LOGGER_SERVICE, LogEntryType.ENTITY_LOOKUP, LogResult.NOT_FOUND, source_ip='127.0.0.1',
+                                 input_properties={'handle': 'kryten'})
+        self.assertEqual(self.test_logger.mock.mock_calls, log_entry.get_calls())
 
     def test_entity_invalid_handle(self):
         WHOIS.get_contact_by_handle.side_effect = INVALID_HANDLE
@@ -130,10 +129,9 @@ class TestObjectView(SimpleTestCase):
         self.assertEqual(response.content, b'')
 
         # Check logger
-        calls = [call.create_request('127.0.0.1', 'RDAP', 'EntityLookup', properties=[('handle', 'kryten')]),
-                 call.create_request().close(properties=[])]
-        self.assertEqual(self.logger_mock.mock_calls, calls)
-        self.assertEqual(self.logger_mock.create_request.return_value.result, 'BadRequest')
+        log_entry = TestLogEntry(LOGGER_SERVICE, LogEntryType.ENTITY_LOOKUP, LogResult.BAD_REQUEST,
+                                 source_ip='127.0.0.1', input_properties={'handle': 'kryten'})
+        self.assertEqual(self.test_logger.mock.mock_calls, log_entry.get_calls())
 
     def test_entity_exception(self):
         WHOIS.get_contact_by_handle.side_effect = TRANSIENT
@@ -141,9 +139,10 @@ class TestObjectView(SimpleTestCase):
             self.client.get('/entity/kryten')
 
         # Check logger
-        calls = [call.create_request('127.0.0.1', 'RDAP', 'EntityLookup', properties=[('handle', 'kryten')]),
-                 call.create_request().close(properties=[('error', 'TRANSIENT')])]
-        self.assertEqual(self.logger_mock.mock_calls, calls)
+        log_entry = TestLogEntry(LOGGER_SERVICE, LogEntryType.ENTITY_LOOKUP, LogResult.INTERNAL_SERVER_ERROR,
+                                 source_ip='127.0.0.1', input_properties={'handle': 'kryten'},
+                                 properties={'error': 'TRANSIENT'})
+        self.assertEqual(self.test_logger.mock.mock_calls, log_entry.get_calls())
 
     def test_post(self):
         # Test POST returns `Method Not Allowed` response instead of CSRF check failure.
@@ -162,8 +161,8 @@ class TestFqdnObjectView(SimpleTestCase):
         self.addCleanup(patcher.stop)
         patcher.start()
 
-        self.logger_mock = Mock(Logger, autospec=True)
-        log_patcher = patch('rdap.views.LOGGER', new=self.logger_mock)
+        self.test_logger = TestLoggerClient()
+        log_patcher = patch('rdap.views.LOGGER.client', new=self.test_logger)
         self.addCleanup(log_patcher.stop)
         log_patcher.start()
 
@@ -178,11 +177,9 @@ class TestFqdnObjectView(SimpleTestCase):
         self.assertEqual(result['handle'], 'holly')
 
         # Check logger
-        calls = [call.create_request('127.0.0.1', 'RDAP', 'NameserverLookup',
-                                     properties=[('handle', 'holly')]),
-                 call.create_request().close(properties=[])]
-        self.assertEqual(self.logger_mock.mock_calls, calls)
-        self.assertEqual(self.logger_mock.create_request.return_value.result, 'Ok')
+        log_entry = TestLogEntry(LOGGER_SERVICE, LogEntryType.NAMESERVER_LOOKUP, LogResult.SUCCESS,
+                                 source_ip='127.0.0.1', input_properties={'handle': 'holly'})
+        self.assertEqual(self.test_logger.mock.mock_calls, log_entry.get_calls())
 
     def test_nameserver_invalid_fqdn(self):
         response = self.client.get('/nameserver/-invalid')
@@ -192,7 +189,7 @@ class TestFqdnObjectView(SimpleTestCase):
         self.assertEqual(response.content, b'')
 
         # Check logger
-        self.assertEqual(self.logger_mock.mock_calls, [])
+        self.assertEqual(self.test_logger.mock.mock_calls, [])
 
 
 class TestHelpView(SimpleTestCase):
