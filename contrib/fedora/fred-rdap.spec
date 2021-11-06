@@ -13,12 +13,8 @@ Prefix: %{_prefix}
 BuildArch: noarch
 Vendor: CZ.NIC <fred@nic.cz>
 Url: https://fred.nic.cz/
-BuildRequires: python2-setuptools
-Requires: python2 python2dist(django) >= 1.10 python2-idna fred-idl fred-pyfco uwsgi-plugin-python2 httpd /usr/sbin/semanage policycoreutils
-%if 0%{?el7}
-Requires: mod_proxy_uwsgi
-%endif
-
+BuildRequires: python3 python3-setuptools
+Requires: python3 python3dist(django) >= 1.10 python3-idna python3-fred-idl python3-fred-pyfco uwsgi-plugin-python3 httpd /usr/sbin/semanage policycoreutils python3-pytz python3-fred-pylogger
 
 %description
 RDAP server for FRED registry system
@@ -27,7 +23,7 @@ RDAP server for FRED registry system
 %setup -n %{name}-%{version}
 
 %install
-python2 setup.py install -cO2 --force --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES --prefix=/usr
+/usr/bin/python3 setup.py install -cO2 --force --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES --prefix=/usr
 
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/
 install contrib/fedora/apache.conf $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/fred-rdap-apache.conf
