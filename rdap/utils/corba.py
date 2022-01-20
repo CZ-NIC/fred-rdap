@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright (C) 2014-2021  CZ.NIC, z. s. p. o.
+# Copyright (C) 2014-2022  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -16,6 +16,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with FRED.  If not, see <https://www.gnu.org/licenses/>.
+#
+from datetime import datetime
+from typing import cast
+
 from django.conf import settings
 from django.utils import timezone
 from django.utils.functional import SimpleLazyObject
@@ -33,14 +37,14 @@ _WHOIS = SimpleLazyObject(lambda: _CORBA.get_object('Whois2', Whois.WhoisIntf))
 class RdapCorbaRecoder(CorbaRecoder):
     """Corba recoder for RDAP."""
 
-    def __init__(self, coding='utf-8'):
+    def __init__(self, coding: str = 'utf-8') -> None:
         super(RdapCorbaRecoder, self).__init__(coding)
         self.add_recode_function(IsoDate, decode_iso_date, self._identity)
         self.add_recode_function(IsoDateTime, self._decode_iso_datetime, self._identity)
 
-    def _decode_iso_datetime(self, value):
+    def _decode_iso_datetime(self, value: IsoDateTime) -> datetime:
         """Decode `IsoDateTime` struct to datetime object with respect to the timezone settings."""
-        result = decode_iso_datetime(value)
+        result = cast(datetime, decode_iso_datetime(value))
         if not settings.USE_TZ:
             result = timezone.make_naive(result, timezone.get_default_timezone())
         return result

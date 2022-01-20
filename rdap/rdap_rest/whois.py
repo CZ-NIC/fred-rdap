@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014-2021  CZ.NIC, z. s. p. o.
+# Copyright (C) 2014-2022  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -15,10 +15,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with FRED.  If not, see <https://www.gnu.org/licenses/>.
-
+#
 """Wrapper module to whois idl interface."""
 import logging
+from typing import Any, Dict, Optional
 
+from django.http import HttpRequest
 from fred_idl.Registry.Whois import (INVALID_HANDLE, INVALID_LABEL, OBJECT_DELETE_CANDIDATE, OBJECT_NOT_FOUND,
                                      TOO_MANY_LABELS, UNMANAGED_ZONE)
 
@@ -32,7 +34,7 @@ from .nameserver import nameserver_to_dict
 from .nsset import nsset_to_dict
 
 
-def get_contact_by_handle(request, handle):
+def get_contact_by_handle(request: HttpRequest, handle: str) -> Optional[Dict[str, Any]]:
     logging.debug('get_contact_by_handle: %s', handle)
     try:
         return contact_to_dict(request, WHOIS.get_contact_by_handle(handle))
@@ -42,7 +44,7 @@ def get_contact_by_handle(request, handle):
         raise InvalidHandleError()
 
 
-def get_domain_by_handle(request, handle):
+def get_domain_by_handle(request: HttpRequest, handle: str) -> Optional[Dict[str, Any]]:
     logging.debug('get_domain_by_handle: %s', handle)
     try:
         return domain_to_dict(request, WHOIS.get_domain_by_handle(handle))
@@ -54,7 +56,7 @@ def get_domain_by_handle(request, handle):
         raise InvalidHandleError()
 
 
-def get_nameserver_by_handle(request, handle):
+def get_nameserver_by_handle(request: HttpRequest, handle: str) -> Optional[Dict[str, Any]]:
     logging.debug('get_nameserver_by_handle: %s', handle)
     try:
         return nameserver_to_dict(request, WHOIS.get_nameserver_by_fqdn(handle))
@@ -64,7 +66,7 @@ def get_nameserver_by_handle(request, handle):
         raise InvalidHandleError()
 
 
-def get_nsset_by_handle(request, handle):
+def get_nsset_by_handle(request: HttpRequest, handle: str) -> Optional[Dict[str, Any]]:
     logging.debug('get_nsset_by_handle: %s', handle)
     try:
         return nsset_to_dict(request, WHOIS.get_nsset_by_handle(handle))
@@ -74,7 +76,7 @@ def get_nsset_by_handle(request, handle):
         raise InvalidHandleError()
 
 
-def get_keyset_by_handle(request, handle):
+def get_keyset_by_handle(request: HttpRequest, handle: str) -> Optional[Dict[str, Any]]:
     logging.debug('get_keyset_by_handle: %s', handle)
     try:
         return keyset_to_dict(request, WHOIS.get_keyset_by_handle(handle))

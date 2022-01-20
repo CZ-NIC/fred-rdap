@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014-2021  CZ.NIC, z. s. p. o.
+# Copyright (C) 2014-2022  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -17,6 +17,8 @@
 # along with FRED.  If not, see <https://www.gnu.org/licenses/>.
 
 """RDAP application settings wrapper."""
+from typing import Any, Dict
+
 from appsettings import AppSettings, DictSetting, IntegerSetting, ListSetting, StringSetting
 from frgal import make_credentials
 
@@ -24,7 +26,7 @@ from frgal import make_credentials
 class LoggerOptionsSetting(DictSetting):
     """Custom dict setting for logger options."""
 
-    def transform(self, value):
+    def transform(self, value: Dict[str, Any]) -> Dict[str, Any]:
         """Transform the credentials."""
         value = super().transform(value)
         if 'credentials' in value:
