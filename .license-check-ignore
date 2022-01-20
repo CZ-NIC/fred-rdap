@@ -1,4 +1,5 @@
 benchmark/*
+setup.py
 # Ignore docker configuration
 docker/*/*
 # Check on test settings is wicked.

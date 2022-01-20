@@ -1,15 +1,12 @@
-########################################################################################################################
-# This file was generated using python_env, please do not edit directly.
-########################################################################################################################
 stages:
     - image
     - test
 
 variables:
-    DOCKER_REGISTRY: "archive.nic.cz:5000"
+    DOCKER_REGISTRY: "reg.nic.cz"
     # Set up pip cache shared between all jobs of the project.
     PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-    TOX_PARALLEL_NO_SPINNER: 1
+    PYTHONWARNINGS: ""
 
 cache:
     paths:
@@ -79,17 +76,10 @@ image:conformance:
     stage: test
     before_script:
         - echo "Active index - $PIP_INDEX_URL"
-        # First, build all virtualenvs without actually executing any tests.
-        - tox --parallel all --notest
     script:
         - tox
-
-.test-thaw: &test-thaw
-    <<: *test
-    only:
-        - schedules
-    script:
-        - tox -e py36-thaw,py37-thaw,py38-thaw,py39-thaw
+    coverage: '/TOTAL(?:\s+\d+){4}\s+(\d+\%)/'
+    interruptible: true
 
 ########################################################################################################################
 # Individual jobs
@@ -99,15 +89,6 @@ licensing:
         - common
     script:
         - license-check -v
-
-piprot:
-    <<: *py39
-    only:
-        - schedules
-    script:
-        - pip install piprot
-        - piprot requirements.txt constraints.txt
-    allow_failure: true
 
 test:py36:
     <<: *test
@@ -129,26 +110,6 @@ test:py39:
     <<: *py39
     needs: ["image:py39"]
 
-test:py36-thaw:
-    <<: *test-thaw
-    <<: *py36
-    needs: ["image:py36"]
-
-test:py37-thaw:
-    <<: *test-thaw
-    <<: *py37
-    needs: ["image:py37"]
-
-test:py38-thaw:
-    <<: *test-thaw
-    <<: *py38
-    needs: ["image:py38"]
-
-test:py39-thaw:
-    <<: *test-thaw
-    <<: *py39
-    needs: ["image:py39"]
-
 conformance:
     services:
         - name: "$CI_REGISTRY_IMAGE/conformance:latest"
@@ -162,3 +123,4 @@ conformance:
         # Run the conformance test.
         - cd /app
         - /app/entrypoint.sh $CI_PROJECT_DIR/docker/conformance/rdap_conformance.json
+    interruptible: true

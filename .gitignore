@@ -3,7 +3,6 @@ dist/
 build/
 fred-rdap-*/
 fred_rdap.egg-info/
-RELEASE-VERSION
 *.pyc
 *.bak
 *~

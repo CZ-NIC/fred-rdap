@@ -44,7 +44,7 @@ Dependencies
 * python >=3.6
 * python-omniorb
 * python-django 1.11 to 3.2
-* Other dependencies are listed in `requirements.txt <requirements.txt>`_
+* Other dependencies are listed in `setup.cfg <setup.cfg>`_
 
 Installation
 ============
@@ -69,7 +69,7 @@ Detailed information about deploynment of Django applications can be found at ht
 
        ROOT_URLCONF = 'rdap.urls'
 
-#. According to `RDAP specification <https://tools.ietf.org/html/rfc7480#section-5.6>`_ it is recommended to set the ``Access-Control-Allow-Origin`` header.
+#. According to `RDAP specification, section 5.6 <https://tools.ietf.org/html/rfc7480#section-5.6>`_ it is recommended to set the ``Access-Control-Allow-Origin`` header.
    It may be added by HTTP server or `django-cors-headers <https://github.com/ottoyiu/django-cors-headers>`_ application.
 
 Configuration
@@ -109,7 +109,7 @@ Default value is ``{}``.
 -------------------
 
 A disclaimer text to be attached to every response.
-Valid value is a list of strings, see `RDAP specification <https://tools.ietf.org/html/rfc7483#section-4.3>`_ for details.
+Valid value is a list of strings, see `RDAP specification, section 4.3 <https://tools.ietf.org/html/rfc7483#section-4.3>`_ for details.
 Default value is ``None``\ , i.e. no disclaimer.
 
 ``RDAP_UNIX_WHOIS``

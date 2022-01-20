@@ -100,7 +100,7 @@ Unreleased
 * Add README
 * Add conformance tests to CI
 
-0.9.0 (2017-12-20) 
+0.9.0 (2017-12-20)
 ------------------
 
 * Drop support for Django < 1.10.
@@ -137,7 +137,7 @@ Unreleased
 * CI changes/fixes (coverage)
 
 0.4.2 (2017-03-07)
------------------
+------------------
 
 * fedora packaging
 
