@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright (C) 2014-2020  CZ.NIC, z. s. p. o.
+# Copyright (C) 2014-2021  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -19,7 +19,6 @@
 from django.conf import settings
 from django.utils import timezone
 from django.utils.functional import SimpleLazyObject
-from fred_idl.ccReg import Logger
 from fred_idl.Registry import IsoDate, IsoDateTime, Whois
 from pyfco import CorbaClient, CorbaClientProxy, CorbaNameServiceClient, CorbaRecoder
 from pyfco.recoder import decode_iso_date, decode_iso_datetime
@@ -29,7 +28,6 @@ from rdap.settings import RDAP_SETTINGS
 _CORBA = CorbaNameServiceClient(host_port=RDAP_SETTINGS.CORBA_NETLOC,
                                 context_name=RDAP_SETTINGS.CORBA_CONTEXT)
 _WHOIS = SimpleLazyObject(lambda: _CORBA.get_object('Whois2', Whois.WhoisIntf))
-_LOGGER = SimpleLazyObject(lambda: _CORBA.get_object(RDAP_SETTINGS.LOGGER_CORBA_OBJECT, Logger))
 
 
 class RdapCorbaRecoder(CorbaRecoder):
@@ -49,4 +47,3 @@ class RdapCorbaRecoder(CorbaRecoder):
 
 
 WHOIS = CorbaClientProxy(CorbaClient(_WHOIS, RdapCorbaRecoder(), Whois.INTERNAL_SERVER_ERROR))
-LOGGER = CorbaClientProxy(CorbaClient(_LOGGER, CorbaRecoder('utf-8'), Logger.INTERNAL_SERVER_ERROR))

@@ -33,4 +33,5 @@ setup(name='fred-rdap',
       include_package_data=True,
       python_requires='~=3.6',
       install_requires=open('requirements.txt').read().splitlines(),
-      extras_require={'quality': ['isort', 'flake8', 'pydocstyle', 'mypy']})
+      extras_require={'quality': ['isort', 'flake8', 'pydocstyle', 'mypy'],
+                      'types': ['types-dataclasses ; python_version == "3.6.*"']})

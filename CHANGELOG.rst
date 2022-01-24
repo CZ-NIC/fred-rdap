@@ -8,6 +8,12 @@ Unreleased
 * Drop Python 3.5 support.
 * Drop Django 1.10 support.
 * Add Django 3.2 support.
+* Switch logging to FRED logger from ``pylogger`` to ``grill`` library.
+  This change is backwards incompatible: new library and settings are used.
+  The structure of logs is left intact.
+* Drop setting ``RDAP_LOGGER_CORBA_OBJECT``.
+* Add new settings ``RDAP_LOGGER`` and ``RDAP_LOGGER_OPTIONS``.
+* Add ``rdap.constants`` module with constants and enums used for FRED logger.
 
 1.0.2 (2021-11-18)
 ------------------

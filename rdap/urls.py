@@ -21,21 +21,23 @@ from rdap.rdap_rest.whois import (get_contact_by_handle, get_domain_by_handle, g
                                   get_nameserver_by_handle, get_nsset_by_handle)
 from rdap.views import FqdnObjectView, HelpView, ObjectView, UnsupportedView
 
+from .constants import LogEntryType
+
 urlpatterns = [
     url(r'^entity/(?P<handle>.+)$',
-        ObjectView.as_view(getter=get_contact_by_handle, request_type='EntityLookup'),
+        ObjectView.as_view(getter=get_contact_by_handle, request_type=LogEntryType.ENTITY_LOOKUP),
         name='entity-detail'),
     url(r'^domain/(?P<handle>.+)$',
-        FqdnObjectView.as_view(getter=get_domain_by_handle, request_type='DomainLookup'),
+        FqdnObjectView.as_view(getter=get_domain_by_handle, request_type=LogEntryType.DOMAIN_LOOKUP),
         name='domain-detail'),
     url(r'^nameserver/(?P<handle>.+)$',
-        FqdnObjectView.as_view(getter=get_nameserver_by_handle, request_type='NameserverLookup'),
+        FqdnObjectView.as_view(getter=get_nameserver_by_handle, request_type=LogEntryType.NAMESERVER_LOOKUP),
         name='nameserver-detail'),
     url(r'^fred_nsset/(?P<handle>.+)$',
-        ObjectView.as_view(getter=get_nsset_by_handle, request_type='NSSetLookup'),
+        ObjectView.as_view(getter=get_nsset_by_handle, request_type=LogEntryType.NSSET_LOOKUP),
         name='nsset-detail'),
     url(r'^fred_keyset/(?P<handle>.+)$',
-        ObjectView.as_view(getter=get_keyset_by_handle, request_type='KeySetLookup'),
+        ObjectView.as_view(getter=get_keyset_by_handle, request_type=LogEntryType.KEYSET_LOOKUP),
         name='keyset-detail'),
     url(r'^autnum/.+$', UnsupportedView.as_view()),
     url(r'^ip/.+$', UnsupportedView.as_view()),
