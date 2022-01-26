@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2016-2021  CZ.NIC, z. s. p. o.
+# Copyright (C) 2016-2022  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -17,9 +17,9 @@
 # along with FRED.  If not, see <https://www.gnu.org/licenses/>.
 #
 """RDAP views."""
-from typing import Callable, cast
+from typing import Any, Callable, cast
 
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, JsonResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
 from grill import Logger, get_logger_client
@@ -48,10 +48,10 @@ class ObjectView(View):
     request_type = None
 
     @csrf_exempt
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         return super(ObjectView, self).dispatch(request, *args, **kwargs)
 
-    def get(self, request, handle, *args, **kwargs):
+    def get(self, request: HttpRequest, handle: str, *args: Any, **kwargs: Any) -> HttpResponse:
         with LOGGER.create(cast(str, self.request_type), source_ip=request.META.get('REMOTE_ADDR', ''),
                            properties={'handle': handle}) as log_entry:
             try:
@@ -79,7 +79,7 @@ class ObjectView(View):
 class FqdnObjectView(ObjectView):
     """View for domains and nameservers."""
 
-    def get(self, request, handle, *args, **kwargs):
+    def get(self, request: HttpRequest, handle: str, *args: Any, **kwargs: Any) -> HttpResponse:
         try:
             handle = preprocess_fqdn(handle)
         except InvalidIdn:
@@ -96,10 +96,10 @@ class HelpView(View):
     help_text = 'See the API reference: https://fred.nic.cz/documentation/html/RDAPReference'
 
     @csrf_exempt
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         return super(HelpView, self).dispatch(request, *args, **kwargs)
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         data = {
             'rdapConformance': RDAP_CONFORMANCE,
             'notices': [{'title': 'Help', 'description': [self.help_text]}],
@@ -117,8 +117,8 @@ class UnsupportedView(View):
     status = 501
 
     @csrf_exempt
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         return super(UnsupportedView, self).dispatch(request, *args, **kwargs)
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         return HttpResponse(status=self.status, content_type=RDAP_CONTENT_TYPE)

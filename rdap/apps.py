@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2018-2020  CZ.NIC, z. s. p. o.
+# Copyright (C) 2018-2022  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -27,5 +27,5 @@ class RdapAppConfig(AppConfig):
 
     name = 'rdap'
 
-    def ready(self):
+    def ready(self) -> None:
         RDAP_SETTINGS.check()

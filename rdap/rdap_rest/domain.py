@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014-2020  CZ.NIC, z. s. p. o.
+# Copyright (C) 2014-2022  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -15,13 +15,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with FRED.  If not, see <https://www.gnu.org/licenses/>.
-
+#
 """Wrapper module to whois idl interface."""
-
 import logging
+from typing import Any, Dict, Optional
 
+from django.http import HttpRequest
 from django.urls import reverse
-from fred_idl.Registry.Whois import IPv4, IPv6
+from fred_idl.Registry.Whois import Domain, IPv4, IPv6
 
 from rdap.settings import RDAP_SETTINGS
 from rdap.utils.corba import WHOIS
@@ -29,7 +30,7 @@ from rdap.utils.corba import WHOIS
 from .rdap_utils import ObjectClassName, add_unicode_name, nonempty, rdap_status_mapping, to_rfc3339
 
 
-def domain_to_dict(request, struct):
+def domain_to_dict(request: HttpRequest, struct: Domain) -> Optional[Dict[str, Any]]:
     """Transform CORBA domain struct to python dictionary."""
     logging.debug(struct)
 
@@ -229,7 +230,7 @@ def domain_to_dict(request, struct):
     return result
 
 
-def delete_candidate_domain_to_dict(request, handle):
+def delete_candidate_domain_to_dict(request: HttpRequest, handle: str) -> Dict[str, Any]:
     """Return python dictionary with RDAP data for domain with `deleteCandidate` status."""
     self_link = request.build_absolute_uri(reverse('domain-detail', kwargs={"handle": handle}))
 

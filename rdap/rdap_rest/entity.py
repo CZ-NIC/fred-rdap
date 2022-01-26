@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014-2020  CZ.NIC, z. s. p. o.
+# Copyright (C) 2014-2022  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -15,18 +15,21 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with FRED.  If not, see <https://www.gnu.org/licenses/>.
-
+#
 """Wrapper module to whois idl interface."""
 import logging
+from typing import Any, Dict, Optional
 
+from django.http import HttpRequest
 from django.urls import reverse
+from fred_idl.Registry.Whois import Contact
 
 from rdap.settings import RDAP_SETTINGS
 
 from .rdap_utils import ObjectClassName, disclosable_nonempty, nonempty, rdap_status_mapping, to_rfc3339
 
 
-def contact_to_dict(request, struct):
+def contact_to_dict(request: HttpRequest, struct: Contact) -> Optional[Dict[str, Any]]:
     """Transform CORBA contact struct to python dictionary."""
     logging.debug(struct)
 

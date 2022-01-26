@@ -1,9 +1,0 @@
-django >=1.11,<3.2.99
-django-app-settings
-idna
-omniORB ~=4.2.2
-pytz
-fred-idl ~=2.36.0
-fred-pyfco ~=1.15
-frgal ~=3.8
-grill ~=1.6

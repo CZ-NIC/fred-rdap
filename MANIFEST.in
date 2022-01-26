@@ -1,12 +1,9 @@
-include *.md
+include *.rst
 include LICENSE
 include COPYING
-include dependency_links.txt
-include requirements.txt
-include constraints.txt
 include contrib/fedora/fred-rdap.spec
 include contrib/fedora/uwsgi.ini
 include contrib/fedora/apache.conf
 include contrib/fedora/rdap_cfg.py
 graft examples
-graft rdap/tests/data
+graft rdap

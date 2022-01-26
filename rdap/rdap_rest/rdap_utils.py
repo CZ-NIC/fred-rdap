@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014-2020  CZ.NIC, z. s. p. o.
+# Copyright (C) 2014-2022  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -15,14 +15,18 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with FRED.  If not, see <https://www.gnu.org/licenses/>.
-
+#
 """Utils for translating Corba objects to python dictionary."""
+from datetime import datetime
+from typing import Any, Dict, Optional, Sequence
+
 import idna
 from django.conf import settings
 from django.utils import timezone
+from fred_idl.Registry.Whois import DisclosableString
 
 
-def to_rfc3339(dt):
+def to_rfc3339(dt: datetime) -> str:
     """Format datetime object as in rfc3339 (with stripped microsecond part)."""
     if timezone.is_aware(dt) and not settings.USE_TZ:
         raise TypeError("can't compare offset-naive and offset-aware datetimes")
@@ -37,11 +41,11 @@ def to_rfc3339(dt):
     return aux.isoformat('T')
 
 
-def nonempty(input):
+def nonempty(input: Optional[str]) -> bool:
     return input is not None and input != ''
 
 
-def disclosable_nonempty(disclosable):
+def disclosable_nonempty(disclosable: DisclosableString) -> bool:
     """Check if value which can be hidden by user setting should be added to output."""
     if disclosable.disclose:
         return nonempty(disclosable.value)
@@ -85,7 +89,7 @@ RDAP_STATUS_MAPPING = {
 }
 
 
-def rdap_status_mapping(status_list):
+def rdap_status_mapping(status_list: Sequence[str]) -> Sequence[str]:
     """Translate backend status identifiers to rdap values.
 
     ('ok' status is not returned by backend and it is represented
@@ -115,20 +119,20 @@ class InvalidIdn(Exception):
     """Invalid input - internationalized domain name."""
 
 
-def preprocess_fqdn(fqdn):
+def preprocess_fqdn(fqdn: str) -> str:
     """Normalize fqdn input search string for backend call.
 
     @rtype: str
     """
     try:
-        fqdn = idna.encode(fqdn)
-        idna.decode(fqdn)
+        encoded = idna.encode(fqdn)
+        idna.decode(encoded)
     except UnicodeError:
         raise InvalidIdn()
-    return fqdn.decode()
+    return encoded.decode()
 
 
-def add_unicode_name(dst_dict, ldh_name):
+def add_unicode_name(dst_dict: Dict[str, Any], ldh_name: str) -> None:
     """Add optional unicodeName key to dictionary if contains non-ascii characters."""
     unicode_name = ldh_name.encode("idna").decode("idna")
     if unicode_name != ldh_name:
