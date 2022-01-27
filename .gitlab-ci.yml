@@ -28,11 +28,6 @@ cache:
     variables:
         IMAGE_TAG: "$CI_REGISTRY_IMAGE/tox:$PYTHON_VERSION"
 
-image:py36:
-    extends: .image
-    variables:
-        PYTHON_VERSION: "3.6"
-
 image:py37:
     extends: .image
     variables:
@@ -48,6 +43,11 @@ image:py39:
     variables:
         PYTHON_VERSION: "3.9"
 
+image:py310:
+    extends: .image
+    variables:
+        PYTHON_VERSION: "3.10"
+
 image:conformance:
     extends: .image
     script:
@@ -60,9 +60,6 @@ image:conformance:
 
 ########################################################################################################################
 # Basic declarations
-.py36: &py36
-    image: "$CI_REGISTRY_IMAGE/tox:3.6"
-
 .py37: &py37
     image: "$CI_REGISTRY_IMAGE/tox:3.7"
 
@@ -71,6 +68,9 @@ image:conformance:
 
 .py39: &py39
     image: "$CI_REGISTRY_IMAGE/tox:3.9"
+
+.py310: &py310
+    image: "$CI_REGISTRY_IMAGE/tox:3.10"
 
 .test: &test
     stage: test
@@ -90,11 +90,6 @@ licensing:
     script:
         - license-check -v
 
-test:py36:
-    <<: *test
-    <<: *py36
-    needs: ["image:py36"]
-
 test:py37:
     <<: *test
     <<: *py37
@@ -109,6 +104,11 @@ test:py39:
     <<: *test
     <<: *py39
     needs: ["image:py39"]
+
+test:py310:
+    <<: *test
+    <<: *py310
+    needs: ["image:py310"]
 
 conformance:
     services:
