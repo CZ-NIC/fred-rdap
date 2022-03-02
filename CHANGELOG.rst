@@ -5,8 +5,12 @@ Changelog
 Unreleased
 ----------
 
+1.1.0 (2022-03-02)
+------------------
+
 * Drop Python 3.5 support.
-* Drop Django 1.10 support.
+* Add Django 1.10 support.
+* Add Django 1.10, 1.11, 2.0 and 2.1 support.
 * Add Django 3.2 support.
 * Switch logging to FRED logger from ``pylogger`` to ``grill`` library.
   This change is backwards incompatible: new library and settings are used.
@@ -14,6 +18,10 @@ Unreleased
 * Drop setting ``RDAP_LOGGER_CORBA_OBJECT``.
 * Add new settings ``RDAP_LOGGER`` and ``RDAP_LOGGER_OPTIONS``.
 * Add ``rdap.constants`` module with constants and enums used for FRED logger.
+* Add ``Dockerfile`` for production usage.
+* Update static checks & project setup.
+* Add more strict mypy checks and improve annotations.
+* Refactor conformance tests.
 
 1.0.2 (2021-11-18)
 ------------------
