@@ -12,6 +12,7 @@ Unreleased
 * Add Django 1.10 support.
 * Add Django 1.10, 1.11, 2.0 and 2.1 support.
 * Add Django 3.2 support.
+* Add fred-idl 2.37 and 2.38 support.
 * Switch logging to FRED logger from ``pylogger`` to ``grill`` library.
   This change is backwards incompatible: new library and settings are used.
   The structure of logs is left intact.
