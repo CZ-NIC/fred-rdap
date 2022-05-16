@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2016-2021  CZ.NIC, z. s. p. o.
+# Copyright (C) 2016-2022  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -15,7 +15,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with FRED.  If not, see <https://www.gnu.org/licenses/>.
-
-INSTALLED_APPS = ('rdap.apps.RdapAppConfig', )
+#
+INSTALLED_APPS = ('rdap.tests.apps.TestRdapAppConfig', )
 ROOT_URLCONF = 'rdap.urls'
 SECRET_KEY = 'SECRET'

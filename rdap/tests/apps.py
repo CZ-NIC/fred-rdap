@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2018-2022  CZ.NIC, z. s. p. o.
+# Copyright (C) 2022  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -16,24 +16,12 @@
 # You should have received a copy of the GNU General Public License
 # along with FRED.  If not, see <https://www.gnu.org/licenses/>.
 #
-"""AppConfig definition."""
-from django.apps import AppConfig
+from unittest.mock import patch
 
-from .settings import RDAP_SETTINGS
+from rdap.apps import RdapAppConfig
 
 
-class RdapAppConfig(AppConfig):
-    """RDAP specific app config."""
-
-    name = 'rdap'
-
+class TestRdapAppConfig(RdapAppConfig):
     def ready(self) -> None:
-        from rdap.views import LOGGER
-
-        from .constants import LOGGER_SERVICE, LogEntryType, LogResult
-
-        RDAP_SETTINGS.check()
-
-        LOGGER.client.register_service(LOGGER_SERVICE, handle='rdap_')
-        LOGGER.client.register_log_entry_types(LOGGER_SERVICE, LogEntryType)
-        LOGGER.client.register_results(LOGGER_SERVICE, LogResult)
+        with patch('rdap.views.LOGGER.client', autospec=True):
+            super().ready()
