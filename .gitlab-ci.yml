@@ -53,10 +53,11 @@ image:conformance:
     script:
         # Login to GitLab container registry https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#using-the-gitlab-container-registry
         - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
-        - docker build --pull --tag "$IMAGE_TAG" --file docker/conformance/Dockerfile .
+        - docker build --pull --build-arg PIP_INDEX_URL=$PIP_INDEX_URL --tag "$IMAGE_TAG" --file docker/conformance/Dockerfile .
         - docker push "$IMAGE_TAG"
     variables:
         IMAGE_TAG: "$CI_REGISTRY_IMAGE/conformance:latest"
+        PIP_INDEX_URL: "https://pypi.nic.cz/cznic/public"
 
 ########################################################################################################################
 # Basic declarations

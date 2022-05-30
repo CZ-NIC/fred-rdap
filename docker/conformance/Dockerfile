@@ -11,7 +11,7 @@ RUN apt-get --yes update \
 # Prepare rdap
 WORKDIR /app
 COPY . .
-ENV PIP_INDEX_URL=https://pypi.nic.cz/cznic/public
+ARG PIP_INDEX_URL=https://pypi.nic.cz/cznic/public
 RUN tox --devenv venv
 
 ENV PYTHONPATH="/app/docker/conformance:$PYTHONPATH"
