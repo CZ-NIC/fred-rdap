@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2016-2021  CZ.NIC, z. s. p. o.
+# Copyright (C) 2016-2022  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -15,20 +15,16 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with FRED.  If not, see <https://www.gnu.org/licenses/>.
-
-"""
-Tests of RDAP views.
-"""
+#
 import json
 from unittest.mock import patch
 
 from django.test import Client, SimpleTestCase
-from fred_idl.Registry import IsoDateTime
-from fred_idl.Registry.Whois import (INVALID_HANDLE, OBJECT_NOT_FOUND, Contact, ContactIdentification,
-                                     DisclosableContactIdentification, DisclosablePlaceAddress, DisclosableString,
-                                     NameServer, PlaceAddress)
+from fred_idl.Registry.Whois import INVALID_LABEL, OBJECT_NOT_FOUND, NameServer
 from grill.utils import TestLogEntry, TestLoggerClient
 from omniORB.CORBA import TRANSIENT
+from regal import Contact
+from regal.exceptions import ContactDoesNotExist
 
 from rdap.constants import LOGGER_SERVICE, LogEntryType, LogResult
 from rdap.utils.corba import WHOIS
@@ -50,7 +46,7 @@ class TestObjectView(SimpleTestCase):
     client_class = EnforcingCsrfClient
 
     def setUp(self):
-        patcher = patch.object(WHOIS, 'client', spec=('get_contact_by_handle', ))
+        patcher = patch.object(WHOIS, 'client', spec=('get_domain_by_handle', ))
         self.addCleanup(patcher.stop)
         patcher.start()
 
@@ -59,30 +55,18 @@ class TestObjectView(SimpleTestCase):
         self.addCleanup(log_patcher.stop)
         log_patcher.start()
 
-    def get_contact(self):
-        address = PlaceAddress('', '', '', '', '', '', '')
-        ident = ContactIdentification('OP', '')
-        return Contact(
-            'kryten',
-            DisclosableString('', True),
-            DisclosableString('', True),
-            DisclosablePlaceAddress(address, True),
-            DisclosableString('', True),
-            DisclosableString('', True),
-            DisclosableString('', True),
-            DisclosableString('', True),
-            DisclosableString('', True),
-            DisclosableContactIdentification(ident, True),
-            '',
-            '',
-            IsoDateTime('1988-09-06T20:00:00Z'),
-            None,
-            None,
-            [])
-
     def test_entity(self):
-        WHOIS.get_contact_by_handle.return_value = self.get_contact()
-        response = self.client.get('/entity/kryten')
+        patcher = patch('rdap.rdap_rest.whois.CONTACT_CLIENT',
+                        spec=('get_contact_info', 'get_contact_id', 'get_contact_state'))
+        with patcher as contact_mock:
+            contact = Contact(contact_id='2X4B', contact_handle='kryten', sponsoring_registrar='HOLLY')
+            contact_mock.get_contact_id.return_value = '2X4B'
+            contact_mock.get_contact_info.return_value = contact
+            contact_mock.get_contact_state.return_value = {}
+
+            with patch('rdap.rdap_rest.entity.CONTACT_CLIENT', new=contact_mock):
+
+                response = self.client.get('/entity/kryten')
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/rdap+json')
@@ -96,9 +80,17 @@ class TestObjectView(SimpleTestCase):
         self.assertEqual(self.test_logger.mock.mock_calls, log_entry.get_calls())
 
     def test_disclaimer(self):
-        WHOIS.get_contact_by_handle.return_value = self.get_contact()
-        with self.settings(RDAP_DISCLAIMER=['Quagaars!']):
-            response = self.client.get('/entity/kryten')
+        patcher = patch('rdap.rdap_rest.whois.CONTACT_CLIENT',
+                        spec=('get_contact_info', 'get_contact_id', 'get_contact_state'))
+        with patcher as contact_mock:
+            contact = Contact(contact_id='2X4B', contact_handle='kryten', sponsoring_registrar='HOLLY')
+            contact_mock.get_contact_id.return_value = '2X4B'
+            contact_mock.get_contact_info.return_value = contact
+            contact_mock.get_contact_state.return_value = {}
+
+            with patch('rdap.rdap_rest.entity.CONTACT_CLIENT', new=contact_mock):
+                with self.settings(RDAP_DISCLAIMER=['Quagaars!']):
+                    response = self.client.get('/entity/kryten')
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/rdap+json')
@@ -108,8 +100,11 @@ class TestObjectView(SimpleTestCase):
         self.assertIn({'title': 'Disclaimer', 'description': ['Quagaars!']}, result['notices'])
 
     def test_entity_not_found(self):
-        WHOIS.get_contact_by_handle.side_effect = OBJECT_NOT_FOUND
-        response = self.client.get('/entity/kryten')
+        patcher = patch('rdap.rdap_rest.whois.CONTACT_CLIENT', spec=('get_contact_id', 'get_contact_info'))
+        with patcher as contact_mock:
+            contact_mock.get_contact_id.side_effect = ContactDoesNotExist
+
+            response = self.client.get('/entity/kryten')
 
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response['Content-Type'], 'application/rdap+json')
@@ -120,27 +115,54 @@ class TestObjectView(SimpleTestCase):
                                  input_properties={'handle': 'kryten'})
         self.assertEqual(self.test_logger.mock.mock_calls, log_entry.get_calls())
 
-    def test_entity_invalid_handle(self):
-        WHOIS.get_contact_by_handle.side_effect = INVALID_HANDLE
-        response = self.client.get('/entity/kryten')
+    def test_entity_exception(self):
+        patcher = patch('rdap.rdap_rest.whois.CONTACT_CLIENT', spec=('get_contact_id', 'get_contact_info'))
+        with patcher as contact_mock:
+            contact_mock.get_contact_id.side_effect = Exception('Gazpacho!')
+
+            with self.assertRaisesRegexp(Exception, 'Gazpacho!'):
+                self.client.get('/entity/kryten')
+
+        # Check logger
+        log_entry = TestLogEntry(LOGGER_SERVICE, LogEntryType.ENTITY_LOOKUP, LogResult.INTERNAL_SERVER_ERROR,
+                                 source_ip='127.0.0.1', input_properties={'handle': 'kryten'},
+                                 properties={'error': 'Exception'})
+        self.assertEqual(self.test_logger.mock.mock_calls, log_entry.get_calls())
+
+    def test_domain_not_found(self):
+        WHOIS.get_domain_by_handle.side_effect = OBJECT_NOT_FOUND
+        response = self.client.get('/domain/example.org')
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response['Content-Type'], 'application/rdap+json')
+        self.assertEqual(response.content, b'')
+
+        # Check logger
+        log_entry = TestLogEntry(LOGGER_SERVICE, LogEntryType.DOMAIN_LOOKUP, LogResult.NOT_FOUND, source_ip='127.0.0.1',
+                                 input_properties={'handle': 'example.org'})
+        self.assertEqual(self.test_logger.mock.mock_calls, log_entry.get_calls())
+
+    def test_domain_invalid_handle(self):
+        WHOIS.get_domain_by_handle.side_effect = INVALID_LABEL
+        response = self.client.get('/domain/example.org')
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response['Content-Type'], 'application/rdap+json')
         self.assertEqual(response.content, b'')
 
         # Check logger
-        log_entry = TestLogEntry(LOGGER_SERVICE, LogEntryType.ENTITY_LOOKUP, LogResult.BAD_REQUEST,
-                                 source_ip='127.0.0.1', input_properties={'handle': 'kryten'})
+        log_entry = TestLogEntry(LOGGER_SERVICE, LogEntryType.DOMAIN_LOOKUP, LogResult.BAD_REQUEST,
+                                 source_ip='127.0.0.1', input_properties={'handle': 'example.org'})
         self.assertEqual(self.test_logger.mock.mock_calls, log_entry.get_calls())
 
-    def test_entity_exception(self):
-        WHOIS.get_contact_by_handle.side_effect = TRANSIENT
+    def test_domain_exception(self):
+        WHOIS.get_domain_by_handle.side_effect = TRANSIENT
         with self.assertRaises(TRANSIENT):
-            self.client.get('/entity/kryten')
+            self.client.get('/domain/example.org')
 
         # Check logger
-        log_entry = TestLogEntry(LOGGER_SERVICE, LogEntryType.ENTITY_LOOKUP, LogResult.INTERNAL_SERVER_ERROR,
-                                 source_ip='127.0.0.1', input_properties={'handle': 'kryten'},
+        log_entry = TestLogEntry(LOGGER_SERVICE, LogEntryType.DOMAIN_LOOKUP, LogResult.INTERNAL_SERVER_ERROR,
+                                 source_ip='127.0.0.1', input_properties={'handle': 'example.org'},
                                  properties={'error': 'TRANSIENT'})
         self.assertEqual(self.test_logger.mock.mock_calls, log_entry.get_calls())
 

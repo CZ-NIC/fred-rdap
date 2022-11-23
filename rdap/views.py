@@ -23,6 +23,7 @@ from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest, HttpR
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
 from grill import Logger, get_logger_client
+from regal.exceptions import ObjectDoesNotExist
 
 from rdap.exceptions import InvalidHandleError, NotFoundError
 from rdap.rdap_rest.rdap_utils import InvalidIdn, preprocess_fqdn
@@ -64,7 +65,7 @@ class ObjectView(View):
                 log_entry.result = LogResult.SUCCESS
                 return JsonResponse(data, content_type=RDAP_CONTENT_TYPE)
 
-            except NotFoundError:
+            except (NotFoundError, ObjectDoesNotExist):
                 log_entry.result = LogResult.NOT_FOUND
                 return HttpResponseNotFound(content_type=RDAP_CONTENT_TYPE)
             except InvalidHandleError:

@@ -105,6 +105,18 @@ A mapping with options for the ``RDAP_LOGGER``.
 If the key ``credentials`` is present, it will be passed to the ``make_credentials`` utility as a mapping.
 Default value is ``{}``.
 
+``RDAP_REGISTRY_NETLOC``
+------------------------
+
+Network location, i.e. host and port, of the registry server.
+This setting is required.
+
+``RDAP_REGISTRY_SSL_CERT``
+--------------------------
+
+Path to file with SSL root certificate.
+Default value is ``None``, which disables the SSL encryption.
+
 ``RDAP_DISCLAIMER``
 -------------------
 

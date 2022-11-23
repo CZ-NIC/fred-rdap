@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2021  CZ.NIC, z. s. p. o.
+# Copyright (C) 2021-2022  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -41,3 +41,22 @@ class LogEntryType(str, Enum):
     NAMESERVER_LOOKUP = 'NameserverLookup'
     NSSET_LOOKUP = 'NSSetLookup'
     KEYSET_LOOKUP = 'KeySetLookup'
+
+
+@unique
+class ObjectStatus(str, Enum):
+    """Important object statuses."""
+
+    LINKED = 'linked'
+
+
+@unique
+class Publish(str, Enum):
+    """Publish field names."""
+
+    NAME = 'name'
+    ORGANIZATION = 'organization'
+    EMAILS = 'emails'
+    TELEPHONE = 'telephone'
+    FAX = 'fax'
+    PLACE = 'place'

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2017-2021  CZ.NIC, z. s. p. o.
+# Copyright (C) 2017-2022  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -15,38 +15,24 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with FRED.  If not, see <https://www.gnu.org/licenses/>.
-
+#
 """Tests for `rdap.rdap_rest` package."""
-from datetime import date, datetime
+from datetime import date, datetime, timezone
+from typing import Any, Dict, List
 from unittest.mock import patch, sentinel
 
 from django.test import RequestFactory, SimpleTestCase, override_settings
-from fred_idl.Registry.Whois import (Contact, ContactIdentification, DisclosableContactIdentification,
-                                     DisclosablePlaceAddress, DisclosableString, Domain, KeySet, NameServer, NSSet,
-                                     PlaceAddress)
+from fred_idl.Registry.Whois import Domain, KeySet, NameServer, NSSet
+from regal import Address, Contact, ObjectEvent, ObjectEvents
 
+from rdap.constants import ObjectStatus
 from rdap.rdap_rest.domain import delete_candidate_domain_to_dict, domain_to_dict
 from rdap.rdap_rest.entity import contact_to_dict
 from rdap.rdap_rest.keyset import keyset_to_dict
 from rdap.rdap_rest.nameserver import nameserver_to_dict
 from rdap.rdap_rest.nsset import nsset_to_dict
+from rdap.rdap_rest.rdap_utils import ObjectClassName
 from rdap.utils.corba import WHOIS
-
-
-def get_contact():
-    nothing = DisclosableString(value='', disclose=False)
-    place = PlaceAddress(street1='', street2='', street3='', city='', stateorprovince='', postalcode='',
-                         country_code='')
-    address = DisclosablePlaceAddress(value=place, disclose=False)
-    ident = DisclosableContactIdentification(
-        value=ContactIdentification(identification_type='PASS', identification_data=''),
-        disclose=False,
-    )
-    return Contact(
-        handle='KRYTEN', organization=nothing, name=nothing, address=address, phone=nothing, fax=nothing, email=nothing,
-        notify_email=nothing, vat_number=nothing, identification=ident, creating_registrar_handle='HOLLY',
-        sponsoring_registrar_handle='LISTER', created=datetime(1980, 1, 4, 11, 14, 10), changed=None,
-        last_transfer=None, statuses=[])
 
 
 def get_domain(admin_contact_handles=None, nsset_handle=None, keyset_handle=None):
@@ -166,22 +152,196 @@ class TestDeleteCandidateDomainToDict(SimpleTestCase):
         self.assertEqual(result['port43'], 'whois.example.com')
 
 
-@override_settings(ALLOWED_HOSTS=['rdap.example'], RDAP_UNIX_WHOIS=None)
+@override_settings(ALLOWED_HOSTS=['rdap.example'], RDAP_UNIX_WHOIS=None, USE_TZ=True)
 class TestContactToDict(SimpleTestCase):
     """Test `rdap.rdap_rest.domain.contact_to_dict` function."""
 
     def setUp(self):
         self.request = RequestFactory(HTTP_HOST='rdap.example').get('/dummy/')
 
-    def test_simple(self):
-        result = contact_to_dict(self.request, get_contact())
-        self.assertEqual(result['links'][0]['value'], 'http://rdap.example/entity/KRYTEN')
-        self.assertNotIn('port43', result)
+        patcher = patch('rdap.rdap_rest.entity.CONTACT_CLIENT', spec=('get_contact_state', ))
+        self.addCleanup(patcher.stop)
+        self.contact_mock = patcher.start()
 
-    def test_port43(self):
-        with override_settings(RDAP_UNIX_WHOIS='whois.example.com'):
-            result = contact_to_dict(self.request, get_contact())
-        self.assertEqual(result['port43'], 'whois.example.com')
+    def _test(self, contact: Contact, states: Dict[str, bool], data: Dict[str, Any]) -> None:
+        self.contact_mock.get_contact_state.return_value = states
+
+        result = contact_to_dict(contact, self.request)
+
+        link = {'value': 'http://rdap.example/entity/KRYTEN', 'rel': 'self',
+                'href': 'http://rdap.example/entity/KRYTEN', 'type': 'application/rdap+json'}
+        defaults = {
+            'rdapConformance': ["rdap_level_0"],
+            'objectClassName': ObjectClassName.ENTITY,
+            'handle': 'KRYTEN',
+            'links': [link],
+            'entities': [{'objectClassName': ObjectClassName.ENTITY, 'handle': 'HOLLY', 'roles': ['registrar']}],
+        }
+        self.assertEqual(result, dict(defaults, **data))
+
+    def _test_unlinked(self, states: Dict[str, bool]) -> None:
+        contact = Contact(contact_id='2X4B', contact_handle='KRYTEN', sponsoring_registrar='HOLLY')
+        data = {'remarks': [{"description": ["Omitting data because contact is not linked to any registry object."]}]}
+        self._test(contact, states, data)
+
+    def test_unlinked_missing(self):
+        self._test_unlinked({})
+
+    def test_unlinked_false(self):
+        self._test_unlinked({ObjectStatus.LINKED: False})
+
+    def _test_linked(self, contact_kwargs: Dict[str, Any], vcard: List[List[Any]]) -> None:
+        events = ObjectEvents(
+            registered=ObjectEvent(registrar_handle='DIVADROID', timestamp=datetime(1988, 9, 6, tzinfo=timezone.utc)),
+            transferred=ObjectEvent(registrar_handle='QUEEG-500'))
+        contact = Contact(contact_id='2X4B', contact_handle='KRYTEN', sponsoring_registrar='HOLLY', events=events,
+                          **contact_kwargs)
+
+        events_data = [
+            {'eventAction': 'registration', 'eventDate': '1988-09-06T00:00:00+00:00', 'eventActor': 'DIVADROID'}]
+        data = {
+            'vcardArray': ['vcard', vcard],
+            'events': events_data,
+            'status': ['associated'],
+        }
+        self._test(contact, {ObjectStatus.LINKED: True}, data)
+
+    def test_linked_simple(self):
+        self._test_linked({}, [["version", {}, "text", "4.0"]])
+
+    def test_name_publish(self):
+        vcard = [["version", {}, "text", "4.0"], ['fn', {}, 'text', 'Kryten']]
+        self._test_linked({'name': 'Kryten', 'publish': {'name': True}}, vcard)
+
+    def test_name_unpublish(self):
+        vcard = [["version", {}, "text", "4.0"]]
+        self._test_linked({'name': 'Kryten', 'publish': {'name': False}}, vcard)
+
+    def test_name_empty(self):
+        vcard = [["version", {}, "text", "4.0"]]
+        self._test_linked({'name': '', 'publish': {'name': True}}, vcard)
+
+    def test_organization_publish(self):
+        vcard = [["version", {}, "text", "4.0"], ['org', {}, 'text', 'JMC']]
+        self._test_linked({'organization': 'JMC', 'publish': {'organization': True}}, vcard)
+
+    def test_organization_unpublish(self):
+        vcard = [["version", {}, "text", "4.0"]]
+        self._test_linked({'organization': 'JMC', 'publish': {'organization': False}}, vcard)
+
+    def test_organization_empty(self):
+        vcard = [["version", {}, "text", "4.0"]]
+        self._test_linked({'organization': '', 'publish': {'organization': True}}, vcard)
+
+    def test_place_publish(self):
+        address = Address(street=['Deck 16'], city='Red Dwarf', state_or_province='Deep Space', postal_code='JMC',
+                          country_code='JU')
+        vcard = [["version", {}, "text", "4.0"],
+                 ['adr', {'type': ''}, 'text', ['', 'Deck 16', '', '', 'Red Dwarf', 'Deep Space', 'JMC', 'JU']]]
+        self._test_linked({'place': address, 'publish': {'place': True}}, vcard)
+
+    def test_place_unpublish(self):
+        address = Address(street=['Deck 16'], city='Red Dwarf', state_or_province='Deep Space', postal_code='JMC',
+                          country_code='JU')
+        vcard = [["version", {}, "text", "4.0"]]
+        self._test_linked({'place': address, 'publish': {'place': False}}, vcard)
+
+    def test_place_empty(self):
+        vcard = [["version", {}, "text", "4.0"]]
+        self._test_linked({'place': None, 'publish': {'place': True}}, vcard)
+
+    def test_telephone_publish(self):
+        vcard = [["version", {}, "text", "4.0"], ['tel', {'type': ['voice']}, 'uri', 'tel:+1.234']]
+        self._test_linked({'telephone': '+1.234', 'publish': {'telephone': True}}, vcard)
+
+    def test_telephone_unpublish(self):
+        vcard = [["version", {}, "text", "4.0"]]
+        self._test_linked({'telephone': '+1.234', 'publish': {'telephone': False}}, vcard)
+
+    def test_telephone_empty(self):
+        vcard = [["version", {}, "text", "4.0"]]
+        self._test_linked({'telephone': '', 'publish': {'telephone': True}}, vcard)
+
+    def test_fax_publish(self):
+        vcard = [["version", {}, "text", "4.0"], ['tel', {'type': ['fax']}, 'uri', 'tel:+1.234']]
+        self._test_linked({'fax': '+1.234', 'publish': {'fax': True}}, vcard)
+
+    def test_fax_unpublish(self):
+        vcard = [["version", {}, "text", "4.0"]]
+        self._test_linked({'fax': '+1.234', 'publish': {'fax': False}}, vcard)
+
+    def test_fax_empty(self):
+        vcard = [["version", {}, "text", "4.0"]]
+        self._test_linked({'fax': '', 'publish': {'fax': True}}, vcard)
+
+    def test_email_publish(self):
+        vcard = [["version", {}, "text", "4.0"], ['email', {'type': ''}, 'text', 'kryten@example.org']]
+        self._test_linked({'emails': ['kryten@example.org'], 'publish': {'emails': True}}, vcard)
+
+    def test_email_unpublish(self):
+        vcard = [["version", {}, "text", "4.0"]]
+        self._test_linked({'emails': ['kryten@example.org'], 'publish': {'emails': False}}, vcard)
+
+    def test_email_empty(self):
+        vcard = [["version", {}, "text", "4.0"]]
+        self._test_linked({'emails': [], 'publish': {'emails': True}}, vcard)
+
+    def test_changed(self):
+        events = ObjectEvents(
+            registered=ObjectEvent(registrar_handle='DIVADROID', timestamp=datetime(1988, 9, 6, tzinfo=timezone.utc)),
+            transferred=ObjectEvent(registrar_handle='QUEEG-500'),
+            updated=ObjectEvent(registrar_handle='NOVA5', timestamp=datetime(1988, 9, 13, tzinfo=timezone.utc)))
+        contact = Contact(contact_id='2X4B', contact_handle='KRYTEN', sponsoring_registrar='HOLLY', events=events)
+
+        events_data = [
+            {'eventAction': 'registration', 'eventDate': '1988-09-06T00:00:00+00:00', 'eventActor': 'DIVADROID'},
+            {'eventAction': 'last changed', 'eventDate': '1988-09-13T00:00:00+00:00'}]
+        data = {
+            'vcardArray': ['vcard', [["version", {}, "text", "4.0"]]],
+            'events': events_data,
+            'status': ['associated'],
+        }
+        self._test(contact, {ObjectStatus.LINKED: True}, data)
+
+    def test_transfer(self):
+        events = ObjectEvents(
+            registered=ObjectEvent(registrar_handle='DIVADROID', timestamp=datetime(1988, 9, 6, tzinfo=timezone.utc)),
+            transferred=ObjectEvent(registrar_handle='NOVA5', timestamp=datetime(1988, 9, 13, tzinfo=timezone.utc)))
+        contact = Contact(contact_id='2X4B', contact_handle='KRYTEN', sponsoring_registrar='HOLLY', events=events)
+
+        events_data = [
+            {'eventAction': 'registration', 'eventDate': '1988-09-06T00:00:00+00:00', 'eventActor': 'DIVADROID'},
+            {'eventAction': 'transfer', 'eventDate': '1988-09-13T00:00:00+00:00'}]
+        data = {
+            'vcardArray': ['vcard', [["version", {}, "text", "4.0"]]],
+            'events': events_data,
+            'status': ['associated'],
+        }
+        self._test(contact, {ObjectStatus.LINKED: True}, data)
+
+    def test_unlinked_port43(self):
+        contact = Contact(contact_id='2X4B', contact_handle='KRYTEN', sponsoring_registrar='HOLLY')
+        data = {'remarks': [{"description": ["Omitting data because contact is not linked to any registry object."]}],
+                'port43': 'whois.example.org'}
+        with override_settings(RDAP_UNIX_WHOIS='whois.example.org'):
+            self._test(contact, {}, data)
+
+    def test_linked_port43(self):
+        events = ObjectEvents(
+            registered=ObjectEvent(registrar_handle='DIVADROID', timestamp=datetime(1988, 9, 6, tzinfo=timezone.utc)),
+            transferred=ObjectEvent(registrar_handle='QUEEG-500'))
+        contact = Contact(contact_id='2X4B', contact_handle='KRYTEN', sponsoring_registrar='HOLLY', events=events)
+
+        events_data = [
+            {'eventAction': 'registration', 'eventDate': '1988-09-06T00:00:00+00:00', 'eventActor': 'DIVADROID'}]
+        data = {
+            'vcardArray': ['vcard', [["version", {}, "text", "4.0"]]],
+            'events': events_data,
+            'status': ['associated'],
+            'port43': 'whois.example.org',
+        }
+        with override_settings(RDAP_UNIX_WHOIS='whois.example.org'):
+            self._test(contact, {ObjectStatus.LINKED: True}, data)
 
 
 @override_settings(ALLOWED_HOSTS=['rdap.example'], RDAP_UNIX_WHOIS=None)

@@ -18,34 +18,12 @@
 #
 from datetime import datetime
 from typing import Dict
-from unittest.mock import Mock
 
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils import timezone
 
 from rdap.rdap_rest import rdap_utils
-
-
-class TestDisclosableOutput(SimpleTestCase):
-
-    def test_show(self):
-        dv = Mock()
-        dv.disclose = True
-        dv.value = 'Arthur Dent'
-        self.assertTrue(rdap_utils.disclosable_nonempty(dv))
-
-        dv.value = ''
-        self.assertFalse(rdap_utils.disclosable_nonempty(dv))
-
-    def test_hide(self):
-        dv = Mock()
-        dv.disclose = False
-        dv.value = 'Ford Prefect'
-        self.assertFalse(rdap_utils.disclosable_nonempty(dv))
-
-        dv.value = ''
-        self.assertFalse(rdap_utils.disclosable_nonempty(dv))
 
 
 class TestStatusMappingDefinition(SimpleTestCase):

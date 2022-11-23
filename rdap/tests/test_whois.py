@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2019-2020  CZ.NIC, z. s. p. o.
+# Copyright (C) 2019-2022  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -15,13 +15,59 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with FRED.  If not, see <https://www.gnu.org/licenses/>.
+#
 from unittest.mock import call, patch
 
 from django.test import RequestFactory, SimpleTestCase
 from fred_idl.Registry.Whois import OBJECT_DELETE_CANDIDATE
+from regal import Contact
+from regal.exceptions import ContactDoesNotExist
 
-from rdap.rdap_rest.whois import get_domain_by_handle
+from rdap.rdap_rest.whois import get_contact_by_handle, get_domain_by_handle
 from rdap.utils.corba import WHOIS
+
+
+class TestGetContactByHandle(SimpleTestCase):
+    def setUp(self):
+        patcher = patch('rdap.rdap_rest.whois.CONTACT_CLIENT', spec=('get_contact_info', 'get_contact_id'))
+        self.addCleanup(patcher.stop)
+        self.contact_mock = patcher.start()
+
+    def test_contact(self):
+        contact = Contact(contact_id='2X4B', contact_handle='KRYTEN', sponsoring_registrar='HOLLY')
+        self.contact_mock.get_contact_id.return_value = '2X4B'
+        self.contact_mock.get_contact_info.return_value = contact
+        request = RequestFactory().get('/dummy/')
+
+        with patch('rdap.rdap_rest.entity.CONTACT_CLIENT') as entity_mock:
+            entity_mock.get_contact_state.return_value = {}
+            response = get_contact_by_handle(request, 'KRYTEN')
+
+        self.assertEqual(response['handle'], 'KRYTEN')
+        self.assertEqual(response['objectClassName'], 'entity')
+        calls = [call.get_contact_id('KRYTEN'), call.get_contact_info('2X4B')]
+        self.assertEqual(self.contact_mock.mock_calls, calls)
+
+    def test_contact_not_found(self):
+        self.contact_mock.get_contact_id.return_value = '2X4B'
+        self.contact_mock.get_contact_info.side_effect = ContactDoesNotExist
+        request = RequestFactory().get('/dummy/')
+
+        with self.assertRaises(ContactDoesNotExist):
+            get_contact_by_handle(request, 'KRYTEN')
+
+        calls = [call.get_contact_id('KRYTEN'), call.get_contact_info('2X4B')]
+        self.assertEqual(self.contact_mock.mock_calls, calls)
+
+    def test_contact_id_not_found(self):
+        self.contact_mock.get_contact_id.side_effect = ContactDoesNotExist
+        request = RequestFactory().get('/dummy/')
+
+        with self.assertRaises(ContactDoesNotExist):
+            get_contact_by_handle(request, 'KRYTEN')
+
+        calls = [call.get_contact_id('KRYTEN')]
+        self.assertEqual(self.contact_mock.mock_calls, calls)
 
 
 class TestGetDomainByHandle(SimpleTestCase):

@@ -23,7 +23,6 @@ from typing import Any, Dict, Optional, Sequence
 import idna
 from django.conf import settings
 from django.utils import timezone
-from fred_idl.Registry.Whois import DisclosableString
 
 
 def to_rfc3339(dt: datetime) -> str:
@@ -43,14 +42,6 @@ def to_rfc3339(dt: datetime) -> str:
 
 def nonempty(input: Optional[str]) -> bool:
     return input is not None and input != ''
-
-
-def disclosable_nonempty(disclosable: DisclosableString) -> bool:
-    """Check if value which can be hidden by user setting should be added to output."""
-    if disclosable.disclose:
-        return nonempty(disclosable.value)
-    else:
-        return False
 
 
 RDAP_STATUS_MAPPING = {
