@@ -1,12 +1,17 @@
-install.log
-dist/
-build/
-fred-rdap-*/
-fred_rdap.egg-info/
-*.pyc
-*.bak
-*~
-install.log
+# Byte-compiled
+__pycache__/
+
+# Distribution / packaging
+/build/
+/dist/
+/eggs/
+/.eggs/
+/*.egg-info/
+/MANIFEST
+
+# Unit test / coverage reports
+/.tox/
 /.coverage*
-/.tox
-/.mypy_cache
+
+# mypy
+/.mypy_cache/
