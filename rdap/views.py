@@ -44,7 +44,7 @@ class ObjectView(View):
     @cvar request_type: Request type for logger
     """
 
-    getter = None  # type: Callable
+    getter: Callable = None  # type: ignore[assignment]  # not ideal, but backward compatible
     request_type = None
 
     @csrf_exempt
