@@ -1,11 +1,16 @@
 stages:
     - image
     - test
+    - build
+    - publish
 
 variables:
     DOCKER_REGISTRY: "reg.nic.cz"
     # Set up pip cache shared between all jobs of the project.
     PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+    PIP_INDEX_URL:
+        value: "https://pypi.nic.cz/cznic/public"
+        description: "PyPI index to be used."
     PYTHONWARNINGS: ""
 
 cache:
@@ -57,7 +62,6 @@ image:conformance:
         - docker push "$IMAGE_TAG"
     variables:
         IMAGE_TAG: "$CI_REGISTRY_IMAGE/conformance:latest"
-        PIP_INDEX_URL: "https://pypi.nic.cz/cznic/public"
 
 ########################################################################################################################
 # Basic declarations
@@ -110,6 +114,30 @@ test:py310:
     <<: *test
     <<: *py310
     needs: ["image:py310"]
+
+build:
+    stage: build
+    image: "$DOCKER_REGISTRY/python/upload:latest"
+    script:
+        - python3 -m build
+    artifacts:
+        paths:
+            - dist
+        expire_in: 1h
+    needs: []
+
+publish:
+    stage: publish
+    image: "$DOCKER_REGISTRY/python/upload:latest"
+    script:
+        - ls dist
+        - devpi use "https://pypi.nic.cz/cznic/test"
+        - devpi login ciuser --password "$DEVPI_PASSWORD"
+        - devpi upload dist/*
+    needs: ["build"]
+    rules:
+        - if: $CI_COMMIT_TAG
+
 
 conformance:
     services:
