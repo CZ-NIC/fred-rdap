@@ -23,7 +23,7 @@ from unittest.mock import patch, sentinel
 
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from fred_idl.Registry.Whois import Domain, KeySet, NameServer, NSSet
-from regal import Address, Contact, ObjectEvent, ObjectEvents
+from regal import Address, Contact, DnsKey, Keyset, ObjectEvent, ObjectEvents
 
 from rdap.constants import ObjectStatus
 from rdap.rdap_rest.domain import delete_candidate_domain_to_dict, domain_to_dict
@@ -344,28 +344,117 @@ class TestContactToDict(SimpleTestCase):
             self._test(contact, {ObjectStatus.LINKED: True}, data)
 
 
-@override_settings(ALLOWED_HOSTS=['rdap.example'], RDAP_UNIX_WHOIS=None)
+@override_settings(ALLOWED_HOSTS=['rdap.example'], RDAP_UNIX_WHOIS=None, USE_TZ=True)
 class TestKeysetToDict(SimpleTestCase):
     """Test `rdap.rdap_rest.domain.keyset_to_dict` function."""
 
     def setUp(self):
         self.request = RequestFactory(HTTP_HOST='rdap.example').get('/dummy/')
 
-    def test_simple(self):
-        result = keyset_to_dict(self.request, get_keyset())
-        self.assertEqual(result['links'][0]['value'], 'http://rdap.example/fred_keyset/gazpacho')
-        self.assertNotIn('port43', result)
+        patcher = patch('rdap.rdap_rest.keyset.KEYSET_CLIENT', spec=('get_keyset_state', ))
+        self.addCleanup(patcher.stop)
+        self.keyset_mock = patcher.start()
+        patcher = patch('rdap.rdap_rest.keyset.CONTACT_CLIENT', spec=('get_contact_info', ))
+        self.addCleanup(patcher.stop)
+        self.contact_mock = patcher.start()
 
-    def test_tech_contacts(self):
-        result = keyset_to_dict(self.request, get_keyset(tech_contact_handles=['KOCHANSKI']))
-        tech = result['entities'][1]
-        self.assertEqual(tech['roles'], ['technical'])
-        self.assertEqual(tech['links'][0]['value'], 'http://rdap.example/entity/KOCHANSKI')
+    def _test(self, keyset: Keyset, states: Dict[str, bool], data: Dict[str, Any]) -> None:
+        self.keyset_mock.get_keyset_state.return_value = states
+
+        result = keyset_to_dict(keyset, self.request)
+
+        link = {'value': 'http://rdap.example/fred_keyset/KRYTEN', 'rel': 'self',
+                'href': 'http://rdap.example/fred_keyset/KRYTEN', 'type': 'application/rdap+json'}
+        events_data = [{'eventAction': 'registration', 'eventDate': '1988-09-06T00:00:00+00:00'}]
+        defaults = {
+            'rdapConformance': ["rdap_level_0", "fred_version_0"],
+            'objectClassName': ObjectClassName.KEYSET,
+            'handle': 'KRYTEN',
+            'links': [link],
+            'entities': [{'objectClassName': ObjectClassName.ENTITY, 'handle': 'HOLLY', 'roles': ['registrar']}],
+            'events': events_data,
+            'status': ['active'],
+        }
+        self.assertEqual(result, dict(defaults, **data))
+
+    def test_simple(self):
+        events = ObjectEvents(
+            registered=ObjectEvent(registrar_handle='DIVADROID', timestamp=datetime(1988, 9, 6, tzinfo=timezone.utc)),
+            transferred=ObjectEvent(registrar_handle='QUEEG-500'))
+        keyset = Keyset(keyset_id='2X4B', keyset_handle='KRYTEN', sponsoring_registrar='HOLLY', events=events)
+        self._test(keyset, {}, {})
 
     def test_port43(self):
-        with override_settings(RDAP_UNIX_WHOIS='whois.example.com'):
-            result = keyset_to_dict(self.request, get_keyset())
-        self.assertEqual(result['port43'], 'whois.example.com')
+        events = ObjectEvents(
+            registered=ObjectEvent(registrar_handle='DIVADROID', timestamp=datetime(1988, 9, 6, tzinfo=timezone.utc)),
+            transferred=ObjectEvent(registrar_handle='QUEEG-500'))
+        keyset = Keyset(keyset_id='2X4B', keyset_handle='KRYTEN', sponsoring_registrar='HOLLY', events=events)
+        data = {'port43': 'whois.example.org'}
+        with override_settings(RDAP_UNIX_WHOIS='whois.example.org'):
+            self._test(keyset, {}, data)
+
+    def test_statuses(self):
+        events = ObjectEvents(
+            registered=ObjectEvent(registrar_handle='DIVADROID', timestamp=datetime(1988, 9, 6, tzinfo=timezone.utc)),
+            transferred=ObjectEvent(registrar_handle='QUEEG-500'))
+        keyset = Keyset(keyset_id='2X4B', keyset_handle='KRYTEN', sponsoring_registrar='HOLLY', events=events)
+        data = {'status': ['associated']}
+        self._test(keyset, {ObjectStatus.LINKED: True}, data)
+
+    def test_tech_contacts(self):
+        self.contact_mock.get_contact_info.return_value = Contact(contact_id='ID-RIMMER', contact_handle='RIMMER')
+        events = ObjectEvents(
+            registered=ObjectEvent(registrar_handle='DIVADROID', timestamp=datetime(1988, 9, 6, tzinfo=timezone.utc)),
+            transferred=ObjectEvent(registrar_handle='QUEEG-500'))
+        keyset = Keyset(keyset_id='2X4B', keyset_handle='KRYTEN', sponsoring_registrar='HOLLY', events=events,
+                        technical_contacts=['ID-RIMMER'])
+        entities = [{'objectClassName': ObjectClassName.ENTITY, 'handle': 'HOLLY', 'roles': ['registrar']}]
+        link = 'http://rdap.example/entity/RIMMER'
+        entities.append({
+            'objectClassName': ObjectClassName.ENTITY,
+            'handle': 'RIMMER',
+            'roles': ['technical'],
+            'links': [{'value': link, 'rel': 'self', 'href': link, 'type': 'application/rdap+json'}],
+        })
+        self._test(keyset, {}, {'entities': entities})
+
+    def test_dnskey(self):
+        events = ObjectEvents(
+            registered=ObjectEvent(registrar_handle='DIVADROID', timestamp=datetime(1988, 9, 6, tzinfo=timezone.utc)),
+            transferred=ObjectEvent(registrar_handle='QUEEG-500'))
+        keyset = Keyset(keyset_id='2X4B', keyset_handle='KRYTEN', sponsoring_registrar='HOLLY', events=events,
+                        dns_keys=[DnsKey(flags=42, protocol=3, alg=-15, key='Gazpacho!')])
+        key = {'flags': 42, 'protocol': 3, 'algorithm': -15, 'publicKey': 'Gazpacho!'}
+        self._test(keyset, {}, {'dns_keys': [key]})
+
+    def test_changed(self):
+        events = ObjectEvents(
+            registered=ObjectEvent(registrar_handle='DIVADROID', timestamp=datetime(1988, 9, 6, tzinfo=timezone.utc)),
+            transferred=ObjectEvent(registrar_handle='QUEEG-500'),
+            updated=ObjectEvent(registrar_handle='NOVA5', timestamp=datetime(1988, 9, 13, tzinfo=timezone.utc)))
+        keyset = Keyset(keyset_id='2X4B', keyset_handle='KRYTEN', sponsoring_registrar='HOLLY', events=events)
+
+        events_data = [
+            {'eventAction': 'registration', 'eventDate': '1988-09-06T00:00:00+00:00'},
+            {'eventAction': 'last changed', 'eventDate': '1988-09-13T00:00:00+00:00'}]
+        data = {
+            'events': events_data,
+        }
+        self._test(keyset, {}, data)
+
+    def test_transfer(self):
+        events = ObjectEvents(
+            registered=ObjectEvent(registrar_handle='DIVADROID', timestamp=datetime(1988, 9, 6, tzinfo=timezone.utc)),
+            transferred=ObjectEvent(registrar_handle='NOVA5', timestamp=datetime(1988, 9, 13, tzinfo=timezone.utc)))
+        keyset = Keyset(keyset_id='2X4B', keyset_handle='KRYTEN', sponsoring_registrar='HOLLY', events=events)
+
+        events_data = [
+            {'eventAction': 'registration', 'eventDate': '1988-09-06T00:00:00+00:00'},
+            {'eventAction': 'transfer', 'eventDate': '1988-09-13T00:00:00+00:00'}]
+        data = {
+            'events': events_data,
+        }
+        self._test(keyset, {}, data)
 
 
 @override_settings(ALLOWED_HOSTS=['rdap.example'])
