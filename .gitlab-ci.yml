@@ -33,11 +33,6 @@ cache:
     variables:
         IMAGE_TAG: "$CI_REGISTRY_IMAGE/tox:$PYTHON_VERSION"
 
-image:py37:
-    extends: .image
-    variables:
-        PYTHON_VERSION: "3.7"
-
 image:py38:
     extends: .image
     variables:
@@ -65,9 +60,6 @@ image:conformance:
 
 ########################################################################################################################
 # Basic declarations
-.py37: &py37
-    image: "$CI_REGISTRY_IMAGE/tox:3.7"
-
 .py38: &py38
     image: "$CI_REGISTRY_IMAGE/tox:3.8"
 
@@ -94,11 +86,6 @@ licensing:
         - common
     script:
         - license-check -v
-
-test:py37:
-    <<: *test
-    <<: *py37
-    needs: ["image:py37"]
 
 test:py38:
     <<: *test
