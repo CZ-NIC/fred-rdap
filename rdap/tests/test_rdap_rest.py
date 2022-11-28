@@ -18,12 +18,13 @@
 #
 """Tests for `rdap.rdap_rest` package."""
 from datetime import date, datetime, timezone
+from ipaddress import IPv4Address, IPv6Address
 from typing import Any, Dict, List
 from unittest.mock import patch, sentinel
 
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from fred_idl.Registry.Whois import Domain, KeySet, NameServer, NSSet
-from regal import Address, Contact, DnsKey, Keyset, ObjectEvent, ObjectEvents
+from regal import Address, Contact, DnsHost, DnsKey, Keyset, Nsset, ObjectEvent, ObjectEvents
 
 from rdap.constants import ObjectStatus
 from rdap.rdap_rest.domain import delete_candidate_domain_to_dict, domain_to_dict
@@ -470,31 +471,141 @@ class TestNameserverToDict(SimpleTestCase):
         self.assertEqual(result['links'][0]['value'], 'http://rdap.example/nameserver/nameserver.example.cz')
 
 
-@override_settings(ALLOWED_HOSTS=['rdap.example'], RDAP_UNIX_WHOIS=None)
+@override_settings(ALLOWED_HOSTS=['rdap.example'], RDAP_UNIX_WHOIS=None, USE_TZ=True)
 class TestNssetToDict(SimpleTestCase):
     """Test `rdap.rdap_rest.domain.nsset_to_dict` function."""
 
     def setUp(self):
         self.request = RequestFactory(HTTP_HOST='rdap.example').get('/dummy/')
 
+        patcher = patch('rdap.rdap_rest.nsset.NSSET_CLIENT', spec=('get_nsset_state', ))
+        self.addCleanup(patcher.stop)
+        self.nsset_mock = patcher.start()
+        patcher = patch('rdap.rdap_rest.nsset.CONTACT_CLIENT', spec=('get_contact_info', ))
+        self.addCleanup(patcher.stop)
+        self.contact_mock = patcher.start()
+
+    def _test(self, nsset: Nsset, states: Dict[str, bool], data: Dict[str, Any]) -> None:
+        self.nsset_mock.get_nsset_state.return_value = states
+
+        result = nsset_to_dict(nsset, self.request)
+
+        link = {'value': 'http://rdap.example/fred_nsset/KRYTEN', 'rel': 'self',
+                'href': 'http://rdap.example/fred_nsset/KRYTEN', 'type': 'application/rdap+json'}
+        events_data = [{'eventAction': 'registration', 'eventDate': '1988-09-06T00:00:00+00:00'}]
+        defaults = {
+            'rdapConformance': ["rdap_level_0", "fred_version_0"],
+            'objectClassName': ObjectClassName.NSSET,
+            'handle': 'KRYTEN',
+            'links': [link],
+            'entities': [{'objectClassName': ObjectClassName.ENTITY, 'handle': 'HOLLY', 'roles': ['registrar']}],
+            'events': events_data,
+            'nameservers': [],
+            'status': ['active'],
+        }
+        self.assertEqual(result, dict(defaults, **data))
+
     def test_simple(self):
-        result = nsset_to_dict(self.request, get_nsset())
-        self.assertEqual(result['links'][0]['value'], 'http://rdap.example/fred_nsset/new-saturn')
-        self.assertNotIn('port43', result)
-
-    def test_tech_contacts(self):
-        result = nsset_to_dict(self.request, get_nsset(tech_contact_handles=['KOCHANSKI']))
-        tech = result['entities'][1]
-        self.assertEqual(tech['roles'], ['technical'])
-        self.assertEqual(tech['links'][0]['value'], 'http://rdap.example/entity/KOCHANSKI')
-
-    def test_nameservers(self):
-        nservers = [NameServer(fqdn='nameserver.example.cz', ip_addresses=[])]
-        result = nsset_to_dict(self.request, get_nsset(nservers=nservers))
-        self.assertEqual(result['nameservers'][0]['links'][0]['value'],
-                         'http://rdap.example/nameserver/nameserver.example.cz')
+        events = ObjectEvents(
+            registered=ObjectEvent(registrar_handle='DIVADROID', timestamp=datetime(1988, 9, 6, tzinfo=timezone.utc)),
+            transferred=ObjectEvent(registrar_handle='QUEEG-500'))
+        nsset = Nsset(nsset_id='2X4B', nsset_handle='KRYTEN', sponsoring_registrar='HOLLY', events=events)
+        self._test(nsset, {}, {})
 
     def test_port43(self):
-        with override_settings(RDAP_UNIX_WHOIS='whois.example.com'):
-            result = nsset_to_dict(self.request, get_nsset())
-        self.assertEqual(result['port43'], 'whois.example.com')
+        events = ObjectEvents(
+            registered=ObjectEvent(registrar_handle='DIVADROID', timestamp=datetime(1988, 9, 6, tzinfo=timezone.utc)),
+            transferred=ObjectEvent(registrar_handle='QUEEG-500'))
+        nsset = Nsset(nsset_id='2X4B', nsset_handle='KRYTEN', sponsoring_registrar='HOLLY', events=events)
+        data = {'port43': 'whois.example.org'}
+        with override_settings(RDAP_UNIX_WHOIS='whois.example.org'):
+            self._test(nsset, {}, data)
+
+    def test_statuses(self):
+        events = ObjectEvents(
+            registered=ObjectEvent(registrar_handle='DIVADROID', timestamp=datetime(1988, 9, 6, tzinfo=timezone.utc)),
+            transferred=ObjectEvent(registrar_handle='QUEEG-500'))
+        nsset = Nsset(nsset_id='2X4B', nsset_handle='KRYTEN', sponsoring_registrar='HOLLY', events=events)
+        data = {'status': ['associated']}
+        self._test(nsset, {ObjectStatus.LINKED: True}, data)
+
+    def test_tech_contacts(self):
+        self.contact_mock.get_contact_info.return_value = Contact(contact_id='ID-RIMMER', contact_handle='RIMMER')
+        events = ObjectEvents(
+            registered=ObjectEvent(registrar_handle='DIVADROID', timestamp=datetime(1988, 9, 6, tzinfo=timezone.utc)),
+            transferred=ObjectEvent(registrar_handle='QUEEG-500'))
+        nsset = Nsset(nsset_id='2X4B', nsset_handle='KRYTEN', sponsoring_registrar='HOLLY', events=events,
+                      technical_contacts=['ID-RIMMER'])
+        entities = [{'objectClassName': ObjectClassName.ENTITY, 'handle': 'HOLLY', 'roles': ['registrar']}]
+        link = 'http://rdap.example/entity/RIMMER'
+        entities.append({
+            'objectClassName': ObjectClassName.ENTITY,
+            'handle': 'RIMMER',
+            'roles': ['technical'],
+            'links': [{'value': link, 'rel': 'self', 'href': link, 'type': 'application/rdap+json'}],
+        })
+        self._test(nsset, {}, {'entities': entities})
+
+    def test_nameserver_empty(self):
+        events = ObjectEvents(
+            registered=ObjectEvent(registrar_handle='DIVADROID', timestamp=datetime(1988, 9, 6, tzinfo=timezone.utc)),
+            transferred=ObjectEvent(registrar_handle='QUEEG-500'))
+        nsset = Nsset(nsset_id='2X4B', nsset_handle='KRYTEN', sponsoring_registrar='HOLLY', events=events,
+                      dns_hosts=[DnsHost(fqdn='ns.example.org', ip_addresses=[])])
+        link = 'http://rdap.example/nameserver/ns.example.org'
+        ns = {"objectClassName": ObjectClassName.NAMESERVER, 'handle': 'ns.example.org', 'ldhName': 'ns.example.org',
+              'links': [{'value': link, 'rel': 'self', 'href': link, 'type': 'application/rdap+json'}]}
+        self._test(nsset, {}, {'nameservers': [ns]})
+
+    def test_nameserver_ipv4(self):
+        events = ObjectEvents(
+            registered=ObjectEvent(registrar_handle='DIVADROID', timestamp=datetime(1988, 9, 6, tzinfo=timezone.utc)),
+            transferred=ObjectEvent(registrar_handle='QUEEG-500'))
+        nsset = Nsset(nsset_id='2X4B', nsset_handle='KRYTEN', sponsoring_registrar='HOLLY', events=events,
+                      dns_hosts=[DnsHost(fqdn='ns.example.org', ip_addresses=[IPv4Address('127.0.0.1')])])
+        link = 'http://rdap.example/nameserver/ns.example.org'
+        ns = {"objectClassName": ObjectClassName.NAMESERVER, 'handle': 'ns.example.org', 'ldhName': 'ns.example.org',
+              'links': [{'value': link, 'rel': 'self', 'href': link, 'type': 'application/rdap+json'}],
+              'ipAddresses': {'v4': ['127.0.0.1']}}
+        self._test(nsset, {}, {'nameservers': [ns]})
+
+    def test_nameserver_ipv6(self):
+        events = ObjectEvents(
+            registered=ObjectEvent(registrar_handle='DIVADROID', timestamp=datetime(1988, 9, 6, tzinfo=timezone.utc)),
+            transferred=ObjectEvent(registrar_handle='QUEEG-500'))
+        nsset = Nsset(nsset_id='2X4B', nsset_handle='KRYTEN', sponsoring_registrar='HOLLY', events=events,
+                      dns_hosts=[DnsHost(fqdn='ns.example.org', ip_addresses=[IPv6Address('::1')])])
+        link = 'http://rdap.example/nameserver/ns.example.org'
+        ns = {"objectClassName": ObjectClassName.NAMESERVER, 'handle': 'ns.example.org', 'ldhName': 'ns.example.org',
+              'links': [{'value': link, 'rel': 'self', 'href': link, 'type': 'application/rdap+json'}],
+              'ipAddresses': {'v6': ['::1']}}
+        self._test(nsset, {}, {'nameservers': [ns]})
+
+    def test_changed(self):
+        events = ObjectEvents(
+            registered=ObjectEvent(registrar_handle='DIVADROID', timestamp=datetime(1988, 9, 6, tzinfo=timezone.utc)),
+            transferred=ObjectEvent(registrar_handle='QUEEG-500'),
+            updated=ObjectEvent(registrar_handle='NOVA5', timestamp=datetime(1988, 9, 13, tzinfo=timezone.utc)))
+        nsset = Nsset(nsset_id='2X4B', nsset_handle='KRYTEN', sponsoring_registrar='HOLLY', events=events)
+
+        events_data = [
+            {'eventAction': 'registration', 'eventDate': '1988-09-06T00:00:00+00:00'},
+            {'eventAction': 'last changed', 'eventDate': '1988-09-13T00:00:00+00:00'}]
+        data = {
+            'events': events_data,
+        }
+        self._test(nsset, {}, data)
+
+    def test_transfer(self):
+        events = ObjectEvents(
+            registered=ObjectEvent(registrar_handle='DIVADROID', timestamp=datetime(1988, 9, 6, tzinfo=timezone.utc)),
+            transferred=ObjectEvent(registrar_handle='NOVA5', timestamp=datetime(1988, 9, 13, tzinfo=timezone.utc)))
+        nsset = Nsset(nsset_id='2X4B', nsset_handle='KRYTEN', sponsoring_registrar='HOLLY', events=events)
+
+        events_data = [
+            {'eventAction': 'registration', 'eventDate': '1988-09-06T00:00:00+00:00'},
+            {'eventAction': 'transfer', 'eventDate': '1988-09-13T00:00:00+00:00'}]
+        data = {
+            'events': events_data,
+        }
+        self._test(nsset, {}, data)

@@ -14,6 +14,10 @@ from fred_api.registry.keyset.keyset_info_types_pb2 import (KeysetIdReply, Keyse
 from fred_api.registry.keyset.keyset_state_types_pb2 import KeysetStateReply, KeysetStateRequest
 from fred_api.registry.keyset.service_keyset_grpc_pb2_grpc import (KeysetServicer as _KeysetServicer,
                                                                    add_KeysetServicer_to_server)
+from fred_api.registry.nsset.nsset_info_types_pb2 import NssetIdReply, NssetIdRequest, NssetInfoReply, NssetInfoRequest
+from fred_api.registry.nsset.nsset_state_types_pb2 import NssetStateReply, NssetStateRequest
+from fred_api.registry.nsset.service_nsset_grpc_pb2_grpc import (NssetServicer as _NssetServicer,
+                                                                 add_NssetServicer_to_server)
 from grpc import RpcContext
 
 
@@ -67,11 +71,34 @@ class KeysetServicer(_KeysetServicer):
         return reply
 
 
+class NssetServicer(_NssetServicer):
+    def get_nsset_info(self, request: NssetInfoRequest, context: RpcContext) -> NssetInfoReply:
+        reply = NssetInfoReply()
+        reply.data.nsset_id.uuid.value = request.nsset_id.uuid.value
+        reply.data.nsset_handle.value = request.nsset_id.uuid.value
+        reply.data.sponsoring_registrar.value = 'REGGIE'
+        reply.data.events.registered.registrar_handle.value = 'REGGIE'
+        reply.data.events.registered.timestamp.FromDatetime(datetime.now())
+        reply.data.events.transferred.registrar_handle.value = 'REGGIE'
+        return reply
+
+    def get_nsset_id(self, request: NssetIdRequest, context: RpcContext) -> NssetIdReply:
+        reply = NssetIdReply()
+        reply.data.nsset_id.uuid.value = request.nsset_handle.value
+        return reply
+
+    def get_nsset_state(self, request: NssetStateRequest, context: RpcContext) -> NssetStateReply:
+        reply = NssetStateReply()
+        reply.data.state.flags['linked'] = True
+        return reply
+
+
 def main() -> None:
     """Run the server."""
     server = grpc.server(ThreadPoolExecutor())
     add_ContactServicer_to_server(ContactServicer(), server)
     add_KeysetServicer_to_server(KeysetServicer(), server)
+    add_NssetServicer_to_server(NssetServicer(), server)
     server.add_insecure_port('[::]:50050')
     server.start()
     server.wait_for_termination()
