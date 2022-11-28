@@ -48,6 +48,7 @@ class ObjectStatus(str, Enum):
     """Important object statuses."""
 
     LINKED = 'linked'
+    DELETE_CANDIDATE = 'deleteCandidate'
 
 
 @unique

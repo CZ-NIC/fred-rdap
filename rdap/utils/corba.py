@@ -28,7 +28,7 @@ from frgal import make_credentials
 from frgal.aio import SyncGrpcProxy
 from pyfco import CorbaClient, CorbaClientProxy, CorbaNameServiceClient, CorbaRecoder
 from pyfco.recoder import decode_iso_date, decode_iso_datetime
-from regal import ContactClient, KeysetClient, NssetClient
+from regal import ContactClient, DomainClient, KeysetClient, NssetClient
 
 from rdap.settings import RDAP_SETTINGS
 
@@ -56,6 +56,8 @@ class RdapCorbaRecoder(CorbaRecoder):
 WHOIS = CorbaClientProxy(CorbaClient(_WHOIS, RdapCorbaRecoder(), Whois.INTERNAL_SERVER_ERROR))
 CONTACT_CLIENT = SyncGrpcProxy(ContactClient(RDAP_SETTINGS.REGISTRY_NETLOC,
                                              make_credentials(RDAP_SETTINGS.REGISTRY_SSL_CERT)))
+DOMAIN_CLIENT = SyncGrpcProxy(DomainClient(RDAP_SETTINGS.REGISTRY_NETLOC,
+                                           make_credentials(RDAP_SETTINGS.REGISTRY_SSL_CERT)))
 KEYSET_CLIENT = SyncGrpcProxy(KeysetClient(RDAP_SETTINGS.REGISTRY_NETLOC,
                                            make_credentials(RDAP_SETTINGS.REGISTRY_SSL_CERT)))
 NSSET_CLIENT = SyncGrpcProxy(NssetClient(RDAP_SETTINGS.REGISTRY_NETLOC,

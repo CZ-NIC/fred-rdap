@@ -20,14 +20,11 @@ import json
 from unittest.mock import patch
 
 from django.test import Client, SimpleTestCase
-from fred_idl.Registry.Whois import INVALID_LABEL, OBJECT_NOT_FOUND
 from grill.utils import TestLogEntry, TestLoggerClient
-from omniORB.CORBA import TRANSIENT
 from regal import Contact
 from regal.exceptions import ContactDoesNotExist
 
 from rdap.constants import LOGGER_SERVICE, LogEntryType, LogResult
-from rdap.utils.corba import WHOIS
 
 
 class EnforcingCsrfClient(Client):
@@ -46,10 +43,6 @@ class TestObjectView(SimpleTestCase):
     client_class = EnforcingCsrfClient
 
     def setUp(self):
-        patcher = patch.object(WHOIS, 'client', spec=('get_domain_by_handle', ))
-        self.addCleanup(patcher.stop)
-        patcher.start()
-
         self.test_logger = TestLoggerClient()
         log_patcher = patch('rdap.views.LOGGER.client', new=self.test_logger)
         self.addCleanup(log_patcher.stop)
@@ -127,43 +120,6 @@ class TestObjectView(SimpleTestCase):
         log_entry = TestLogEntry(LOGGER_SERVICE, LogEntryType.ENTITY_LOOKUP, LogResult.INTERNAL_SERVER_ERROR,
                                  source_ip='127.0.0.1', input_properties={'handle': 'kryten'},
                                  properties={'error': 'Exception'})
-        self.assertEqual(self.test_logger.mock.mock_calls, log_entry.get_calls())
-
-    def test_domain_not_found(self):
-        WHOIS.get_domain_by_handle.side_effect = OBJECT_NOT_FOUND
-        response = self.client.get('/domain/example.org')
-
-        self.assertEqual(response.status_code, 404)
-        self.assertEqual(response['Content-Type'], 'application/rdap+json')
-        self.assertEqual(response.content, b'')
-
-        # Check logger
-        log_entry = TestLogEntry(LOGGER_SERVICE, LogEntryType.DOMAIN_LOOKUP, LogResult.NOT_FOUND, source_ip='127.0.0.1',
-                                 input_properties={'handle': 'example.org'})
-        self.assertEqual(self.test_logger.mock.mock_calls, log_entry.get_calls())
-
-    def test_domain_invalid_handle(self):
-        WHOIS.get_domain_by_handle.side_effect = INVALID_LABEL
-        response = self.client.get('/domain/example.org')
-
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response['Content-Type'], 'application/rdap+json')
-        self.assertEqual(response.content, b'')
-
-        # Check logger
-        log_entry = TestLogEntry(LOGGER_SERVICE, LogEntryType.DOMAIN_LOOKUP, LogResult.BAD_REQUEST,
-                                 source_ip='127.0.0.1', input_properties={'handle': 'example.org'})
-        self.assertEqual(self.test_logger.mock.mock_calls, log_entry.get_calls())
-
-    def test_domain_exception(self):
-        WHOIS.get_domain_by_handle.side_effect = TRANSIENT
-        with self.assertRaises(TRANSIENT):
-            self.client.get('/domain/example.org')
-
-        # Check logger
-        log_entry = TestLogEntry(LOGGER_SERVICE, LogEntryType.DOMAIN_LOOKUP, LogResult.INTERNAL_SERVER_ERROR,
-                                 source_ip='127.0.0.1', input_properties={'handle': 'example.org'},
-                                 properties={'error': 'TRANSIENT'})
         self.assertEqual(self.test_logger.mock.mock_calls, log_entry.get_calls())
 
     def test_post(self):

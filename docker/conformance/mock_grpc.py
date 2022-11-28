@@ -9,6 +9,11 @@ from fred_api.registry.contact.contact_info_types_pb2 import (ContactIdReply, Co
 from fred_api.registry.contact.contact_state_types_pb2 import ContactStateReply, ContactStateRequest
 from fred_api.registry.contact.service_contact_grpc_pb2_grpc import (ContactServicer as _ContactServicer,
                                                                      add_ContactServicer_to_server)
+from fred_api.registry.domain.domain_info_types_pb2 import (DomainIdReply, DomainIdRequest, DomainInfoReply,
+                                                            DomainInfoRequest)
+from fred_api.registry.domain.domain_state_types_pb2 import DomainStateReply, DomainStateRequest
+from fred_api.registry.domain.service_domain_grpc_pb2_grpc import (DomainServicer as _DomainServicer,
+                                                                   add_DomainServicer_to_server)
 from fred_api.registry.keyset.keyset_info_types_pb2 import (KeysetIdReply, KeysetIdRequest, KeysetInfoReply,
                                                             KeysetInfoRequest)
 from fred_api.registry.keyset.keyset_state_types_pb2 import KeysetStateReply, KeysetStateRequest
@@ -47,6 +52,35 @@ class ContactServicer(_ContactServicer):
     def get_contact_state(self, request: ContactStateRequest, context: RpcContext) -> ContactStateReply:
         reply = ContactStateReply()
         reply.data.state.flags['linked'] = False
+        return reply
+
+
+class DomainServicer(_DomainServicer):
+    def get_domain_info(self, request: DomainInfoRequest, context: RpcContext) -> DomainInfoReply:
+        reply = DomainInfoReply()
+        reply.data.domain_id.uuid.value = request.domain_id.uuid.value
+        reply.data.fqdn.value = request.domain_id.uuid.value
+        reply.data.registrant.uuid.value = 'LISTER'
+        reply.data.expires_at.FromDatetime(datetime(2030, 1, 1))
+        reply.data.sponsoring_registrar.value = 'REGGIE'
+        reply.data.events.registered.registrar_handle.value = 'REGGIE'
+        reply.data.events.registered.timestamp.FromDatetime(datetime.now())
+        reply.data.events.transferred.registrar_handle.value = 'REGGIE'
+        return reply
+
+    def get_domain_id(self, request: DomainIdRequest, context: RpcContext) -> DomainIdReply:
+        if request.fqdn.value == 'kochanski.cz':
+            reply = ContactIdReply()
+            reply.exception.contact_does_not_exist.CopyFrom(ContactIdReply.Exception.ContactDoesNotExist())
+            return reply
+
+        reply = DomainIdReply()
+        reply.data.domain_id.uuid.value = request.fqdn.value
+        return reply
+
+    def get_domain_state(self, request: DomainStateRequest, context: RpcContext) -> DomainStateReply:
+        reply = DomainStateReply()
+        reply.data.state.flags['linked'] = True
         return reply
 
 
@@ -103,6 +137,7 @@ def main() -> None:
     """Run the server."""
     server = grpc.server(ThreadPoolExecutor())
     add_ContactServicer_to_server(ContactServicer(), server)
+    add_DomainServicer_to_server(DomainServicer(), server)
     add_KeysetServicer_to_server(KeysetServicer(), server)
     add_NssetServicer_to_server(NssetServicer(), server)
     server.add_insecure_port('[::]:50050')
