@@ -14,7 +14,8 @@ from fred_api.registry.keyset.keyset_info_types_pb2 import (KeysetIdReply, Keyse
 from fred_api.registry.keyset.keyset_state_types_pb2 import KeysetStateReply, KeysetStateRequest
 from fred_api.registry.keyset.service_keyset_grpc_pb2_grpc import (KeysetServicer as _KeysetServicer,
                                                                    add_KeysetServicer_to_server)
-from fred_api.registry.nsset.nsset_info_types_pb2 import NssetIdReply, NssetIdRequest, NssetInfoReply, NssetInfoRequest
+from fred_api.registry.nsset.nsset_info_types_pb2 import (CheckDnsHostReply, CheckDnsHostRequest, NssetIdReply,
+                                                          NssetIdRequest, NssetInfoReply, NssetInfoRequest)
 from fred_api.registry.nsset.nsset_state_types_pb2 import NssetStateReply, NssetStateRequest
 from fred_api.registry.nsset.service_nsset_grpc_pb2_grpc import (NssetServicer as _NssetServicer,
                                                                  add_NssetServicer_to_server)
@@ -90,6 +91,11 @@ class NssetServicer(_NssetServicer):
     def get_nsset_state(self, request: NssetStateRequest, context: RpcContext) -> NssetStateReply:
         reply = NssetStateReply()
         reply.data.state.flags['linked'] = True
+        return reply
+
+    def check_dns_host(self, request: CheckDnsHostRequest, context: RpcContext) -> CheckDnsHostReply:
+        reply = CheckDnsHostReply()
+        reply.data.dns_host_exists = not (request.fqdn == 'ace.rimmer.cz')
         return reply
 
 

@@ -465,10 +465,23 @@ class TestNameserverToDict(SimpleTestCase):
     def setUp(self):
         self.request = RequestFactory(HTTP_HOST='rdap.example').get('/dummy/')
 
+        patcher = patch('rdap.rdap_rest.nsset.NSSET_CLIENT', spec=('get_nsset_state', ))
+        self.addCleanup(patcher.stop)
+        self.nsset_mock = patcher.start()
+
     def test_simple(self):
-        nameserver = NameServer(fqdn='nameserver.example.cz', ip_addresses=[])
-        result = nameserver_to_dict(self.request, nameserver)
-        self.assertEqual(result['links'][0]['value'], 'http://rdap.example/nameserver/nameserver.example.cz')
+        result = nameserver_to_dict('ns.example.org', self.request)
+
+        link = {'value': 'http://rdap.example/nameserver/ns.example.org', 'rel': 'self',
+                'href': 'http://rdap.example/nameserver/ns.example.org', 'type': 'application/rdap+json'}
+        data = {
+            'rdapConformance': ["rdap_level_0"],
+            'objectClassName': ObjectClassName.NAMESERVER,
+            'handle': 'ns.example.org',
+            'ldhName': 'ns.example.org',
+            'links': [link],
+        }
+        self.assertEqual(result, data)
 
 
 @override_settings(ALLOWED_HOSTS=['rdap.example'], RDAP_UNIX_WHOIS=None, USE_TZ=True)

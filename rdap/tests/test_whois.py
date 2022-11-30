@@ -22,9 +22,10 @@ from unittest.mock import call, patch
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from fred_idl.Registry.Whois import OBJECT_DELETE_CANDIDATE
 from regal import Contact, Keyset, Nsset, ObjectEvent, ObjectEvents
-from regal.exceptions import ContactDoesNotExist, KeysetDoesNotExist, NssetDoesNotExist
+from regal.exceptions import ContactDoesNotExist, KeysetDoesNotExist, NssetDoesNotExist, ObjectDoesNotExist
 
-from rdap.rdap_rest.whois import get_contact_by_handle, get_domain_by_handle, get_keyset_by_handle, get_nsset_by_handle
+from rdap.rdap_rest.whois import (get_contact_by_handle, get_domain_by_handle, get_keyset_by_handle,
+                                  get_nameserver_by_handle, get_nsset_by_handle)
 from rdap.utils.corba import WHOIS
 
 
@@ -137,6 +138,34 @@ class TestGetKeysetByHandle(SimpleTestCase):
 
         calls = [call.get_keyset_id('KRYTEN')]
         self.assertEqual(self.keyset_mock.mock_calls, calls)
+
+
+class TestGetNameserverByHandle(SimpleTestCase):
+    def setUp(self):
+        patcher = patch('rdap.rdap_rest.whois.NSSET_CLIENT', spec=('check_dns_host', ))
+        self.addCleanup(patcher.stop)
+        self.nameserver_mock = patcher.start()
+
+    def test_nameserver(self):
+        self.nameserver_mock.check_dns_host.return_value = True
+        request = RequestFactory().get('/dummy/')
+
+        response = get_nameserver_by_handle(request, 'ns.example.org')
+
+        self.assertEqual(response['handle'], 'ns.example.org')
+        self.assertEqual(response['objectClassName'], 'nameserver')
+        calls = [call.check_dns_host('ns.example.org')]
+        self.assertEqual(self.nameserver_mock.mock_calls, calls)
+
+    def test_nameserver_not_found(self):
+        self.nameserver_mock.check_dns_host.return_value = False
+        request = RequestFactory().get('/dummy/')
+
+        with self.assertRaises(ObjectDoesNotExist):
+            get_nameserver_by_handle(request, 'ns.example.org')
+
+        calls = [call.check_dns_host('ns.example.org')]
+        self.assertEqual(self.nameserver_mock.mock_calls, calls)
 
 
 @override_settings(USE_TZ=True)
