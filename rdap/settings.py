@@ -38,8 +38,6 @@ class LoggerOptionsSetting(DictSetting):
 class RdapAppSettings(AppSettings):
     """RDAP specific settings."""
 
-    CORBA_NETLOC = StringSetting(default='localhost')
-    CORBA_CONTEXT = StringSetting(default='fred')
     LOGGER = StringSetting(default='grill.DummyLoggerClient')
     LOGGER_OPTIONS = LoggerOptionsSetting(default={})
     REGISTRY_NETLOC = StringSetting(required=True)

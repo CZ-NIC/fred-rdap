@@ -42,7 +42,6 @@ Dependencies
 ============
 
 * python >=3.8
-* python-omniorb
 * python-django 3.2, 4.0 and 4.1
 * Other dependencies are listed in `setup.cfg <setup.cfg>`_
 
@@ -79,27 +78,14 @@ Study the example configuration in `examples/rdap_cfg.py <examples/rdap_cfg.py>`
 
 RDAP can be configured with the following settings.
 
-``RDAP_CORBA_NETLOC``
----------------------
-
-Network location, i.e. host and port, of the CORBA server.
-Used to construct Interoperable Object Reference (IOR).
-Default value is ``localhost``.
-
-``RDAP_CORBA_CONTEXT``
-----------------------
-
-The name of the RDAP CORBA context.
-Default value is ``fred``.
-
 ``RDAP_LOGGER``
-~~~~~~~~~~~~~~~
+---------------
 
 A dotted path to the logger client.
 Default value is ``grill.DummyLoggerClient``.
 
 ``RDAP_LOGGER_OPTIONS``
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 A mapping with options for the ``RDAP_LOGGER``.
 If the key ``credentials`` is present, it will be passed to the ``make_credentials`` utility as a mapping.

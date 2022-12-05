@@ -25,7 +25,6 @@ from django.views.generic import View
 from grill import Logger, get_logger_client
 from regal.exceptions import ObjectDoesNotExist
 
-from rdap.exceptions import InvalidHandleError, NotFoundError
 from rdap.rdap_rest.rdap_utils import InvalidIdn, preprocess_fqdn
 from rdap.settings import RDAP_SETTINGS
 
@@ -65,12 +64,9 @@ class ObjectView(View):
                 log_entry.result = LogResult.SUCCESS
                 return JsonResponse(data, content_type=RDAP_CONTENT_TYPE)
 
-            except (NotFoundError, ObjectDoesNotExist):
+            except ObjectDoesNotExist:
                 log_entry.result = LogResult.NOT_FOUND
                 return HttpResponseNotFound(content_type=RDAP_CONTENT_TYPE)
-            except InvalidHandleError:
-                log_entry.result = LogResult.BAD_REQUEST
-                return HttpResponseBadRequest(content_type=RDAP_CONTENT_TYPE)
             except Exception as error:
                 log_entry.properties = {'error': type(error).__name__}
                 raise error

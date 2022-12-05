@@ -45,7 +45,6 @@ ENV DJANGO_SETTINGS_MODULE="rdap_settings"
 # Install runtime dependencies
 RUN apt-get --yes update \
     && apt-get install --yes --no-install-recommends \
-        libomniorb4-2 \
         libxml2 \
     && rm -rf /var/lib/apt/lists/*
 

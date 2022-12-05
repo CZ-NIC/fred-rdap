@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2017-2019  CZ.NIC, z. s. p. o.
+# Copyright (C) 2017-2022  CZ.NIC, z. s. p. o.
 #
 # This file is part of FRED.
 #
@@ -66,12 +66,6 @@ LOGGING = {
 
 
 # ## RDAP Server Settings #####################################################
-
-# #### CORBA configuration
-# Naming service address (host[:port])
-# RDAP_CORBA_NETLOC = 'localhost'
-# Naming service context
-# RDAP_CORBA_CONTEXT = 'fred'
 
 # #### WHOIS URLs configuration
 # Unix Whois server address
