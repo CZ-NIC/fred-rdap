@@ -26,8 +26,7 @@ from django.urls import reverse
 from regal import Domain, ObjectEvents
 
 from rdap.constants import ObjectStatus
-from rdap.settings import RDAP_SETTINGS
-from rdap.utils.corba import CONTACT_CLIENT, DOMAIN_CLIENT, KEYSET_CLIENT, NSSET_CLIENT
+from rdap.settings import CONTACT_CLIENT, DOMAIN_CLIENT, KEYSET_CLIENT, NSSET_CLIENT, RDAP_SETTINGS
 
 from .rdap_utils import ObjectClassName, add_unicode_name, rdap_status_mapping, to_rfc3339
 

@@ -22,6 +22,8 @@ from typing import Any, Dict
 
 from appsettings import AppSettings, DictSetting, FileSetting, IntegerSetting, ListSetting, StringSetting
 from frgal import make_credentials
+from frgal.aio import SyncGrpcProxy
+from regal import ContactClient, DomainClient, KeysetClient, NssetClient
 
 
 class LoggerOptionsSetting(DictSetting):
@@ -51,3 +53,13 @@ class RdapAppSettings(AppSettings):
 
 
 RDAP_SETTINGS = RdapAppSettings()
+
+
+CONTACT_CLIENT = SyncGrpcProxy(ContactClient(RDAP_SETTINGS.REGISTRY_NETLOC,
+                                             make_credentials(RDAP_SETTINGS.REGISTRY_SSL_CERT)))
+DOMAIN_CLIENT = SyncGrpcProxy(DomainClient(RDAP_SETTINGS.REGISTRY_NETLOC,
+                                           make_credentials(RDAP_SETTINGS.REGISTRY_SSL_CERT)))
+KEYSET_CLIENT = SyncGrpcProxy(KeysetClient(RDAP_SETTINGS.REGISTRY_NETLOC,
+                                           make_credentials(RDAP_SETTINGS.REGISTRY_SSL_CERT)))
+NSSET_CLIENT = SyncGrpcProxy(NssetClient(RDAP_SETTINGS.REGISTRY_NETLOC,
+                                         make_credentials(RDAP_SETTINGS.REGISTRY_SSL_CERT)))

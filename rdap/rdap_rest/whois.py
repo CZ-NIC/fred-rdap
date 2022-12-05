@@ -23,8 +23,7 @@ from typing import Any, Dict, Optional
 from django.http import HttpRequest
 from regal.exceptions import ObjectDoesNotExist
 
-from rdap.utils.corba import CONTACT_CLIENT, DOMAIN_CLIENT, KEYSET_CLIENT, NSSET_CLIENT
-
+from ..settings import CONTACT_CLIENT, DOMAIN_CLIENT, KEYSET_CLIENT, NSSET_CLIENT
 from .domain import domain_to_dict
 from .entity import contact_to_dict
 from .keyset import keyset_to_dict
