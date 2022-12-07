@@ -33,7 +33,7 @@ from rdap.rdap_rest.nsset import nsset_to_dict
 from rdap.rdap_rest.rdap_utils import ObjectClassName
 
 
-@override_settings(ALLOWED_HOSTS=['rdap.example'], RDAP_UNIX_WHOIS=None, USE_TZ=True)
+@override_settings(ALLOWED_HOSTS=['rdap.example'], RDAP_UNIX_WHOIS=None)
 class TestDomainToDict(SimpleTestCase):
     """Test `rdap.rdap_rest.domain.domain_to_dict` function."""
 
@@ -253,7 +253,7 @@ class TestDomainToDict(SimpleTestCase):
         self._test_simple({'keyset': 'EXAMPLE'}, data)
 
 
-@override_settings(ALLOWED_HOSTS=['rdap.example'], RDAP_UNIX_WHOIS=None, USE_TZ=True)
+@override_settings(ALLOWED_HOSTS=['rdap.example'], RDAP_UNIX_WHOIS=None)
 class TestContactToDict(SimpleTestCase):
     """Test `rdap.rdap_rest.domain.contact_to_dict` function."""
 
@@ -445,7 +445,7 @@ class TestContactToDict(SimpleTestCase):
             self._test(contact, {ObjectStatus.LINKED: True}, data)
 
 
-@override_settings(ALLOWED_HOSTS=['rdap.example'], RDAP_UNIX_WHOIS=None, USE_TZ=True)
+@override_settings(ALLOWED_HOSTS=['rdap.example'], RDAP_UNIX_WHOIS=None)
 class TestKeysetToDict(SimpleTestCase):
     """Test `rdap.rdap_rest.domain.keyset_to_dict` function."""
 
@@ -584,7 +584,7 @@ class TestNameserverToDict(SimpleTestCase):
         self.assertEqual(result, data)
 
 
-@override_settings(ALLOWED_HOSTS=['rdap.example'], RDAP_UNIX_WHOIS=None, USE_TZ=True)
+@override_settings(ALLOWED_HOSTS=['rdap.example'], RDAP_UNIX_WHOIS=None)
 class TestNssetToDict(SimpleTestCase):
     """Test `rdap.rdap_rest.domain.nsset_to_dict` function."""
 

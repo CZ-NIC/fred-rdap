@@ -19,7 +19,7 @@
 from datetime import datetime, timezone
 from unittest.mock import call, patch
 
-from django.test import RequestFactory, SimpleTestCase, override_settings
+from django.test import RequestFactory, SimpleTestCase
 from regal import Contact, Domain, Keyset, Nsset, ObjectEvent, ObjectEvents
 from regal.exceptions import (ContactDoesNotExist, DomainDoesNotExist, KeysetDoesNotExist, NssetDoesNotExist,
                               ObjectDoesNotExist)
@@ -71,7 +71,6 @@ class TestGetContactByHandle(SimpleTestCase):
         self.assertEqual(self.contact_mock.mock_calls, calls)
 
 
-@override_settings(USE_TZ=True)
 class TestGetDomainByHandle(SimpleTestCase):
     def setUp(self):
         patcher = patch('rdap.rdap_rest.whois.DOMAIN_CLIENT', spec=('get_domain_info', 'get_domain_id'))
@@ -123,7 +122,6 @@ class TestGetDomainByHandle(SimpleTestCase):
         self.assertEqual(self.domain_mock.mock_calls, calls)
 
 
-@override_settings(USE_TZ=True)
 class TestGetKeysetByHandle(SimpleTestCase):
     def setUp(self):
         patcher = patch('rdap.rdap_rest.whois.KEYSET_CLIENT', spec=('get_keyset_info', 'get_keyset_id'))
@@ -198,7 +196,6 @@ class TestGetNameserverByHandle(SimpleTestCase):
         self.assertEqual(self.nameserver_mock.mock_calls, calls)
 
 
-@override_settings(USE_TZ=True)
 class TestGetNssetByHandle(SimpleTestCase):
     def setUp(self):
         patcher = patch('rdap.rdap_rest.whois.NSSET_CLIENT', spec=('get_nsset_info', 'get_nsset_id'))
