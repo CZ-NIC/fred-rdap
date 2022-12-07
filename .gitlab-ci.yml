@@ -127,6 +127,8 @@ publish:
 
 
 conformance:
+    stage: test
+    needs: ["image:conformance"]
     services:
         - name: "$CI_REGISTRY_IMAGE/conformance:latest"
           alias: rdap

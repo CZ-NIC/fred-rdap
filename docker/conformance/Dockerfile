@@ -1,18 +1,28 @@
 ARG PYTHON_VERSION=3.9
-FROM reg.nic.cz/python/tox:${PYTHON_VERSION}
-RUN apt-get --yes update \
+FROM python:${PYTHON_VERSION}-slim
+
+# Install build dependencies from debian
+RUN apt-get update \
  && apt-get install --yes --no-install-recommends \
-    curl \
+    build-essential \
     # Dependencies of the RDAP & RDAP backend mock.
     libomniorb4-2 \
     omniorb-nameserver \
  && rm -rf /var/lib/apt/lists/*
 
-# Prepare rdap
+ARG PIP_INDEX_URL=https://pypi.nic.cz/cznic/public
 WORKDIR /app
 COPY . .
-ARG PIP_INDEX_URL=https://pypi.nic.cz/cznic/public
-RUN tox --devenv venv
+
+# Create and use virtualenv
+RUN python3 -m venv /app/venv
+ENV PATH="/app/venv/bin:$PATH"
+
+# Install application and dependencies
+RUN pip install --no-cache-dir \
+        . \
+        # Install uwsgi for the python version in use.
+        uwsgi
 
 ENV PYTHONPATH="/app/docker/conformance:$PYTHONPATH"
 ENV DJANGO_SETTINGS_MODULE="settings"
