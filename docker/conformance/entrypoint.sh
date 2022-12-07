@@ -6,8 +6,7 @@ omniNames -start &
 /app/venv/bin/python /app/docker/conformance/mock_fred.py &
 
 if [ "$1" = "" ]; then
-    # This is defined here, because `hostname` command can't be used in Dockerfile CMD directive.
-    /app/venv/bin/django-admin runserver "$(hostname):8000"
+    uwsgi --ini /app/docker/conformance/uwsgi.ini
 else
     exec "$@"
 fi
