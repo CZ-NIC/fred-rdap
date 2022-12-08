@@ -15,11 +15,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with FRED.  If not, see <https://www.gnu.org/licenses/>.
-
+#
 """RDAP application settings wrapper."""
+import os
 from typing import Any, Dict
 
-from appsettings import AppSettings, DictSetting, IntegerSetting, ListSetting, StringSetting
+from appsettings import AppSettings, DictSetting, FileSetting, IntegerSetting, ListSetting, StringSetting
 from frgal import make_credentials
 
 
@@ -41,6 +42,8 @@ class RdapAppSettings(AppSettings):
     CORBA_CONTEXT = StringSetting(default='fred')
     LOGGER = StringSetting(default='grill.DummyLoggerClient')
     LOGGER_OPTIONS = LoggerOptionsSetting(default={})
+    REGISTRY_NETLOC = StringSetting(required=True)
+    REGISTRY_SSL_CERT = FileSetting(default=None, mode=os.R_OK)
     DISCLAIMER = ListSetting(default=None)
     UNIX_WHOIS = StringSetting(default=None)
     MAX_SIG_LIFE = IntegerSetting(default=None)

@@ -19,3 +19,4 @@
 INSTALLED_APPS = ('rdap.tests.apps.TestRdapAppConfig', )
 ROOT_URLCONF = 'rdap.urls'
 SECRET_KEY = 'SECRET'
+RDAP_REGISTRY_NETLOC = 'example.org:55555'

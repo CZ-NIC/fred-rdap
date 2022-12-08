@@ -25,7 +25,7 @@ from fred_idl.Registry.Whois import (INVALID_HANDLE, INVALID_LABEL, OBJECT_DELET
                                      TOO_MANY_LABELS, UNMANAGED_ZONE)
 
 from rdap.exceptions import InvalidHandleError, NotFoundError
-from rdap.utils.corba import WHOIS
+from rdap.utils.corba import CONTACT_CLIENT, WHOIS
 
 from .domain import delete_candidate_domain_to_dict, domain_to_dict
 from .entity import contact_to_dict
@@ -35,13 +35,10 @@ from .nsset import nsset_to_dict
 
 
 def get_contact_by_handle(request: HttpRequest, handle: str) -> Optional[Dict[str, Any]]:
+    """Get contact by handle and return RDAP structure."""
     logging.debug('get_contact_by_handle: %s', handle)
-    try:
-        return contact_to_dict(request, WHOIS.get_contact_by_handle(handle))
-    except OBJECT_NOT_FOUND:
-        raise NotFoundError()
-    except INVALID_HANDLE:
-        raise InvalidHandleError()
+    contact = CONTACT_CLIENT.get_contact_info(CONTACT_CLIENT.get_contact_id(handle))
+    return contact_to_dict(contact, request)
 
 
 def get_domain_by_handle(request: HttpRequest, handle: str) -> Optional[Dict[str, Any]]:
