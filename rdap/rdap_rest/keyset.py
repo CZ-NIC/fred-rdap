@@ -18,95 +18,96 @@
 #
 """Wrapper module to whois idl interface."""
 import logging
-from typing import Any, Dict, Optional
+from datetime import datetime
+from typing import Any, Dict, cast
 
 from django.http import HttpRequest
 from django.urls import reverse
-from fred_idl.Registry.Whois import KeySet
+from regal import Keyset, ObjectEvents
 
 from rdap.settings import RDAP_SETTINGS
+from rdap.utils.corba import CONTACT_CLIENT, KEYSET_CLIENT
 
-from .rdap_utils import ObjectClassName, nonempty, rdap_status_mapping, to_rfc3339
+from .rdap_utils import ObjectClassName, rdap_status_mapping, to_rfc3339
 
 
-def keyset_to_dict(request: HttpRequest, struct: KeySet) -> Optional[Dict[str, Any]]:
-    """Transform CORBA keyset struct to python dictionary."""
-    logging.debug(struct)
+def keyset_to_dict(keyset: Keyset, request: HttpRequest) -> Dict[str, Any]:
+    """Transform CORBA keyset keyset to python dictionary."""
+    logging.debug(keyset)
+    events = cast(ObjectEvents, keyset.events)
 
-    if struct is None:
-        result = None
-    else:
-        self_link = request.build_absolute_uri(reverse('keyset-detail', kwargs={"handle": struct.handle}))
+    self_link = request.build_absolute_uri(reverse('keyset-detail', kwargs={"handle": keyset.keyset_handle}))
 
-        result = {
-            "rdapConformance": ["rdap_level_0", "fred_version_0"],
-            "objectClassName": ObjectClassName.KEYSET,
-            "handle": struct.handle,
-            "entities": [
-                {
-                    "objectClassName": ObjectClassName.ENTITY,
-                    "handle": struct.registrar_handle,
-                    "roles": ["registrar"],
-                },
-            ],
-            "events": [
-                {
-                    "eventAction": "registration",
-                    "eventDate": to_rfc3339(struct.created),
-                },
-            ],
+    result: Dict[str, Any] = {
+        "rdapConformance": ["rdap_level_0", "fred_version_0"],
+        "objectClassName": ObjectClassName.KEYSET,
+        "handle": keyset.keyset_handle,
+        "entities": [
+            {
+                "objectClassName": ObjectClassName.ENTITY,
+                "handle": keyset.sponsoring_registrar,
+                "roles": ["registrar"],
+            },
+        ],
+        "events": [
+            {
+                "eventAction": "registration",
+                "eventDate": to_rfc3339(cast(datetime, events.registered.timestamp)),
+            },
+        ],
+        "links": [
+            {
+                "value": self_link,
+                "rel": "self",
+                "href": self_link,
+                "type": "application/rdap+json",
+            },
+        ]
+    }
+    if RDAP_SETTINGS.UNIX_WHOIS:
+        result['port43'] = RDAP_SETTINGS.UNIX_WHOIS
+
+    statuses = KEYSET_CLIENT.get_keyset_state(keyset.keyset_id)
+    result["status"] = rdap_status_mapping(tuple(s for s, f in statuses.items() if f))
+
+    for tech_id in keyset.technical_contacts:
+        contact = CONTACT_CLIENT.get_contact_info(tech_id)
+        tech_link = request.build_absolute_uri(reverse('entity-detail', kwargs={"handle": contact.contact_handle}))
+        result['entities'].append({
+            "objectClassName": ObjectClassName.ENTITY,
+            "handle": contact.contact_handle,
+            "roles": ["technical"],
             "links": [
                 {
-                    "value": self_link,
+                    "value": tech_link,
                     "rel": "self",
-                    "href": self_link,
+                    "href": tech_link,
                     "type": "application/rdap+json",
                 },
-            ]
-        }
-        if RDAP_SETTINGS.UNIX_WHOIS:
-            result['port43'] = RDAP_SETTINGS.UNIX_WHOIS
+            ],
+        })
 
-        status = rdap_status_mapping(struct.statuses)
-        if status:
-            result["status"] = status
+    if events.updated:
+        result['events'].append({
+            "eventAction": "last changed",
+            "eventDate": to_rfc3339(cast(datetime, events.updated.timestamp)),
+        })
+    # transferred is always present, but may not have timestamp.
+    if events.transferred.timestamp:
+        result['events'].append({
+            "eventAction": "transfer",
+            "eventDate": to_rfc3339(events.transferred.timestamp),
+        })
 
-        for tech_c in struct.tech_contact_handles:
-            tech_link = request.build_absolute_uri(reverse('entity-detail', kwargs={"handle": tech_c}))
-            result['entities'].append({
-                "objectClassName": ObjectClassName.ENTITY,
-                "handle": tech_c,
-                "roles": ["technical"],
-                "links": [
-                    {
-                        "value": tech_link,
-                        "rel": "self",
-                        "href": tech_link,
-                        "type": "application/rdap+json",
-                    },
-                ],
+    if keyset.dns_keys:
+        result["dns_keys"] = []
+        for key in keyset.dns_keys:
+            result['dns_keys'].append({
+                "flags": key.flags,
+                "protocol": key.protocol,
+                "algorithm": key.alg,
+                "publicKey": key.key,
             })
-
-        if nonempty(struct.changed):
-            result['events'].append({
-                "eventAction": "last changed",
-                "eventDate": to_rfc3339(struct.changed),
-            })
-        if nonempty(struct.last_transfer):
-            result['events'].append({
-                "eventAction": "transfer",
-                "eventDate": to_rfc3339(struct.last_transfer),
-            })
-
-        if struct.dns_keys:
-            result["dns_keys"] = []
-            for key in struct.dns_keys:
-                result['dns_keys'].append({
-                    "flags": key.flags,
-                    "protocol": key.protocol,
-                    "algorithm": key.alg,
-                    "publicKey": key.public_key,
-                })
 
     logging.debug(result)
     return result
