@@ -20,13 +20,12 @@ from datetime import datetime, timezone
 from unittest.mock import call, patch
 
 from django.test import RequestFactory, SimpleTestCase, override_settings
-from fred_idl.Registry.Whois import OBJECT_DELETE_CANDIDATE
-from regal import Contact, Keyset, Nsset, ObjectEvent, ObjectEvents
-from regal.exceptions import ContactDoesNotExist, KeysetDoesNotExist, NssetDoesNotExist, ObjectDoesNotExist
+from regal import Contact, Domain, Keyset, Nsset, ObjectEvent, ObjectEvents
+from regal.exceptions import (ContactDoesNotExist, DomainDoesNotExist, KeysetDoesNotExist, NssetDoesNotExist,
+                              ObjectDoesNotExist)
 
 from rdap.rdap_rest.whois import (get_contact_by_handle, get_domain_by_handle, get_keyset_by_handle,
                                   get_nameserver_by_handle, get_nsset_by_handle)
-from rdap.utils.corba import WHOIS
 
 
 class TestGetContactByHandle(SimpleTestCase):
@@ -72,25 +71,56 @@ class TestGetContactByHandle(SimpleTestCase):
         self.assertEqual(self.contact_mock.mock_calls, calls)
 
 
+@override_settings(USE_TZ=True)
 class TestGetDomainByHandle(SimpleTestCase):
     def setUp(self):
-        patcher = patch.object(WHOIS, 'client', spec=('get_domain_by_handle', ))
+        patcher = patch('rdap.rdap_rest.whois.DOMAIN_CLIENT', spec=('get_domain_info', 'get_domain_id'))
         self.addCleanup(patcher.stop)
-        patcher.start()
+        self.domain_mock = patcher.start()
+        patcher = patch('rdap.rdap_rest.domain.CONTACT_CLIENT', spec=('get_contact_info', ))
+        self.addCleanup(patcher.stop)
+        self.contact_mock = patcher.start()
+        self.contact_mock.get_contact_info.return_value = Contact(contact_id='2X4B', contact_handle='KRYTEN')
 
-    def test_domain_delete_candidate(self):
-        WHOIS.get_domain_by_handle.side_effect = OBJECT_DELETE_CANDIDATE
+    def test_domain(self):
+        events = ObjectEvents(
+            registered=ObjectEvent(registrar_handle='DIVADROID', timestamp=datetime(1988, 9, 6, tzinfo=timezone.utc)),
+            transferred=ObjectEvent(registrar_handle='QUEEG-500'))
+        domain = Domain(domain_id='2X4B', fqdn='example.org', sponsoring_registrar='HOLLY', events=events,
+                        registrant='KRYTEN', expires_at=datetime(1999, 4, 5, tzinfo=timezone.utc))
+        self.domain_mock.get_domain_id.return_value = '2X4B'
+        self.domain_mock.get_domain_info.return_value = domain
         request = RequestFactory().get('/dummy/')
 
-        response = get_domain_by_handle(request, 'test.example')
+        with patch('rdap.rdap_rest.domain.DOMAIN_CLIENT') as entity_mock:
+            entity_mock.get_domain_state.return_value = {}
+            response = get_domain_by_handle(request, 'example.org')
 
-        self.assertEqual(response['handle'], 'test.example')
+        self.assertEqual(response['handle'], 'example.org')
         self.assertEqual(response['objectClassName'], 'domain')
-        self.assertEqual(response['status'], ['pending delete'])
+        calls = [call.get_domain_id('example.org'), call.get_domain_info('2X4B')]
+        self.assertEqual(self.domain_mock.mock_calls, calls)
 
-        # Check corba calls
-        calls = [call.get_domain_by_handle('test.example')]
-        self.assertEqual(WHOIS.client.mock_calls, calls)
+    def test_domain_not_found(self):
+        self.domain_mock.get_domain_id.return_value = '2X4B'
+        self.domain_mock.get_domain_info.side_effect = DomainDoesNotExist
+        request = RequestFactory().get('/dummy/')
+
+        with self.assertRaises(DomainDoesNotExist):
+            get_domain_by_handle(request, 'example.org')
+
+        calls = [call.get_domain_id('example.org'), call.get_domain_info('2X4B')]
+        self.assertEqual(self.domain_mock.mock_calls, calls)
+
+    def test_domain_id_not_found(self):
+        self.domain_mock.get_domain_id.side_effect = DomainDoesNotExist
+        request = RequestFactory().get('/dummy/')
+
+        with self.assertRaises(DomainDoesNotExist):
+            get_domain_by_handle(request, 'example.org')
+
+        calls = [call.get_domain_id('example.org')]
+        self.assertEqual(self.domain_mock.mock_calls, calls)
 
 
 @override_settings(USE_TZ=True)

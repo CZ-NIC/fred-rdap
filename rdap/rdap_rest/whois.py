@@ -21,14 +21,11 @@ import logging
 from typing import Any, Dict, Optional
 
 from django.http import HttpRequest
-from fred_idl.Registry.Whois import (INVALID_LABEL, OBJECT_DELETE_CANDIDATE, OBJECT_NOT_FOUND, TOO_MANY_LABELS,
-                                     UNMANAGED_ZONE)
 from regal.exceptions import ObjectDoesNotExist
 
-from rdap.exceptions import InvalidHandleError, NotFoundError
-from rdap.utils.corba import CONTACT_CLIENT, KEYSET_CLIENT, NSSET_CLIENT, WHOIS
+from rdap.utils.corba import CONTACT_CLIENT, DOMAIN_CLIENT, KEYSET_CLIENT, NSSET_CLIENT
 
-from .domain import delete_candidate_domain_to_dict, domain_to_dict
+from .domain import domain_to_dict
 from .entity import contact_to_dict
 from .keyset import keyset_to_dict
 from .nameserver import nameserver_to_dict
@@ -44,14 +41,8 @@ def get_contact_by_handle(request: HttpRequest, handle: str) -> Optional[Dict[st
 
 def get_domain_by_handle(request: HttpRequest, handle: str) -> Optional[Dict[str, Any]]:
     logging.debug('get_domain_by_handle: %s', handle)
-    try:
-        return domain_to_dict(request, WHOIS.get_domain_by_handle(handle))
-    except OBJECT_DELETE_CANDIDATE:
-        return delete_candidate_domain_to_dict(request, handle)
-    except (OBJECT_NOT_FOUND, TOO_MANY_LABELS, UNMANAGED_ZONE):
-        raise NotFoundError()
-    except INVALID_LABEL:
-        raise InvalidHandleError()
+    domain = DOMAIN_CLIENT.get_domain_info(DOMAIN_CLIENT.get_domain_id(handle))
+    return domain_to_dict(domain, request)
 
 
 def get_nameserver_by_handle(request: HttpRequest, handle: str) -> Dict[str, Any]:
