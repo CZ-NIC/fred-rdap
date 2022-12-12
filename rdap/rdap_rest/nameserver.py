@@ -18,40 +18,36 @@
 #
 """Wrapper module to whois idl interface."""
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from django.http import HttpRequest
 from django.urls import reverse
-from fred_idl.Registry.Whois import NameServer
 
 from .rdap_utils import ObjectClassName, add_unicode_name
 
 
-def nameserver_to_dict(request: HttpRequest, struct: NameServer) -> Optional[Dict[str, Any]]:
+def nameserver_to_dict(fqdn: str, request: HttpRequest) -> Dict[str, Any]:
     """Transform CORBA nameserver struct to python dictionary."""
-    logging.debug(struct)
+    logging.debug(fqdn)
 
-    if struct is None:
-        result = None
-    else:
-        self_link = request.build_absolute_uri(reverse('nameserver-detail', kwargs={"handle": struct.fqdn}))
+    self_link = request.build_absolute_uri(reverse('nameserver-detail', kwargs={"handle": fqdn}))
 
-        result = {
-            "rdapConformance": ["rdap_level_0"],
-            "objectClassName": ObjectClassName.NAMESERVER,
-            "handle": struct.fqdn,
-            "ldhName": struct.fqdn,
-            "links": [
-                {
-                    "value": self_link,
-                    "rel": "self",
-                    "href": self_link,
-                    "type": "application/rdap+json",
-                },
-            ],
-        }
+    result = {
+        "rdapConformance": ["rdap_level_0"],
+        "objectClassName": ObjectClassName.NAMESERVER,
+        "handle": fqdn,
+        "ldhName": fqdn,
+        "links": [
+            {
+                "value": self_link,
+                "rel": "self",
+                "href": self_link,
+                "type": "application/rdap+json",
+            },
+        ],
+    }
 
-        add_unicode_name(result, struct.fqdn)
+    add_unicode_name(result, fqdn)
 
     logging.debug(result)
     return result

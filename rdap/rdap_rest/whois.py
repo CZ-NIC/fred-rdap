@@ -21,8 +21,9 @@ import logging
 from typing import Any, Dict, Optional
 
 from django.http import HttpRequest
-from fred_idl.Registry.Whois import (INVALID_HANDLE, INVALID_LABEL, OBJECT_DELETE_CANDIDATE, OBJECT_NOT_FOUND,
-                                     TOO_MANY_LABELS, UNMANAGED_ZONE)
+from fred_idl.Registry.Whois import (INVALID_LABEL, OBJECT_DELETE_CANDIDATE, OBJECT_NOT_FOUND, TOO_MANY_LABELS,
+                                     UNMANAGED_ZONE)
+from regal.exceptions import ObjectDoesNotExist
 
 from rdap.exceptions import InvalidHandleError, NotFoundError
 from rdap.utils.corba import CONTACT_CLIENT, KEYSET_CLIENT, NSSET_CLIENT, WHOIS
@@ -53,14 +54,12 @@ def get_domain_by_handle(request: HttpRequest, handle: str) -> Optional[Dict[str
         raise InvalidHandleError()
 
 
-def get_nameserver_by_handle(request: HttpRequest, handle: str) -> Optional[Dict[str, Any]]:
+def get_nameserver_by_handle(request: HttpRequest, handle: str) -> Dict[str, Any]:
     logging.debug('get_nameserver_by_handle: %s', handle)
-    try:
-        return nameserver_to_dict(request, WHOIS.get_nameserver_by_fqdn(handle))
-    except OBJECT_NOT_FOUND:
-        raise NotFoundError()
-    except INVALID_HANDLE:
-        raise InvalidHandleError()
+    if NSSET_CLIENT.check_dns_host(handle):
+        return nameserver_to_dict(handle, request)
+    else:
+        raise ObjectDoesNotExist()
 
 
 def get_nsset_by_handle(request: HttpRequest, handle: str) -> Optional[Dict[str, Any]]:

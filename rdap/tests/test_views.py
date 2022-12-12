@@ -20,7 +20,7 @@ import json
 from unittest.mock import patch
 
 from django.test import Client, SimpleTestCase
-from fred_idl.Registry.Whois import INVALID_LABEL, OBJECT_NOT_FOUND, NameServer
+from fred_idl.Registry.Whois import INVALID_LABEL, OBJECT_NOT_FOUND
 from grill.utils import TestLogEntry, TestLoggerClient
 from omniORB.CORBA import TRANSIENT
 from regal import Contact
@@ -179,9 +179,9 @@ class TestFqdnObjectView(SimpleTestCase):
     """
 
     def setUp(self):
-        patcher = patch.object(WHOIS, 'client', spec=('get_nameserver_by_fqdn', ))
+        patcher = patch('rdap.rdap_rest.whois.NSSET_CLIENT', spec=('check_dns_host', ))
         self.addCleanup(patcher.stop)
-        patcher.start()
+        self.nsset_mock = patcher.start()
 
         self.test_logger = TestLoggerClient()
         log_patcher = patch('rdap.views.LOGGER.client', new=self.test_logger)
@@ -189,7 +189,7 @@ class TestFqdnObjectView(SimpleTestCase):
         log_patcher.start()
 
     def test_nameserver(self):
-        WHOIS.get_nameserver_by_fqdn.return_value = NameServer('holly', [])
+        self.nsset_mock.check_dns_host.return_value = True
         response = self.client.get('/nameserver/holly')
 
         self.assertEqual(response.status_code, 200)
@@ -210,6 +210,7 @@ class TestFqdnObjectView(SimpleTestCase):
         self.assertEqual(response['Content-Type'], 'application/rdap+json')
         self.assertEqual(response.content, b'')
 
+        self.assertEqual(self.nsset_mock.mock_calls, [])
         # Check logger
         self.assertEqual(self.test_logger.mock.mock_calls, [])
 
