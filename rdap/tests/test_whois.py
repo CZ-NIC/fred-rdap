@@ -21,10 +21,10 @@ from unittest.mock import call, patch
 
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from fred_idl.Registry.Whois import OBJECT_DELETE_CANDIDATE
-from regal import Contact, Keyset, ObjectEvent, ObjectEvents
-from regal.exceptions import ContactDoesNotExist, KeysetDoesNotExist
+from regal import Contact, Keyset, Nsset, ObjectEvent, ObjectEvents
+from regal.exceptions import ContactDoesNotExist, KeysetDoesNotExist, NssetDoesNotExist
 
-from rdap.rdap_rest.whois import get_contact_by_handle, get_domain_by_handle, get_keyset_by_handle
+from rdap.rdap_rest.whois import get_contact_by_handle, get_domain_by_handle, get_keyset_by_handle, get_nsset_by_handle
 from rdap.utils.corba import WHOIS
 
 
@@ -137,3 +137,50 @@ class TestGetKeysetByHandle(SimpleTestCase):
 
         calls = [call.get_keyset_id('KRYTEN')]
         self.assertEqual(self.keyset_mock.mock_calls, calls)
+
+
+@override_settings(USE_TZ=True)
+class TestGetNssetByHandle(SimpleTestCase):
+    def setUp(self):
+        patcher = patch('rdap.rdap_rest.whois.NSSET_CLIENT', spec=('get_nsset_info', 'get_nsset_id'))
+        self.addCleanup(patcher.stop)
+        self.nsset_mock = patcher.start()
+
+    def test_nsset(self):
+        events = ObjectEvents(
+            registered=ObjectEvent(registrar_handle='DIVADROID', timestamp=datetime(1988, 9, 6, tzinfo=timezone.utc)),
+            transferred=ObjectEvent(registrar_handle='QUEEG-500'))
+        nsset = Nsset(nsset_id='2X4B', nsset_handle='KRYTEN', sponsoring_registrar='HOLLY', events=events)
+        self.nsset_mock.get_nsset_id.return_value = '2X4B'
+        self.nsset_mock.get_nsset_info.return_value = nsset
+        request = RequestFactory().get('/dummy/')
+
+        with patch('rdap.rdap_rest.nsset.NSSET_CLIENT') as entity_mock:
+            entity_mock.get_nsset_state.return_value = {}
+            response = get_nsset_by_handle(request, 'KRYTEN')
+
+        self.assertEqual(response['handle'], 'KRYTEN')
+        self.assertEqual(response['objectClassName'], 'fred_nsset')
+        calls = [call.get_nsset_id('KRYTEN'), call.get_nsset_info('2X4B')]
+        self.assertEqual(self.nsset_mock.mock_calls, calls)
+
+    def test_nsset_not_found(self):
+        self.nsset_mock.get_nsset_id.return_value = '2X4B'
+        self.nsset_mock.get_nsset_info.side_effect = NssetDoesNotExist
+        request = RequestFactory().get('/dummy/')
+
+        with self.assertRaises(NssetDoesNotExist):
+            get_nsset_by_handle(request, 'KRYTEN')
+
+        calls = [call.get_nsset_id('KRYTEN'), call.get_nsset_info('2X4B')]
+        self.assertEqual(self.nsset_mock.mock_calls, calls)
+
+    def test_nsset_id_not_found(self):
+        self.nsset_mock.get_nsset_id.side_effect = NssetDoesNotExist
+        request = RequestFactory().get('/dummy/')
+
+        with self.assertRaises(NssetDoesNotExist):
+            get_nsset_by_handle(request, 'KRYTEN')
+
+        calls = [call.get_nsset_id('KRYTEN')]
+        self.assertEqual(self.nsset_mock.mock_calls, calls)
