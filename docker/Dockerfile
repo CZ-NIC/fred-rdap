@@ -1,4 +1,4 @@
-ARG PYTHON_VERSION=3.8
+ARG PYTHON_VERSION=3.11
 FROM reg.nic.cz/python/tox:${PYTHON_VERSION}
 RUN apt-get --yes update \
 # Install testing dependencies
