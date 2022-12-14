@@ -34,6 +34,6 @@ class RdapAppConfig(AppConfig):
 
         RDAP_SETTINGS.check()
 
-        LOGGER.client.register_service(LOGGER_SERVICE, handle='rdap_')
+        LOGGER.client.register_service(LOGGER_SERVICE, handle='rdap')
         LOGGER.client.register_log_entry_types(LOGGER_SERVICE, LogEntryType)
         LOGGER.client.register_results(LOGGER_SERVICE, LogResult)

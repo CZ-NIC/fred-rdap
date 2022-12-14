@@ -34,7 +34,7 @@ class RdapAppConfigTest(SimpleTestCase):
             Apps(('rdap.apps.RdapAppConfig', ))  # Trigger `ready`.
 
             self.assertEqual(logger_mock.mock_calls, [
-                call.register_service(LOGGER_SERVICE, handle='rdap_'),
+                call.register_service(LOGGER_SERVICE, handle='rdap'),
                 call.register_log_entry_types(LOGGER_SERVICE, LogEntryType),
                 call.register_results(LOGGER_SERVICE, LogResult),
             ])
