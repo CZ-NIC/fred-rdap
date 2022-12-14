@@ -19,7 +19,6 @@ MIDDLEWARE = ['settings.CorsMiddleware',
               'django.middleware.common.CommonMiddleware']
 ROOT_URLCONF = 'rdap.urls'
 SECRET_KEY = 'SECRET'
-USE_TZ = True
 # Disable logger
 RDAP_LOGGER = 'grill.DummyLoggerClient'
 RDAP_LOGGER_OPTIONS = {}

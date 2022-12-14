@@ -21,15 +21,11 @@ from datetime import datetime
 from typing import Any, Dict, Sequence
 
 import idna
-from django.conf import settings
 from django.utils import timezone
 
 
 def to_rfc3339(dt: datetime) -> str:
     """Format datetime object as in rfc3339 (with stripped microsecond part)."""
-    if timezone.is_aware(dt) and not settings.USE_TZ:
-        raise TypeError("can't compare offset-naive and offset-aware datetimes")
-
     aux = dt.replace(microsecond=0)
 
     if timezone.is_aware(dt):

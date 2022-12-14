@@ -72,8 +72,7 @@ class TestInputFqdnProcessing(SimpleTestCase):
         self.assertRaises(rdap_utils.InvalidIdn, rdap_utils.preprocess_fqdn, 'xn--skvrkl-ňúríkl.example')
 
 
-class TestRfc3339TimestampFormat(SimpleTestCase):
-
+class ToRfc3339Test(SimpleTestCase):
     def test_utc_dt(self):
         dt = datetime(2015, 5, 9, 10, 31, 51)
         with override_settings(TIME_ZONE='UTC', USE_TZ=False):
