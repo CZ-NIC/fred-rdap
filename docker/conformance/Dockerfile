@@ -5,9 +5,6 @@ FROM python:${PYTHON_VERSION}-slim
 RUN apt-get update \
  && apt-get install --yes --no-install-recommends \
     build-essential \
-    # Dependencies of the RDAP & RDAP backend mock.
-    libomniorb4-2 \
-    omniorb-nameserver \
  && rm -rf /var/lib/apt/lists/*
 
 ARG PIP_INDEX_URL=https://pypi.nic.cz/cznic/public

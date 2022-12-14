@@ -25,8 +25,7 @@ from django.http import HttpRequest
 from django.urls import reverse
 from regal import Nsset, ObjectEvents
 
-from rdap.settings import RDAP_SETTINGS
-from rdap.utils.corba import CONTACT_CLIENT, NSSET_CLIENT
+from rdap.settings import CONTACT_CLIENT, NSSET_CLIENT, RDAP_SETTINGS
 
 from .rdap_utils import ObjectClassName, add_unicode_name, rdap_status_mapping, to_rfc3339
 

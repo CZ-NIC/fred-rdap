@@ -18,7 +18,7 @@
 #
 """Utils for translating Corba objects to python dictionary."""
 from datetime import datetime
-from typing import Any, Dict, Optional, Sequence
+from typing import Any, Dict, Sequence
 
 import idna
 from django.conf import settings
@@ -38,10 +38,6 @@ def to_rfc3339(dt: datetime) -> str:
         aux = timezone.make_aware(aux, timezone.get_default_timezone())
 
     return aux.isoformat('T')
-
-
-def nonempty(input: Optional[str]) -> bool:
-    return input is not None and input != ''
 
 
 RDAP_STATUS_MAPPING = {

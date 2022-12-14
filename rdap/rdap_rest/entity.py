@@ -26,8 +26,7 @@ from django.urls import reverse
 from regal import Contact, ObjectEvents
 
 from rdap.constants import ObjectStatus, Publish
-from rdap.settings import RDAP_SETTINGS
-from rdap.utils.corba import CONTACT_CLIENT
+from rdap.settings import CONTACT_CLIENT, RDAP_SETTINGS
 
 from .rdap_utils import ObjectClassName, rdap_status_mapping, to_rfc3339
 
