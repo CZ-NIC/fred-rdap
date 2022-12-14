@@ -48,6 +48,11 @@ image:py310:
     variables:
         PYTHON_VERSION: "3.10"
 
+image:py311:
+    extends: .image
+    variables:
+        PYTHON_VERSION: "3.11"
+
 image:conformance:
     extends: .image
     script:
@@ -68,6 +73,9 @@ image:conformance:
 
 .py310: &py310
     image: "$CI_REGISTRY_IMAGE/tox:3.10"
+
+.py311: &py311
+    image: "$CI_REGISTRY_IMAGE/tox:3.11"
 
 .test: &test
     stage: test
@@ -101,6 +109,11 @@ test:py310:
     <<: *test
     <<: *py310
     needs: ["image:py310"]
+
+test:py311:
+    <<: *test
+    <<: *py311
+    needs: ["image:py311"]
 
 build:
     stage: build
