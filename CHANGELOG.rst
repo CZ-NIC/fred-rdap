@@ -5,6 +5,19 @@ Changelog
 Unreleased
 ----------
 
+2.0.0 (2022-12-14)
+------------------
+
+* Drop Python 3.7 support.
+* Add Python 3.11 support.
+* Drop Django 2.2 support.
+* Add Django 4.1 support.
+* Add logger registrations (#1).
+* Refactor RDAP to use registry backend instead of CORBA (#2, #3, #4, #5, #6, #10).
+* Don't raise error in ``to_rfc3339`` (#7).
+* Update conformance tests (use uwsgi).
+* Update project setup.
+
 1.1.0 (2022-03-02)
 ------------------
 
