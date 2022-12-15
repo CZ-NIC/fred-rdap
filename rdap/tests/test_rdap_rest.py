@@ -47,10 +47,10 @@ class TestDomainToDict(SimpleTestCase):
         patcher = patch('rdap.rdap_rest.domain.DOMAIN_CLIENT', spec=('get_domain_state', ))
         self.addCleanup(patcher.stop)
         self.domain_mock = patcher.start()
-        patcher = patch('rdap.rdap_rest.domain.KEYSET_CLIENT', spec=('get_keyset_id', 'get_keyset_info'))
+        patcher = patch('rdap.rdap_rest.domain.KEYSET_CLIENT', spec=('get_keyset_info', ))
         self.addCleanup(patcher.stop)
         self.keyset_mock = patcher.start()
-        patcher = patch('rdap.rdap_rest.domain.NSSET_CLIENT', spec=('get_nsset_id', 'get_nsset_info'))
+        patcher = patch('rdap.rdap_rest.domain.NSSET_CLIENT', spec=('get_nsset_info', ))
         self.addCleanup(patcher.stop)
         self.nsset_mock = patcher.start()
 
@@ -161,18 +161,16 @@ class TestDomainToDict(SimpleTestCase):
 
     def test_nsset_empty(self):
         nsset = Nsset(nsset_id='ID-EXAMPLE', nsset_handle='EXAMPLE')
-        self.nsset_mock.get_nsset_id.return_value = 'ID-EXAMPLE'
         self.nsset_mock.get_nsset_info.return_value = nsset
         nsset_link = 'http://rdap.example/fred_nsset/EXAMPLE'
         nsset_data = {
             "objectClassName": ObjectClassName.NSSET, 'handle': 'EXAMPLE', 'nameservers': [],
             'links': [{'value': nsset_link, 'rel': 'self', 'href': nsset_link, 'type': 'application/rdap+json'}]}
-        self._test_simple({'nsset': 'EXAMPLE'}, {'nameservers': [], 'fred_nsset': nsset_data})
+        self._test_simple({'nsset': 'ID-EXAMPLE'}, {'nameservers': [], 'fred_nsset': nsset_data})
 
     def test_nsset_empty_host(self):
         nsset = Nsset(nsset_id='ID-EXAMPLE', nsset_handle='EXAMPLE',
                       dns_hosts=[DnsHost(fqdn='ns.example.org', ip_addresses=[])])
-        self.nsset_mock.get_nsset_id.return_value = 'ID-EXAMPLE'
         self.nsset_mock.get_nsset_info.return_value = nsset
         link = 'http://rdap.example/nameserver/ns.example.org'
         ns = {"objectClassName": ObjectClassName.NAMESERVER, 'handle': 'ns.example.org', 'ldhName': 'ns.example.org',
@@ -181,12 +179,11 @@ class TestDomainToDict(SimpleTestCase):
         nsset_data = {
             "objectClassName": ObjectClassName.NSSET, 'handle': 'EXAMPLE', 'nameservers': [ns],
             'links': [{'value': nsset_link, 'rel': 'self', 'href': nsset_link, 'type': 'application/rdap+json'}]}
-        self._test_simple({'nsset': 'EXAMPLE'}, {'nameservers': [ns], 'fred_nsset': nsset_data})
+        self._test_simple({'nsset': 'ID-EXAMPLE'}, {'nameservers': [ns], 'fred_nsset': nsset_data})
 
     def test_nameserver_ipv4(self):
         nsset = Nsset(nsset_id='ID-EXAMPLE', nsset_handle='EXAMPLE',
                       dns_hosts=[DnsHost(fqdn='ns.example.org', ip_addresses=[IPv4Address('127.0.0.1')])])
-        self.nsset_mock.get_nsset_id.return_value = 'ID-EXAMPLE'
         self.nsset_mock.get_nsset_info.return_value = nsset
         link = 'http://rdap.example/nameserver/ns.example.org'
         ns = {"objectClassName": ObjectClassName.NAMESERVER, 'handle': 'ns.example.org', 'ldhName': 'ns.example.org',
@@ -196,12 +193,11 @@ class TestDomainToDict(SimpleTestCase):
         nsset_data = {
             "objectClassName": ObjectClassName.NSSET, 'handle': 'EXAMPLE', 'nameservers': [ns],
             'links': [{'value': nsset_link, 'rel': 'self', 'href': nsset_link, 'type': 'application/rdap+json'}]}
-        self._test_simple({'nsset': 'EXAMPLE'}, {'nameservers': [ns], 'fred_nsset': nsset_data})
+        self._test_simple({'nsset': 'ID-EXAMPLE'}, {'nameservers': [ns], 'fred_nsset': nsset_data})
 
     def test_nameserver_ipv6(self):
         nsset = Nsset(nsset_id='ID-EXAMPLE', nsset_handle='EXAMPLE',
                       dns_hosts=[DnsHost(fqdn='ns.example.org', ip_addresses=[IPv6Address('::1')])])
-        self.nsset_mock.get_nsset_id.return_value = 'ID-EXAMPLE'
         self.nsset_mock.get_nsset_info.return_value = nsset
         link = 'http://rdap.example/nameserver/ns.example.org'
         ns = {"objectClassName": ObjectClassName.NAMESERVER, 'handle': 'ns.example.org', 'ldhName': 'ns.example.org',
@@ -211,11 +207,10 @@ class TestDomainToDict(SimpleTestCase):
         nsset_data = {
             "objectClassName": ObjectClassName.NSSET, 'handle': 'EXAMPLE', 'nameservers': [ns],
             'links': [{'value': nsset_link, 'rel': 'self', 'href': nsset_link, 'type': 'application/rdap+json'}]}
-        self._test_simple({'nsset': 'EXAMPLE'}, {'nameservers': [ns], 'fred_nsset': nsset_data})
+        self._test_simple({'nsset': 'ID-EXAMPLE'}, {'nameservers': [ns], 'fred_nsset': nsset_data})
 
     def test_keyset_empty(self):
         keyset = Keyset(keyset_id='ID-EXAMPLE', keyset_handle='EXAMPLE')
-        self.keyset_mock.get_keyset_id.return_value = 'ID-EXAMPLE'
         self.keyset_mock.get_keyset_info.return_value = keyset
         keyset_link = 'http://rdap.example/fred_keyset/EXAMPLE'
         keyset_data = {
@@ -223,11 +218,10 @@ class TestDomainToDict(SimpleTestCase):
             'links': [{'value': keyset_link, 'rel': 'self', 'href': keyset_link, 'type': 'application/rdap+json'}]}
         data = {'secureDNS': {'zoneSigned': True, 'delegationSigned': True, 'keyData': []},
                 'fred_keyset': keyset_data}
-        self._test_simple({'keyset': 'EXAMPLE'}, data)
+        self._test_simple({'keyset': 'ID-EXAMPLE'}, data)
 
     def test_keyset_max_sig_life(self):
         keyset = Keyset(keyset_id='ID-EXAMPLE', keyset_handle='EXAMPLE')
-        self.keyset_mock.get_keyset_id.return_value = 'ID-EXAMPLE'
         self.keyset_mock.get_keyset_info.return_value = keyset
         keyset_link = 'http://rdap.example/fred_keyset/EXAMPLE'
         keyset_data = {
@@ -236,12 +230,11 @@ class TestDomainToDict(SimpleTestCase):
         data = {'secureDNS': {'zoneSigned': True, 'delegationSigned': True, 'keyData': [], 'maxSigLife': 42},
                 'fred_keyset': keyset_data}
         with override_settings(RDAP_MAX_SIG_LIFE=42):
-            self._test_simple({'keyset': 'EXAMPLE'}, data)
+            self._test_simple({'keyset': 'ID-EXAMPLE'}, data)
 
     def test_keyset_dnskey(self):
         keyset = Keyset(keyset_id='ID-EXAMPLE', keyset_handle='EXAMPLE',
                         dns_keys=[DnsKey(flags=42, protocol=3, alg=-15, key='Gazpacho!')])
-        self.keyset_mock.get_keyset_id.return_value = 'ID-EXAMPLE'
         self.keyset_mock.get_keyset_info.return_value = keyset
         key = {'flags': 42, 'protocol': 3, 'algorithm': -15, 'publicKey': 'Gazpacho!'}
         keyset_link = 'http://rdap.example/fred_keyset/EXAMPLE'
@@ -250,7 +243,7 @@ class TestDomainToDict(SimpleTestCase):
             'links': [{'value': keyset_link, 'rel': 'self', 'href': keyset_link, 'type': 'application/rdap+json'}]}
         data = {'secureDNS': {'zoneSigned': True, 'delegationSigned': True, 'keyData': [key]},
                 'fred_keyset': keyset_data}
-        self._test_simple({'keyset': 'EXAMPLE'}, data)
+        self._test_simple({'keyset': 'ID-EXAMPLE'}, data)
 
 
 @override_settings(ALLOWED_HOSTS=['rdap.example'], RDAP_UNIX_WHOIS=None)

@@ -135,7 +135,7 @@ def domain_to_dict(domain: Domain, request: HttpRequest) -> Dict[str, Any]:
             })
 
         if domain.nsset:
-            nsset = NSSET_CLIENT.get_nsset_info(NSSET_CLIENT.get_nsset_id(domain.nsset))
+            nsset = NSSET_CLIENT.get_nsset_info(domain.nsset)
 
             nsset_link = request.build_absolute_uri(reverse('nsset-detail', kwargs={"handle": nsset.nsset_handle}))
             result["nameservers"] = []
@@ -182,7 +182,7 @@ def domain_to_dict(domain: Domain, request: HttpRequest) -> Dict[str, Any]:
                 result['fred_nsset']['nameservers'].append(ns_obj)
 
         if domain.keyset:
-            keyset = KEYSET_CLIENT.get_keyset_info(KEYSET_CLIENT.get_keyset_id(domain.keyset))
+            keyset = KEYSET_CLIENT.get_keyset_info(domain.keyset)
 
             result["secureDNS"] = {
                 "zoneSigned": True,
